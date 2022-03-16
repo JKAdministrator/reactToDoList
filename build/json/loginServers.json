@@ -1,0 +1,38 @@
+{
+  "servers": [
+    {
+      "id": "S1",
+      "name": "DATABASE 1",
+      "databases": [
+        { "id": "D1", "name": "DATABASE 1", "default": false },
+        { "id": "D2", "name": "DATABASE 2", "default": true },
+        { "id": "D3", "name": "DATABASE 3", "default": false }
+      ],
+      "default": false
+    },
+    {
+      "id": "S2",
+      "name": "DATABASE 2",
+      "databases": [
+        { "id": "D4", "name": "DATABASE 4", "default": false },
+        { "id": "D5", "name": "DATABASE 5", "default": true },
+        { "id": "D6", "name": "DATABASE 6", "default": false }
+      ],
+      "default": false
+    },
+    {
+      "id": "S3",
+      "name": "DATABASE 3",
+      "databases": [
+        { "id": "D7", "name": "DATABASE 7", "default": false },
+        { "id": "D8", "name": "DATABASE 8", "default": false },
+        { "id": "D9", "name": "DATABASE 9", "default": false }
+      ],
+      "default": true
+    }
+  ],
+  "defaults": {
+    "server": "S3",
+    "database": "D9"
+  }
+}
