@@ -2,33 +2,30 @@
   "servers": [
     {
       "id": "S1",
-      "name": "DATABASE 1",
+      "name": "SERVER 1",
       "databases": [
-        { "id": "D1", "name": "DATABASE 1", "default": false },
-        { "id": "D2", "name": "DATABASE 2", "default": true },
-        { "id": "D3", "name": "DATABASE 3", "default": false }
-      ],
-      "default": false
+        { "id": "D1", "name": "DATABASE 1" },
+        { "id": "D2", "name": "DATABASE 2" },
+        { "id": "D3", "name": "DATABASE 3" }
+      ]
     },
     {
       "id": "S2",
-      "name": "DATABASE 2",
+      "name": "SERVER 2",
       "databases": [
-        { "id": "D4", "name": "DATABASE 4", "default": false },
-        { "id": "D5", "name": "DATABASE 5", "default": true },
-        { "id": "D6", "name": "DATABASE 6", "default": false }
-      ],
-      "default": false
+        { "id": "D4", "name": "DATABASE 4" },
+        { "id": "D5", "name": "DATABASE 5" },
+        { "id": "D6", "name": "DATABASE 6" }
+      ]
     },
     {
       "id": "S3",
-      "name": "DATABASE 3",
+      "name": "SERVER 3",
       "databases": [
-        { "id": "D7", "name": "DATABASE 7", "default": false },
-        { "id": "D8", "name": "DATABASE 8", "default": false },
-        { "id": "D9", "name": "DATABASE 9", "default": false }
-      ],
-      "default": true
+        { "id": "D7", "name": "DATABASE 7" },
+        { "id": "D8", "name": "DATABASE 8" },
+        { "id": "D9", "name": "DATABASE 9" }
+      ]
     }
   ],
   "defaults": {
