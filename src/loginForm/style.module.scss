@@ -12,11 +12,14 @@
     "passwordLabel passwordInput"
     "serverLabel serverInput"
     "databaseLabel databaseInput"
+    "loginResponse loginResponse"
     "loginButton loginButton"
-    "forgotButton signupButton";
+    "forgotButton signupButton"
+    "orSeparator orSeparator"
+    "googleButton googleButton";
   gap: 1rem;
   grid-template-columns: max-content 1fr;
-  grid-template-rows: repeat(6, max-content);
+  grid-template-rows: repeat(11, max-content);
   align-items: center;
   justify-content: center;
   background-color: var(--background-color-card);
@@ -25,7 +28,7 @@
   position: relative;
   align-self: center;
   margin-top: 5rem;
-
+  box-shadow: 0 1px 2px 0 rgb(60 64 67 / 30%), 0 1px 3px 1px rgb(60 64 67 / 15%);
   > h1 {
     grid-area: title;
     width: 100%;
@@ -48,6 +51,18 @@
     }
     &[for="database"] {
       grid-area: databaseLabel;
+    }
+  }
+  > div[name="orSeparator"] {
+    grid-area: orSeparator;
+    height: max-content;
+    width: 100%;
+    display: flex;
+    flex-flow: row;
+    align-items: center;
+    justify-content: center;
+    > span {
+      color: grey;
     }
   }
   > select {
@@ -86,6 +101,16 @@
     &[name="forgot"] {
       grid-area: forgotButton;
     }
+    &[name="google"] {
+      grid-area: googleButton;
+    }
+  }
+  > span[name="loginResponse"] {
+    grid-area: loginResponse;
+    width: 100%;
+    height: max-content;
+    background-color: transparent;
+    color: red;
   }
 }
 .primaryButton {
@@ -142,4 +167,15 @@
     object-fit: scale-down;
     object-position: center;
   }
+}
+
+.line {
+  height: max-content;
+  border-top: 1px solid grey;
+  width: 100%;
+}
+.text {
+  width: max-content;
+  height: max-content;
+  padding: 0.5rem;
 }

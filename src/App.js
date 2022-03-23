@@ -1,37 +1,50 @@
-import "./App.scss";
+import style from "./App.module.scss";
 import React, { useEffect, useState } from "react";
 import LoginForm from "./loginForm";
-import { initializeApp } from "firebase/app";
-import { getAnalytics } from "firebase/analytics";
+import { AppProvider, useAppContext } from "./context/appContext";
+import LoaderAnimation from "./loaderAnimation";
+import { getAuth, getRedirectResult, GoogleAuthProvider } from "firebase/auth";
 
-const firebaseConfig = {
-  apiKey: "AIzaSyDrujrTxfK2k8YgMgkB4qfLa2d5vY8361U",
-  authDomain: "reactapptesting-4bfbb.firebaseapp.com",
-  projectId: "reactapptesting-4bfbb",
-  storageBucket: "reactapptesting-4bfbb.appspot.com",
-  messagingSenderId: "269724904392",
-  appId: "1:269724904392:web:093f1388cb2a90e2772efd",
-  measurementId: "G-6MWE2KNEEG",
-};
+// el React context es un objeto
+// tiene 2 partes "provider" y "consumer"
+export const AppContext = React.createContext();
 
-const app = initializeApp(firebaseConfig);
-const analytics = getAnalytics(app);
+//envolvemos la app dentro del proveedor
+//de esa forma cuando se crea la app lo hace dandole el proveedor a todos sus hijos
+export default () => (
+  <AppProvider>
+    <App></App>
+  </AppProvider>
+);
 
 function App() {
-  const [theme, setTheme] = useState("ligth");
-  console.log("theme", theme);
-  console.log("app", app);
-  console.log("analytics", analytics);
-  useEffect(() => {
-    document.body.classList.remove("dark");
-    document.body.classList.remove("light");
-    document.body.classList.add(theme);
-  }, [theme]);
+  const { firebaseConnectionState, firebaseConnectionStateError } =
+    useAppContext();
+  //la salida debe especificar el valor inicial del proveedor (objeto vacio)
   return (
-    <>
-      <LoginForm name="loginForm"></LoginForm>
-    </>
+    <AppContext.Provider value={{}}>
+      {firebaseConnectionState === "READY" ? (
+        <LoginForm name="loginForm"></LoginForm>
+      ) : (
+        <></>
+      )}
+      {firebaseConnectionState === "LOADING" ? (
+        <>
+          <div className={style.loader}>
+            <LoaderAnimation />
+          </div>
+        </>
+      ) : (
+        <></>
+      )}
+      {firebaseConnectionState === "ERROR" ? (
+        <>
+          <span>error:</span>
+          <span>{firebaseConnectionStateError}</span>
+        </>
+      ) : (
+        <></>
+      )}
+    </AppContext.Provider>
   );
 }
-
-export default App;

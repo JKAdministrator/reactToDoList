@@ -1,3 +1,12 @@
+# Upload to git
+
+git commit
+git push -u origin main
+
+# deploy a firebase
+
+firebase deploy
+
 # Getting Started with Create React App
 
 This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).

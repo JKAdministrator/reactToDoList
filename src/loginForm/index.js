@@ -1,63 +1,112 @@
 import React, { useEffect, useState } from "react";
 import LoaderAnimation from "../loaderAnimation";
 import style from "./style.module.scss";
-
-class LoginFormState {
-  static get READY() {
-    return "READY";
-  }
-  static get LOADING() {
-    return "LOADING";
-  }
-  static get ERROR() {
-    return "ERROR";
-  }
-}
+import { useAppContext } from "../context/appContext";
+import FatalErrorComponent from "../fatalErrorComponent";
+import GoogleLoginButton from "../googleLoginButton";
+import { getAuth, signInWithEmailAndPassword } from "firebase/auth";
 
 const LoginForm = (props) => {
   //variables de estado
+  const { firebaseHttpsCallableFunctions, firebaseLoginFuncions } =
+    useAppContext();
+
   const [stateData, setStateData] = useState({
     username: props.username || "",
     password: props.password || "",
-    state: LoginFormState.LOADING,
+    state: "INITIAL_LOADING",
+    stateErrorMessage: "",
     servers: "",
     server: props.server || "",
     database: props.database || "",
     isUsernameMissing: false,
     isPasswordMissing: false,
+    loginResponseMessage: "",
   });
 
   //funcion para obtener la lista de servidores y bases de datos
-  const gerServers = async () => {
-    const response = await fetch("./json/loginServers.json");
-    const data = await response.json();
-    return data;
+  const getDatabases = async () => {
+    let response, defaultServer, defaultDatabase;
+    try {
+      response = await firebaseHttpsCallableFunctions.getDatabases();
+      defaultServer = response.data.servers.find(
+        (server) => server.id === response.data.defaults.server
+      );
+      defaultDatabase = defaultServer.databases.find(
+        (database) => database.id === response.data.defaults.database
+      );
+    } catch (e) {
+      throw e.toString();
+    }
+    return { servers: response.data.servers, defaultServer, defaultDatabase };
+  };
+
+  const loginWithEmailAndPassword = async (username, password) => {
+    try {
+      let user = await firebaseLoginFuncions.signInWithEmailAndPassword(
+        username,
+        password
+      );
+      return user;
+    } catch (e) {
+      throw e.message;
+    }
   };
 
   //ejecucion inicial
   useEffect(() => {
+    switch (stateData.state) {
+      case "AWAIT_LOGIN_RESPONSE": {
+        loginWithEmailAndPassword(stateData.username, stateData.password)
+          .then((result) => {
+            console.log("LOGIN WITH USERNAME AND PASSWORD SUCCESS!!!", {
+              result,
+            });
+          })
+          .catch((e) => {
+            setStateData((_prevData) => {
+              return {
+                ..._prevData,
+                state: "READY",
+                loginResponseMessage: e.toString(),
+              };
+            });
+          });
+        break;
+      }
+      case "INITIAL_LOADING": {
+        getDatabases()
+          .then((data) => {
+            //coloca el servidor y base de datos default
+            setStateData((_prevData) => {
+              console.log(data);
+              return {
+                ..._prevData,
+                servers: data.servers,
+                server: data.defaultServer,
+                database: data.defaultDatabase,
+                state: "READY",
+                stateErrorMessage: "",
+              };
+            });
+          })
+          .catch((e) => {
+            setStateData((_prevData) => {
+              return {
+                ..._prevData,
+                state: "ERROR",
+                stateErrorMessage: e.toString(),
+              };
+            });
+          });
+        break;
+      }
+      default:
+        break;
+    }
+
     //foco en el campo actual, empezando por el username
-    gerServers().then((data) => {
-      let defaultServer = data.servers.find(
-        (server) => server.id === data.defaults.server
-      );
-
-      let defaultDatabase = defaultServer.databases.find(
-        (database) => database.id === data.defaults.database
-      );
-
-      //coloca el servidor y base de datos default
-      setStateData((_prevData) => {
-        return {
-          ..._prevData,
-          servers: data.servers,
-          server: defaultServer,
-          database: defaultDatabase,
-          state: LoginFormState.READY,
-        };
-      });
-    });
-  }, []);
+  }, [stateData.state]);
 
   // graba el nuevo estado del componente cuando se detecta un cambio en algun input
   const changeHandler = (e) => {
@@ -102,7 +151,7 @@ const LoginForm = (props) => {
         ...stateData,
         isPasswordMissing,
         isUsernameMissing,
-        state: LoginFormState.LOADING,
+        state: "AWAIT_LOGIN_RESPONSE",
       });
       return;
     }
@@ -129,12 +178,11 @@ const LoginForm = (props) => {
             className="clientLogo"
           />
         </div>
-
-        {stateData.state === LoginFormState.READY ? (
+        {stateData.state === "READY" ? (
           <>
             <h1>LOGIN</h1>
             <label htmlFor="username" className={style.label}>
-              Username :
+              Email :
             </label>
             <input
               type="text"
@@ -190,6 +238,7 @@ const LoginForm = (props) => {
                 );
               })}
             </select>
+            <span name="loginResponse">{stateData.loginResponseMessage}</span>
             <button
               type="button"
               className={style.primaryButton}
@@ -212,15 +261,33 @@ const LoginForm = (props) => {
             >
               Sign Up
             </button>
+            <div name="orSeparator">
+              <span className={style.line}></span>
+              <span className={style.text}>OR</span>
+              <span className={style.line}></span>
+            </div>
+            <GoogleLoginButton
+              className={style.socialNetworkButton}
+            ></GoogleLoginButton>
           </>
         ) : (
           <></>
         )}
-        {stateData.state === LoginFormState.LOADING ? (
+        {stateData.state === "INITIAL_LOADING" ||
+        stateData.state === "AWAIT_LOGIN_RESPONSE" ? (
           <>
             <div className={style.loader}>
               <LoaderAnimation />
             </div>
+          </>
+        ) : (
+          <></>
+        )}
+        {stateData.state === "ERROR" ? (
+          <>
+            <FatalErrorComponent
+              mensaje={stateData.stateErrorMessage}
+            ></FatalErrorComponent>
           </>
         ) : (
           <></>
