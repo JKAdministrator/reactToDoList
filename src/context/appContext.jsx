@@ -29,17 +29,23 @@ export function AppProvider(props) {
     firebaseCurrentUser: {},
     isUserLoguedIn: false,
     setTheme: () => {},
-    language: "es",
+    language: "",
     setLanguage: () => {},
+    languages: {},
+    getString: () => {},
   });
 
-  console.log("appContextData", { appContextData });
-
-  const getFirebaseCredentilsData = async () => {
+  const getFiles = async () => {
     try {
-      let response = await fetch("./json/firebasePublicCredentials.json");
-      let data = await response.json();
-      return data;
+      let responses = await Promise.all([
+        fetch("./json/firebasePublicCredentials.json"),
+        fetch("./json/languages.json"),
+      ]);
+      let dataObjects = await Promise.all([
+        responses[0].json(),
+        responses[1].json(),
+      ]);
+      return { firebase: dataObjects[0], languages: dataObjects[1] };
     } catch (e) {
       throw e.toString();
     }
@@ -64,17 +70,16 @@ export function AppProvider(props) {
   };
 
   useEffect(() => {
-    getFirebaseCredentilsData()
-      .then(async (firebaseCredentials) => {
+    getFiles()
+      .then(async (result) => {
         let app,
           functions,
           httpsCallableFunctions = {},
           user = {},
           firebaseLoginFuncions = {};
-
         // connect to firebase and get cloud functions
         try {
-          app = initializeApp(firebaseCredentials);
+          app = initializeApp(result.firebase);
           functions = getFunctions(app);
           if (useEmulator)
             connectFunctionsEmulator(functions, "localhost", 5001);
@@ -111,7 +116,6 @@ export function AppProvider(props) {
           const auth = getAuth();
           try {
             await signOut(auth);
-            console.log("firebase.signOut()");
             setAppContextData((prevProps) => {
               return {
                 ...prevProps,
@@ -130,29 +134,16 @@ export function AppProvider(props) {
         try {
           let auth = getAuth();
           let redirectResult = await getRedirectResult(auth);
-          // This gives you a Google Access Token. You can use it to access Google APIs.
-          //let credential = GoogleAuthProvider.credentialFromResult(redirectResult);
-          //let token = credential.accessToken;
-          // The signed-in user info.
           user = redirectResult.user;
           isUserLoguedIn = true;
-          console.log("usuario logueado", { usuario: user });
         } catch (e) {
-          let errorCode = e.code;
-          errorMessage = e.message;
-          // The email of the user's account used.
-          //let email = e.email;
-          // The AuthCredential type that was used.
-          let loginCredential = GoogleAuthProvider.credentialFromError(e);
-          console.log(
-            "loginCredential",
-            loginCredential,
-            errorCode,
-            errorMessage
-          );
+          //let errorCode = e.code;
+          //errorMessage = e.message;
+          //let loginCredential = GoogleAuthProvider.credentialFromError(e);
           errorMessage = "";
           isUserLoguedIn = false;
         }
+
         setAppContextData((prevProps) => {
           return {
             ...prevProps,
@@ -166,11 +157,14 @@ export function AppProvider(props) {
             isUserLoguedIn: isUserLoguedIn,
             setTheme: setTheme,
             setLanguage: setLanguage,
+            languages: result.languages.languages,
+            language: "es",
+            theme: "light",
           };
         });
       })
       .catch((e) => {
-        console.log("e", e.toString());
+        console.log("error", { e });
         setAppContextData((prevProps) => {
           return {
             ...prevProps,
@@ -190,23 +184,31 @@ export function AppProvider(props) {
   // este es el valor retornado por el provider al componente interesado en escuchar al proveedor
   // use memo permite que React guarde el objeto retornado salvo que las propiedades en [] cambien
   const value = useMemo(() => {
-    return {
-      firebaseConnectionState: appContextData.firebaseConnectionState,
-      firebaseConnectionStateError: appContextData.firebaseConnectionStateError,
-      firebaseHttpsCallableFunctions:
-        appContextData.firebaseHttpsCallableFunctions,
-      theme: appContextData.theme,
-      firebaseLoginFuncions: appContextData.firebaseLoginFuncions,
-      firebaseCurrentUser: appContextData.firebaseCurrentUser,
-      setTheme: appContextData.setTheme,
+    let getLanguageString = (componentName, stringName) => {
+      if (appContextData.languages.length > 0) {
+        let language = appContextData.languages.find((element) => {
+          return appContextData.language === element.id;
+        });
+        let component = language.components.find((component) => {
+          return componentName === component.id;
+        });
+        let string = component.strings[stringName];
+        return string;
+      } else {
+        return "NaStr";
+      }
     };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+
+    return {
+      ...appContextData,
+      getLanguageString: getLanguageString,
+    };
   }, [
     appContextData.firebaseConnectionState,
-    appContextData.theme,
     appContextData.firebaseConnectionStateError,
-    appContextData.firebaseLoginFuncions,
     appContextData.firebaseCurrentUser,
+    appContextData.theme,
+    appContextData.language,
   ]);
 
   return <AppContext.Provider value={value} {...props}></AppContext.Provider>;

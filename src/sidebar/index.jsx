@@ -2,28 +2,34 @@ import React, { useState } from "react";
 import style from "./style.module.scss";
 import { useAppContext } from "../context/appContext";
 const Sidebar = ({ onSectionChangeCallback }) => {
+  const { firebaseLoginFuncions, getLanguageString } = useAppContext();
+
+  const getString = (string) => {
+    return getLanguageString("sidebar", string);
+  };
+
   const options = [
     {
       iconSrc: "./icons/sidebar/configuration.png",
-      label: "Configuration",
+      label: "configuration",
       code: "CONFIGURATION",
       childOf: "",
     },
     {
       iconSrc: "./icons/sidebar/security.png",
-      label: "Security",
+      label: "security",
       code: "SECURITY",
       childOf: "",
     },
     {
       iconSrc: "./icons/sidebar/users.png",
-      label: "Users",
+      label: "users",
       code: "USERS",
       childOf: "SECURITY",
     },
     {
       iconSrc: "./icons/sidebar/groups.png",
-      label: "Groups",
+      label: "groups",
       code: "GROUPS",
       childOf: "SECURITY",
     },
@@ -33,7 +39,6 @@ const Sidebar = ({ onSectionChangeCallback }) => {
     openOptions: [],
   });
 
-  const { firebaseLoginFuncions } = useAppContext();
   function renderOption(option) {
     const childs = options.filter((_option) => {
       return _option.childOf === option.code;
@@ -50,11 +55,11 @@ const Sidebar = ({ onSectionChangeCallback }) => {
         <button type="button" onClick={handleClick}>
           <img
             src={option.iconSrc}
-            alt={option.label}
+            alt={getString(option.label)}
             className="icon"
             name="optionIcon"
           />
-          <label>{option.label}</label>
+          <label>{getString(option.label)}</label>
           {childs.length > 0 ? (
             <img
               src={
@@ -133,11 +138,11 @@ const Sidebar = ({ onSectionChangeCallback }) => {
         <button type="button" onClick={handleClickLogout}>
           <img
             src="./icons/sidebar/logout.png"
-            alt="Logout"
+            alt={getString("logout")}
             className="icon"
             name="optionIcon"
           />
-          <label>Logout</label>
+          <label>{getString("logout")}</label>
         </button>
       </li>
     </ul>

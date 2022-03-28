@@ -1,14 +1,17 @@
 import React, { useEffect, useState } from "react";
 import LoaderAnimation from "../loaderAnimation";
 import style from "./style.module.scss";
-import { useAppContext } from "../context/appContext";
+import { AppProvider, useAppContext } from "../context/appContext";
 import FatalErrorComponent from "../fatalErrorComponent";
 import GoogleLoginButton from "../googleLoginButton";
 
 const LoginForm = (props) => {
   //variables de estado
-  const { firebaseHttpsCallableFunctions, firebaseLoginFuncions } =
-    useAppContext();
+  const {
+    firebaseHttpsCallableFunctions,
+    firebaseLoginFuncions,
+    getLanguageString,
+  } = useAppContext();
 
   const [stateData, setStateData] = useState({
     username: props.username || "",
@@ -78,7 +81,6 @@ const LoginForm = (props) => {
           .then((data) => {
             //coloca el servidor y base de datos default
             setStateData((_prevData) => {
-              console.log(data);
               return {
                 ..._prevData,
                 servers: data.servers,
@@ -156,6 +158,10 @@ const LoginForm = (props) => {
     }
   };
 
+  const getString = (string) => {
+    return getLanguageString("loginForm", string);
+  };
+
   //html retornado
   return (
     <form
@@ -178,9 +184,9 @@ const LoginForm = (props) => {
       </div>
       {stateData.state === "READY" ? (
         <>
-          <h1>LOGIN</h1>
+          <h1>{getString("title")}</h1>
           <label htmlFor="username" className={style.label}>
-            Email :
+            {getString("email")} :
           </label>
           <input
             type="text"
@@ -193,7 +199,7 @@ const LoginForm = (props) => {
             className={`${stateData.isUsernameMissing ? "error" : ""}`}
           />
           <label htmlFor="password" className={style.label}>
-            Password :
+            {getString("password")} :
           </label>
           <input
             type="password"
@@ -204,7 +210,7 @@ const LoginForm = (props) => {
             required
             className={`${stateData.isPasswordMissing ? "error" : ""}`}
           />
-          <label htmlFor="server">Server :</label>
+          <label htmlFor="server">{getString("server")} :</label>
           <select
             name="server"
             id="server"
@@ -220,7 +226,7 @@ const LoginForm = (props) => {
               );
             })}
           </select>
-          <label htmlFor="database">Database :</label>
+          <label htmlFor="database">{getString("database")} :</label>
           <select
             name="database"
             id="database"
@@ -243,7 +249,7 @@ const LoginForm = (props) => {
             onClick={handleSubmit}
             name="login"
           >
-            LOGIN
+            {getString("login")}
           </button>
 
           <div className={style.secondaryButtons}>
@@ -252,20 +258,20 @@ const LoginForm = (props) => {
               className={style.secondaryButton}
               name="forgot"
             >
-              Forgot Password?
+              {getString("forgot")}
             </button>
             <button
               type="button"
               className={style.secondaryButton}
               name="signup"
             >
-              Sign Up
+              {getString("signup")}
             </button>
           </div>
 
           <div name="orSeparator">
             <span className={style.line}></span>
-            <span className={style.text}>OR</span>
+            <span className={style.text}>{getString("or")}</span>
             <span className={style.line}></span>
           </div>
           <GoogleLoginButton

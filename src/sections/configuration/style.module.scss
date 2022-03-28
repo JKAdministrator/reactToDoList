@@ -52,5 +52,77 @@
         grid-area: inputLanguage;
       }
     }
+    &[name="ACCES_ACCOUNTS"] {
+      display: flex;
+      flex-flow: column;
+      align-items: flex-start;
+      justify-content: flex-start;
+      > section {
+        border: 1px solid var(--border-color-input);
+        padding: 1rem;
+        border-radius: var(--border-radius);
+        width: calc(100% - 2rem);
+
+        > h3 {
+          opacity: 0.9;
+          font-weight: 100;
+        }
+        &[name="USERNAME_AND_PASSWORD"] {
+          display: grid;
+          grid-template-areas: "title title" "labelUsername inputUsername" "labelPassword inputPassword";
+          grid-template-columns: max-content 1fr;
+          grid-template-rows: repeat(2, max-content);
+          gap: 0.5rem;
+          > h3 {
+            grid-area: title;
+          }
+          > label[for="username"] {
+            grid-area: labelUsername;
+          }
+          > label[for="password"] {
+            grid-area: labelPassword;
+          }
+          > input[name="username"] {
+            border: none;
+            grid-area: inputUsername;
+            background-color: transparent;
+          }
+          > input[name="password"] {
+            border: none !important;
+            grid-area: inputPassword;
+            background-color: transparent;
+          }
+        }
+        &[name="GOOGLE"] {
+          display: grid;
+          grid-template-areas: "title title" "usrImage googleDisplayName" "usrImage googleEmail";
+          grid-template-rows: repeat(3, max-content);
+          grid-template-columns: 4rem 1fr;
+          gap: 0.5rem;
+          > h3 {
+            grid-area: title;
+          }
+          > img {
+            grid-area: usrImage;
+            border-radius: 50%;
+            width: 100%;
+            height: 100%;
+            object-fit: scale-down;
+            object-position: center;
+          }
+          > input {
+            border: none;
+          }
+          > input[name="googleDisplayName"] {
+            grid-area: googleDisplayName;
+            background-color: transparent;
+          }
+          > input[name="googleEmail"] {
+            grid-area: googleEmail;
+            background-color: transparent;
+          }
+        }
+      }
+    }
   }
 }
