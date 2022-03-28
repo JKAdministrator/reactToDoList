@@ -14,7 +14,7 @@
     "databaseLabel databaseInput"
     "loginResponse loginResponse"
     "loginButton loginButton"
-    "forgotButton signupButton"
+    "secondaryButtons secondaryButtons"
     "orSeparator orSeparator"
     "googleButton googleButton";
   gap: 1rem;
@@ -22,13 +22,11 @@
   grid-template-rows: repeat(11, max-content);
   align-items: center;
   justify-content: center;
-  background-color: var(--background-color-card);
-  border-radius: var(--border-radius);
   border: none;
   position: relative;
   align-self: center;
   margin-top: 5rem;
-  box-shadow: 0 1px 2px 0 rgb(60 64 67 / 30%), 0 1px 3px 1px rgb(60 64 67 / 15%);
+
   > h1 {
     grid-area: title;
     width: 100%;
@@ -66,10 +64,6 @@
     }
   }
   > select {
-    padding: 0.2rem;
-    border-radius: var(--border-radius);
-    font-size: 1rem;
-    font-weight: normal;
     &#server {
       grid-area: serverInput;
     }
@@ -105,6 +99,16 @@
     &[name="google"] {
       grid-area: googleButton;
     }
+  }
+  > .secondaryButtons {
+    grid-area: secondaryButtons;
+    display: flex;
+    flex-flow: row;
+    align-items: center;
+    padding: 0px;
+    margin: 0px;
+    justify-content: space-between;
+    width: 100%;
   }
   > span[name="loginResponse"] {
     grid-area: loginResponse;
@@ -194,13 +198,19 @@
     align-items: flex-start;
     justify-content: flex-start;
     gap: 0.4rem;
+
+    overflow: auto;
+    min-height: max-content;
     > input,
     select,
     button {
       width: 100%;
     }
-    .secondaryButton {
-      width: max-content;
+    > input,
+    select {
+      font-size: 1.1rem;
+      font-weight: lighter;
+      padding: 0.5rem;
     }
   }
 }

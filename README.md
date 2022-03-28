@@ -1,15 +1,23 @@
 # commmit the changes of all files
 
-ist> git commit -a -m "added loguin with email & gmail"
+git commit -a -m "added loguin with email & gmail"
 
-# push to repositori (branch main)
+# push to repository (branch principal: main)
 
-git push -u origin main
-`
+git push -u origin <your-branch-name>
+
+# create a new branch
+
+git checkout -b <your-new-branch-name>
 
 # deploy a firebase
 
 firebase deploy
+
+# deploy a firebase (solo funciones o solo hosting)
+
+firebase deploy --only functions
+firebase deploy --only hosting
 
 # start a firebase emulator
 
