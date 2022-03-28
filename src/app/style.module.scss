@@ -1,0 +1,12 @@
+*[name="loginForm"] {
+  margin-top: 5rem;
+}
+div.container {
+  width: 100%;
+  height: 100%;
+}
+div.container ul[data-state="closed"] {
+  display: none;
+  visibility: hidden;
+  pointer-events: none;
+}

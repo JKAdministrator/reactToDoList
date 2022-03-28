@@ -1,0 +1,147 @@
+import React, { useState } from "react";
+import style from "./style.module.scss";
+import { useAppContext } from "../context/appContext";
+const Sidebar = ({ onSectionChangeCallback }) => {
+  const options = [
+    {
+      iconSrc: "./icons/sidebar/configuration.png",
+      label: "Configuration",
+      code: "CONFIGURATION",
+      childOf: "",
+    },
+    {
+      iconSrc: "./icons/sidebar/security.png",
+      label: "Security",
+      code: "SECURITY",
+      childOf: "",
+    },
+    {
+      iconSrc: "./icons/sidebar/users.png",
+      label: "Users",
+      code: "USERS",
+      childOf: "SECURITY",
+    },
+    {
+      iconSrc: "./icons/sidebar/groups.png",
+      label: "Groups",
+      code: "GROUPS",
+      childOf: "SECURITY",
+    },
+  ];
+  const [stateData, setStateData] = useState({
+    selectedOption: {},
+    openOptions: [],
+  });
+
+  const { firebaseLoginFuncions } = useAppContext();
+  function renderOption(option) {
+    const childs = options.filter((_option) => {
+      return _option.childOf === option.code;
+    });
+
+    let isOptionOpen =
+      stateData.openOptions.indexOf(option.code) > -1 ? true : false;
+    return (
+      <li
+        data-state={isOptionOpen ? "OPEN" : "CLOSED"}
+        key={option.code}
+        data-code={option.code}
+      >
+        <button type="button" onClick={handleClick}>
+          <img
+            src={option.iconSrc}
+            alt={option.label}
+            className="icon"
+            name="optionIcon"
+          />
+          <label>{option.label}</label>
+          {childs.length > 0 ? (
+            <img
+              src={
+                isOptionOpen
+                  ? "./icons/sidebar/optionOpen.png"
+                  : "./icons/sidebar/optionClosed.png"
+              }
+              className="icon"
+              name="stateIcon"
+              alt={isOptionOpen ? "open" : "closed"}
+            ></img>
+          ) : (
+            <>
+              {stateData.selectedOption === option.code ? <div></div> : <></>}
+            </>
+          )}
+        </button>
+        {childs.length > 0 ? (
+          <ul>
+            {childs.map((suboption) => {
+              return renderOption(suboption);
+            })}
+          </ul>
+        ) : (
+          <></>
+        )}
+      </li>
+    );
+  }
+
+  function handleClick(e) {
+    let li = e.target.parentNode;
+    if (li.querySelectorAll("ul").length === 0) {
+      onSectionChangeCallback(li.dataset.code);
+      setStateData((_prevstateData) => {
+        //props.onOptionChangeCallback();
+        return {
+          ..._prevstateData,
+          selectedOption: li.dataset.code,
+        };
+      });
+    } else {
+      setStateData((_prevstateData) => {
+        let newOpenOptions;
+        if (li.dataset.state === "CLOSED") {
+          newOpenOptions = [..._prevstateData.openOptions, li.dataset.code];
+        } else {
+          let index = _prevstateData.openOptions.indexOf(li.dataset.code);
+          _prevstateData.openOptions.splice(index, 1);
+          newOpenOptions = _prevstateData.openOptions;
+        }
+        return {
+          ..._prevstateData,
+          openOptions: newOpenOptions,
+        };
+      });
+    }
+  }
+
+  function handleClickLogout() {
+    console.log("firebaseLoginFuncions", firebaseLoginFuncions);
+    firebaseLoginFuncions.signOut();
+  }
+
+  return (
+    <ul className={style.rootUnsortedList}>
+      <img className={style.logo} src="./logos/client.png" alt="Owner logo" />
+      {options
+        .filter((option) => {
+          return option.childOf === "";
+        })
+        .map((option) => {
+          return renderOption(option);
+        })}
+      <li data-state="CLOSED" data-code="LOGOUT" style={{ marginTop: "auto" }}>
+        <button type="button" onClick={handleClickLogout}>
+          <img
+            src="./icons/sidebar/logout.png"
+            alt="Logout"
+            className="icon"
+            name="optionIcon"
+          />
+          <label>Logout</label>
+        </button>
+      </li>
+    </ul>
+  );
+};
+
+export default Sidebar;
