@@ -100,6 +100,7 @@
     }
     &[name="forgot"] {
       grid-area: forgotButton;
+      justify-self: start;
     }
     &[name="google"] {
       grid-area: googleButton;
@@ -113,7 +114,7 @@
     color: red;
   }
 }
-.primaryButton {
+.form .primaryButton {
   width: 100%;
   height: max-content;
   font-size: 1.2rem;
@@ -126,7 +127,7 @@
     background-color: var(--button-primary-background-color-hover);
   }
 }
-.secondaryButton {
+.form .secondaryButton {
   background-color: transparent;
   width: max-content;
   height: max-content;
@@ -142,7 +143,7 @@
   }
 }
 
-.loader {
+.form .loader {
   display: flex;
   flex-flow: column;
   align-items: center;
@@ -152,7 +153,7 @@
   position: absolute;
   margin-top: 5rem;
 }
-.imagesContainer {
+.form .imagesContainer {
   grid-area: imagesContainer;
   display: flex;
   flex-flow: row;
@@ -169,13 +170,37 @@
   }
 }
 
-.line {
+.form .line {
   height: max-content;
   border-top: 1px solid grey;
   width: 100%;
 }
-.text {
+.form .text {
   width: max-content;
   height: max-content;
   padding: 0.5rem;
+}
+
+@media (max-width: 500px) {
+  .form {
+    width: calc(100% - 2rem);
+    max-width: calc(100% - 2rem);
+    height: 100%;
+    padding: 1rem;
+    margin: 0rem;
+    display: flex;
+    flex-flow: row;
+    flex-wrap: wrap;
+    align-items: flex-start;
+    justify-content: flex-start;
+    gap: 0.4rem;
+    > input,
+    select,
+    button {
+      width: 100%;
+    }
+    .secondaryButton {
+      width: max-content;
+    }
+  }
 }

@@ -1,11 +1,19 @@
-# Upload to git
+# commmit the changes of all files
 
-git commit
+ist> git commit -a -m "added loguin with email & gmail"
+
+# push to repositori (branch main)
+
 git push -u origin main
+`
 
 # deploy a firebase
 
 firebase deploy
+
+# start a firebase emulator
+
+firebase emulators:start
 
 # Getting Started with Create React App
 
