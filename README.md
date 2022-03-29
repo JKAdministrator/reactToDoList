@@ -6,6 +6,10 @@ git commit -a -m "added loguin with email & gmail"
 
 git push -u origin <your-branch-name>
 
+# see current branch and changes not staged for commit
+
+git status
+
 # create a new branch
 
 git checkout -b <your-new-branch-name>
