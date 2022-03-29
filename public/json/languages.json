@@ -1,0 +1,120 @@
+{
+  "languages": [
+    {
+      "id": "es",
+      "components": [
+        {
+          "id": "loginForm",
+          "strings": {
+            "title": "INGRESO",
+            "email": "Email",
+            "password": "Contraseña",
+            "server": "Servidor",
+            "database": "Base",
+            "login": "INGRESAR",
+            "forgot": "Olvidaste la Contraseña?",
+            "signup": "Registrarse",
+            "or": "O"
+          }
+        },
+        {
+          "id": "sidebar",
+          "strings": {
+            "configuration": "Configuración",
+            "security": "Seguridad",
+            "users": "Usuarios",
+            "groups": "Grupos",
+            "logout": "Salir"
+          }
+        },
+        {
+          "id": "sectionConfiguration",
+          "strings": {
+            "title": "Configuración",
+            "application": "Preferencias",
+            "darkMode": "Modo oscuro",
+            "language": "Idioma",
+            "accesAccounts": "Credenciales de acceso",
+            "usernameAndPassword": "Email y password",
+            "username": "Email",
+            "password": "Password",
+            "name": "Nombre",
+            "userId": "ID",
+            "creationDate": "Creación"
+          }
+        },
+        {
+          "id": "sectionConfiguration/accesAccounts/google",
+          "strings": {}
+        },
+        {
+          "id": "sectionConfiguration/accesAccounts/usernameAndPassword",
+          "strings": {
+            "usernameAndPassword": "Email y password",
+            "username": "Email",
+            "password": "Password",
+            "id": "ID"
+          }
+        }
+      ]
+    },
+    {
+      "id": "en",
+      "components": [
+        {
+          "id": "loginForm",
+          "strings": {
+            "title": "LOGIN",
+            "email": "Email",
+            "password": "Password",
+            "server": "Server",
+            "database": "Database",
+            "login": "LOGIN",
+            "forgot": "Forgot Password?",
+            "signup": "Sign Up",
+            "or": "OR"
+          }
+        },
+        {
+          "id": "sidebar",
+          "strings": {
+            "configuration": "Configuration",
+            "security": "Security",
+            "users": "Users",
+            "groups": "Groups",
+            "logout": "Logout"
+          }
+        },
+        {
+          "id": "sectionConfiguration",
+          "strings": {
+            "title": "Configuration",
+            "application": "Preferences",
+            "darkMode": "Dark mode",
+            "language": "Language",
+            "accesAccounts": "Loguin credentials",
+            "usernameAndPassword": "Email and password",
+            "username": "Email",
+            "password": "Password",
+            "name": "Name",
+            "userId": "ID",
+            "creationDate": "Creation"
+          }
+        },
+        {
+          "id": "sectionConfiguration/accesAccounts/google",
+          "strings": {}
+        },
+        {
+          "id": "sectionConfiguration/accesAccounts/usernameAndPassword",
+          "strings": {
+            "usernameAndPassword": "Email and password",
+            "username": "Email",
+            "password": "Password",
+            "id": "ID"
+          }
+        }
+      ]
+    }
+  ]
+}
