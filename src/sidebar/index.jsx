@@ -2,7 +2,8 @@ import React, { useState } from "react";
 import style from "./style.module.scss";
 import { useAppContext } from "../context/appContext";
 const Sidebar = ({ onSectionChangeCallback }) => {
-  const { tryLogout, getLanguageString, userData } = useAppContext();
+  const { tryLogout, getLanguageString, userData, userDisplayName } =
+    useAppContext();
 
   const getString = (string) => {
     return getLanguageString("sidebar", string);
@@ -127,7 +128,7 @@ const Sidebar = ({ onSectionChangeCallback }) => {
     <ul className={style.rootUnsortedList}>
       <img className={style.logo} src="./logos/client.png" alt="Owner logo" />
       <span name="userName" id="usrName" className={style.username}>
-        {userData.user ? userData.user.displayName : ""}
+        {userDisplayName}
       </span>
       {options
         .filter((option) => {
