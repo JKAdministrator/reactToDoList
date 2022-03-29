@@ -2,10 +2,10 @@ import React, { useEffect, useState } from "react";
 import style from "./style.module.scss";
 import { useAppContext } from "../context/appContext";
 const GoogleLoginButton = () => {
-  const { firebaseLoginFuncions } = useAppContext();
+  const { tryLogin } = useAppContext();
 
   function handleLoginClick(e) {
-    firebaseLoginFuncions.signInWithGoogle();
+    tryLogin({ source: "google" });
   }
 
   return (

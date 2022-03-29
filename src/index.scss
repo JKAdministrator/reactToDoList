@@ -32,7 +32,7 @@ body {
   --background-color-card: white;
   --background-color-input: white;
   --background-color-sidebar-sublist: #f9f9f9;
-  --border-color-input: grey;
+  --border-color-input: rgba(128, 128, 128, 0.6);
   --border-color-input-error: red;
   --text-color-primary: black;
   --text-color-secondary: #424242;
@@ -46,7 +46,7 @@ body {
     --background-color-input: #292929;
     --background-color-sidebar-sublist: #383535;
     --border-color-input-error: red;
-    --border-color-input: #383535;
+    --border-color-input: rgba(56, 53, 53, 0.6);
     --text-color-primary: white;
     --text-color-secondary: grey;
     --text-color-secondary-hover: rgb(165, 165, 165);

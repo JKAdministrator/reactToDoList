@@ -1,32 +1,44 @@
 import React, { useEffect } from "react";
 import style from "./style.module.scss";
 import { useAppContext } from "../../context/appContext";
+import SectionConfigurationAccesAccountGoogle from "./accesManagers/google";
+import SectionConfigurationAccesAccountUsernameAndPassword from "./accesManagers/usernameAndPassword";
 
 export const AppContext = React.createContext();
 const SectionConfiguration = () => {
   const {
-    theme,
-    setTheme,
-    language,
-    setLanguage,
+    userLanguage,
+    userTheme,
+    userDisplayName,
     getLanguageString,
-    firebaseCurrentUser,
+    userDocId,
+    userData,
+    updateName,
+    updateTheme,
+    updateLanguage,
   } = useAppContext();
-  console.log("language", language);
 
   function onChangeThemeHandler(e) {
     console.log("onChangeThemeHandler", e);
-    e.target.checked ? setTheme(`dark`) : setTheme(`light`);
+    let newValue = e.target.checked ? `dark` : `light`;
+    //setTheme(newValue);
+    updateTheme(newValue, userDocId);
   }
 
   function onChangeLanguageHandler(e) {
-    setLanguage(e.target.value);
+    updateLanguage(e.target.value, userDocId);
   }
 
   const getString = (string) => {
     return getLanguageString("sectionConfiguration", string);
   };
-  console.log("firebaseCurrentUser", { e: firebaseCurrentUser });
+
+  function handleChangeName(e) {
+    updateName(e.target.value, null);
+  }
+  function handleBlurName(e) {
+    updateName(e.target.value, userDocId);
+  }
 
   return (
     <>
@@ -42,14 +54,14 @@ const SectionConfiguration = () => {
             id="darkMode"
             itemID="darkMode"
             onChange={onChangeThemeHandler}
-            checked={theme === "dark" ? true : false}
+            checked={userTheme === "dark" ? true : false}
           ></input>
           <label htmlFor="language">{getString("language")} :</label>
           <select
             id="language"
             name="language"
             onChange={onChangeLanguageHandler}
-            defaultValue={language}
+            defaultValue={userLanguage}
           >
             <option value="en">English</option>
             <option value="es">Español</option>
@@ -58,41 +70,31 @@ const SectionConfiguration = () => {
 
         <section className="card" name="ACCES_ACCOUNTS">
           <h2>{getString("accesAccounts")}</h2>
-          <section name="USERNAME_AND_PASSWORD">
-            <h3>{getString("usernameAndPassword")}</h3>
-            <label htmlFor="username">{getString("username")} :</label>
-            <input
-              type="username"
-              id="username"
-              name="username"
-              disabled
-            ></input>
-            <label htmlFor="password">{getString("password")} :</label>
-            <input
-              type="password"
-              id="password"
-              name="password"
-              disabled
-            ></input>
-          </section>
-          <section name="GOOGLE">
-            <h3>Google</h3>
-            <img src={firebaseCurrentUser.photoURL} alt="google user image" />
-            <input
-              type="text"
-              disabled
-              id="googleDisplayName"
-              name="googleDisplayName"
-              value={firebaseCurrentUser.displayName}
-            ></input>
-            <input
-              type="text"
-              disabled
-              id="googleEmail"
-              name="googleEmail"
-              value={firebaseCurrentUser.email}
-            ></input>
-          </section>
+          <SectionConfigurationAccesAccountGoogle></SectionConfigurationAccesAccountGoogle>
+          <SectionConfigurationAccesAccountUsernameAndPassword></SectionConfigurationAccesAccountUsernameAndPassword>
+        </section>
+
+        <section className="card" name="MY_DATA">
+          <h2>{getString("myData")}Mis Datos</h2>
+          <label htmlFor="username">{getString("name")} :</label>
+          <input
+            name="username"
+            id="username"
+            type="text"
+            value={userDisplayName}
+            onChange={handleChangeName}
+            onBlur={handleBlurName}
+          />
+          <label htmlFor="userId">{getString("userId")} :</label>
+          <span name="userId" id="userId">
+            {userDocId}
+          </span>
+          <label htmlFor="creationDate">{getString("creationDate")} :</label>
+          <span name="creationDate" id="creationDate">
+            {userData.user
+              ? new Date(userData.user.creationDate._seconds * 1000).toString()
+              : ""}
+          </span>
         </section>
       </form>
     </>

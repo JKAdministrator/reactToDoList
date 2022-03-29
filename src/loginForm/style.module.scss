@@ -142,6 +142,7 @@
   justify-self: end;
   text-decoration: underline;
   padding: 0px;
+  border: none !important;
   &:hover {
     color: var(--text-color-secondary-hover);
   }

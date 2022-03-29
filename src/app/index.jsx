@@ -1,5 +1,5 @@
 import style from "./style.module.scss";
-import React from "react";
+import React, { useEffect, useState, useRef } from "react";
 import LoginForm from "../loginForm/index.jsx";
 import { AppProvider, useAppContext } from "../context/appContext";
 import LoaderAnimation from "../loaderAnimation";
@@ -19,35 +19,35 @@ function providerFunction() {
 }
 
 function App() {
-  const {
-    firebaseCurrentUser,
-    firebaseConnectionState,
-    firebaseConnectionStateError,
-  } = useAppContext();
+  const [state, setState] = useState("LOADING");
+  const { firebaseConnectionState, firebaseConnectionStateError, userDocId } =
+    useAppContext();
 
+  useEffect(() => {
+    if (firebaseConnectionState === "LOADING") setState("LOADING");
+    else if (firebaseConnectionState === "ERROR") setState("ERROR");
+    else if (userDocId !== "") setState("LOGUED_IN");
+    else if (userDocId === "") setState("LOGUED_OUT");
+  }, [userDocId, firebaseConnectionState]);
+
+  console.log("state", state);
   //la salida debe especificar el valor inicial del proveedor (objeto vacio)
   return (
     <AppContext.Provider value={{}}>
-      {firebaseConnectionState === "READY" && firebaseCurrentUser.uid ? (
-        <SectionManager></SectionManager>
-      ) : (
-        <></>
-      )}
-      {firebaseConnectionState === "READY" && !firebaseCurrentUser.uid ? (
+      {state === "LOGUED_IN" ? <SectionManager></SectionManager> : <></>}
+      {state === "LOGUED_OUT" ? (
         <LoginForm name="loginForm"></LoginForm>
       ) : (
         <></>
       )}
-      {firebaseConnectionState === "LOADING" ? (
-        <>
-          <div className={style.loader}>
-            <LoaderAnimation />
-          </div>
-        </>
+      {state === "LOADING" ? (
+        <div className={style.loader}>
+          <LoaderAnimation />
+        </div>
       ) : (
         <></>
       )}
-      {firebaseConnectionState === "ERROR" ? (
+      {state === "ERROR" ? (
         <>
           <span>error:</span>
           <span>{firebaseConnectionStateError}</span>

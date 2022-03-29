@@ -81,3 +81,14 @@ ul.rootUnsortedList button > div {
   background-color: var(--button-primary-background-color);
   pointer-events: none;
 }
+.username {
+  max-width: 8rem;
+  width: calc(100% - 1rem);
+  text-align: center;
+  padding: 0rem 0rem 0rem 1rem;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  font-size: 1rem;
+  opacity: 0.5;
+}

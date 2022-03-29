@@ -7,11 +7,8 @@ import GoogleLoginButton from "../googleLoginButton";
 
 const LoginForm = (props) => {
   //variables de estado
-  const {
-    firebaseHttpsCallableFunctions,
-    firebaseLoginFuncions,
-    getLanguageString,
-  } = useAppContext();
+  const { firebaseHttpsCallableFunctions, getLanguageString, tryLogin } =
+    useAppContext();
 
   const [stateData, setStateData] = useState({
     username: props.username || "",
@@ -45,35 +42,31 @@ const LoginForm = (props) => {
 
   const loginWithEmailAndPassword = async (username, password) => {
     try {
-      let user = await firebaseLoginFuncions.signInWithEmailAndPassword(
-        username,
-        password
-      );
-      return user;
     } catch (e) {
       throw e.message;
     }
   };
 
   //ejecucion inicial
-  useEffect(() => {
+  useEffect(async () => {
     switch (stateData.state) {
       case "AWAIT_LOGIN_RESPONSE": {
-        loginWithEmailAndPassword(stateData.username, stateData.password)
-          .then((result) => {
-            console.log("LOGIN WITH USERNAME AND PASSWORD SUCCESS!!!", {
-              result,
-            });
-          })
-          .catch((e) => {
-            setStateData((_prevData) => {
-              return {
-                ..._prevData,
-                state: "READY",
-                loginResponseMessage: e.toString(),
-              };
-            });
+        try {
+          await tryLogin({
+            source: "usernameAndPassword",
+            email: stateData.username,
+            password: stateData.password,
           });
+        } catch (e) {
+          console.log("loginForm: AWAIT_LOGIN_RESPONSE ... error ", { e });
+          setStateData((_prevData) => {
+            return {
+              ..._prevData,
+              state: "READY",
+              loginResponseMessage: e.toString(),
+            };
+          });
+        }
         break;
       }
       case "INITIAL_LOADING": {
@@ -189,7 +182,7 @@ const LoginForm = (props) => {
             {getString("email")} :
           </label>
           <input
-            type="text"
+            type="email"
             name="username"
             id="username"
             value={stateData.username}
