@@ -4,17 +4,40 @@
       "id": "es",
       "components": [
         {
-          "id": "loginForm",
+          "id": "signinForm",
           "strings": {
-            "title": "INGRESO",
+            "title": "Ingreso",
             "email": "Email",
             "password": "Contraseña",
-            "server": "Servidor",
-            "database": "Base",
             "login": "INGRESAR",
             "forgot": "Olvidaste la Contraseña?",
             "signup": "Registrarse",
             "or": "O"
+          }
+        },
+        {
+          "id": "signupForm",
+          "strings": {
+            "title": "Registrarse",
+            "email": "Email",
+            "username": "Nombre",
+            "password": "Password",
+            "confirmPassword": "Confirmar password",
+            "signupButton": "CREAR USUARIO",
+            "return": "Volver",
+            "passwordMissmatch": "Las contraseñas ingresadas no coinciden",
+            "success": "Usuario creado con exito",
+            "login": "INGRESAR"
+          }
+        },
+        {
+          "id": "recoverForm",
+          "strings": {
+            "title": "Recuperar password",
+            "email": "Email",
+            "recoverButton": "RECUPERAR PASSWORD",
+            "return": "Volver",
+            "success": "Un Email fue enviado a su correo electronico con un nuevo password"
           }
         },
         {
@@ -62,7 +85,7 @@
       "id": "en",
       "components": [
         {
-          "id": "loginForm",
+          "id": "signinForm",
           "strings": {
             "title": "LOGIN",
             "email": "Email",
@@ -73,6 +96,31 @@
             "forgot": "Forgot Password?",
             "signup": "Sign Up",
             "or": "OR"
+          }
+        },
+        {
+          "id": "signupForm",
+          "strings": {
+            "title": "Signup",
+            "email": "Email",
+            "username": "Username",
+            "password": "Password",
+            "confirmPassword": "Confirm password",
+            "signupButton": "CREATE USER",
+            "return": "Return",
+            "passwordMissmatch": "Confirm password missmatch",
+            "success": "User created successfully",
+            "login": "LOGIN"
+          }
+        },
+        {
+          "id": "recoverForm",
+          "strings": {
+            "title": "Recover password",
+            "email": "Email",
+            "recoverButton": "RECOVER PASSWORD",
+            "return": "Return",
+            "success": "A Email has been sent to your mailbox with a new password"
           }
         },
         {

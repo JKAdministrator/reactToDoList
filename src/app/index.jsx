@@ -1,9 +1,13 @@
 import style from "./style.module.scss";
 import React, { useEffect, useState, useRef } from "react";
-import LoginForm from "../loginForm/index.jsx";
+import SigninForm from "../signinForm/index.jsx";
 import { AppProvider, useAppContext } from "../context/appContext";
 import LoaderAnimation from "../loaderAnimation";
 import SectionManager from "../sections/manager";
+import { BrowserRouter, Routes, Route } from "react-router-dom";
+import SignupForm from "../signupForm";
+import RecoverForm from "../recoverForm";
+
 // el React context es un objeto
 // tiene 2 partes "provider" y "consumer"
 export const AppContext = React.createContext();
@@ -30,31 +34,80 @@ function App() {
     else if (userDocId === "") setState("LOGUED_OUT");
   }, [userDocId, firebaseConnectionState]);
 
-  console.log("state", state);
+  console.log("state 2", state);
   //la salida debe especificar el valor inicial del proveedor (objeto vacio)
   return (
     <AppContext.Provider value={{}}>
-      {state === "LOGUED_IN" ? <SectionManager></SectionManager> : <></>}
-      {state === "LOGUED_OUT" ? (
-        <LoginForm name="loginForm"></LoginForm>
-      ) : (
-        <></>
-      )}
-      {state === "LOADING" ? (
-        <div className={style.loader}>
-          <LoaderAnimation />
-        </div>
-      ) : (
-        <></>
-      )}
-      {state === "ERROR" ? (
-        <>
-          <span>error:</span>
-          <span>{firebaseConnectionStateError}</span>
-        </>
-      ) : (
-        <></>
-      )}
+      <BrowserRouter>
+        <Routes>
+          <Route
+            index
+            element={
+              <>
+                {state === "LOGUED_IN" ? (
+                  <SectionManager></SectionManager>
+                ) : (
+                  <></>
+                )}
+                {state === "LOGUED_OUT" ? (
+                  <SigninForm name="signinForm"></SigninForm>
+                ) : (
+                  <></>
+                )}
+                {state === "LOADING" ? (
+                  <div className={style.loader}>
+                    <LoaderAnimation />
+                    <span>sarasa</span>
+                  </div>
+                ) : (
+                  <></>
+                )}
+                {state === "ERROR" ? (
+                  <>
+                    <span>error:</span>
+                    <span>{firebaseConnectionStateError}</span>
+                  </>
+                ) : (
+                  <></>
+                )}
+              </>
+            }
+          />
+          <Route
+            path="signIn"
+            element={
+              <>
+                <LoaderAnimation />
+                <span>signIn</span>
+              </>
+            }
+          />
+          <Route
+            path="signUp"
+            element={
+              <>
+                <SignupForm />
+              </>
+            }
+          />
+          <Route
+            path="recover"
+            element={
+              <>
+                <RecoverForm />
+              </>
+            }
+          />
+          <Route
+            path="*"
+            element={
+              <>
+                <LoaderAnimation /> <span>sarasa</span>
+              </>
+            }
+          />
+        </Routes>
+      </BrowserRouter>
     </AppContext.Provider>
   );
 }

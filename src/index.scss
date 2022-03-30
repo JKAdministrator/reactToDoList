@@ -1,12 +1,3 @@
-body {
-  margin: 0;
-  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Roboto", "Oxygen",
-    "Ubuntu", "Cantarell", "Fira Sans", "Droid Sans", "Helvetica Neue",
-    sans-serif;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-}
-
 code {
   font-family: source-code-pro, Menlo, Monaco, Consolas, "Courier New",
     monospace;
@@ -21,25 +12,47 @@ code {
 html {
   width: 100vw;
   height: 100vh;
+  margin: 0;
+  padding: 0;
 }
 head {
   width: 0;
   height: 0;
   display: none;
+  margin: 0;
+  padding: 0;
 }
+
 body {
-  --background-color-app: whitesmoke;
-  --background-color-card: white;
-  --background-color-input: white;
-  --background-color-sidebar-sublist: #f9f9f9;
-  --border-color-input: rgba(128, 128, 128, 0.6);
-  --border-color-input-error: red;
-  --text-color-primary: black;
-  --text-color-secondary: #424242;
-  --text-color-secondary-hover: rgb(168, 168, 168);
-  --button-primary-background-color: #3d3fb6;
-  --button-primary-background-color-hover: #393cd4;
-  --button-primary-text-color: whitesmoke;
+  margin: 0;
+  padding: 0;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  background-color: var(--background-color-app);
+  display: flex;
+  flex-flow: column;
+  align-items: center;
+  justify-content: center;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Roboto", "Oxygen",
+    "Ubuntu", "Cantarell", "Fira Sans", "Droid Sans", "Helvetica Neue",
+    sans-serif;
+  &:not([data-theme="dark"]) {
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    --background-color-app: whitesmoke;
+    --background-color-card: white;
+    --background-color-input: white;
+    --background-color-sidebar-sublist: #f9f9f9;
+    --border-color-input: rgba(128, 128, 128, 0.6);
+    --border-color-input-error: red;
+    --text-color-primary: black;
+    --text-color-secondary: #424242;
+    --text-color-secondary-hover: rgb(168, 168, 168);
+    --button-primary-background-color: #3d3fb6;
+    --button-primary-background-color-hover: #393cd4;
+    --button-primary-text-color: whitesmoke;
+  }
   &[data-theme="dark"] {
     --background-color-app: black;
     --background-color-card: #1a1a1a;
@@ -59,13 +72,6 @@ body {
   }
   --border-radius: 3px;
 
-  background-color: var(--background-color-app);
-  display: flex;
-  flex-flow: column;
-  align-items: center;
-  justify-content: center;
-  width: 100%;
-  height: 100%;
   * {
     color: var(--text-color-primary);
   }
@@ -110,10 +116,11 @@ body {
 }
 
 div#root {
-  width: 100vw;
-  height: 100vh;
+  width: 100%;
+  height: 100%;
   display: flex;
   flex-flow: column;
   align-items: center;
   justify-content: flex-start;
+  overflow: hidden;
 }

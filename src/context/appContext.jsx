@@ -12,7 +12,10 @@ import {
   GoogleAuthProvider,
   signInWithRedirect,
   signInWithEmailAndPassword,
+  createUserWithEmailAndPassword,
+  sendEmailVerification,
   connectAuthEmulator,
+  sendPasswordResetEmail,
 } from "firebase/auth";
 
 const AppContext = React.createContext();
@@ -32,6 +35,8 @@ const initialContextData = {
   userData: {},
   tryLogin: () => {},
   tryLogout: () => {},
+  trySignup: () => {},
+  tryRecover: () => {},
   updateName: () => {},
   updateLanguage: () => {},
   userTheme: "",
@@ -70,7 +75,7 @@ function getDefautLanguage() {
 
 export function AppProvider(props) {
   // use the local emulator
-  const useEmulator = false;
+  const useEmulator = true;
   const [appContextData, setAppContextData] = useState(initialContextData);
 
   useEffect(() => {
@@ -171,6 +176,17 @@ export function AppProvider(props) {
           });
         };
 
+        //RECOVER PASSWORD FUNCTION
+        let tryRecover = async (_data) => {
+          try {
+            let auth = getAuth();
+
+            await sendPasswordResetEmail(auth, _data.email);
+          } catch (error) {
+            throw error.toString();
+          }
+        };
+
         // LOGOUT FUNCTION
         let tryLogout = async () => {
           try {
@@ -187,6 +203,48 @@ export function AppProvider(props) {
                 userDisplayName: "",
               };
             });
+          } catch (error) {
+            throw error.toString();
+          }
+        };
+
+        //SIGNUP FUNCTION
+        let trySignup = async (_data) => {
+          try {
+            let auth = getAuth();
+            auth.languageCode = userLanguage;
+            let userCredential = await createUserWithEmailAndPassword(
+              auth,
+              _data.email,
+              _data.password
+            );
+
+            await sendEmailVerification(auth.currentUser);
+
+            console.log("trySignup response ", { userCredential });
+            let responseLogin = await httpsCallableFunctions.login({
+              source: "usernameAndPassword",
+              email: _data.email,
+              password: _data.password,
+              displayName: _data.username,
+              navigatorTheme: userTheme,
+              navigatorLanguage: userLanguage,
+            });
+            console.log("trySignup responseLogin ", { responseLogin });
+            if (responseLogin.data.errorCode === 0) {
+              setAppContextData((prevProps) => {
+                return {
+                  ...prevProps,
+                  userDocId: responseLogin.data.userDocId,
+                  userData: responseLogin.data.userData,
+                  userLanguage: responseLogin.data.userData.user.language,
+                  userTheme: responseLogin.data.userData.user.theme,
+                  userDisplayName: responseLogin.data.userData.user.displayName,
+                };
+              });
+            } else {
+              throw responseLogin.data.errorMessage;
+            }
           } catch (error) {
             throw error.toString();
           }
@@ -216,12 +274,6 @@ export function AppProvider(props) {
                     _data.email.toString(),
                     _data.password.toString()
                   );
-                console.log(
-                  "AppContext.tryLogin() responseSignInWithEmailAndPassword",
-                  {
-                    responseSignInWithEmailAndPassword,
-                  }
-                );
                 let responseLogin = await httpsCallableFunctions.login({
                   source: "usernameAndPassword",
                   email: _data.email,
@@ -230,9 +282,6 @@ export function AppProvider(props) {
                     responseSignInWithEmailAndPassword.user.displayName,
                   navigatorTheme: userTheme,
                   navigatorLanguage: userLanguage,
-                });
-                console.log("AppContext.tryLogin() responseLogin", {
-                  responseLogin,
                 });
                 if (responseLogin.data.errorCode === 0) {
                   setAppContextData((prevProps) => {
@@ -257,7 +306,6 @@ export function AppProvider(props) {
               }
             }
           } catch (e) {
-            console.log("AppContext.tryLogin() catch(e)", { e });
             throw e.toString();
           }
         };
@@ -315,6 +363,8 @@ export function AppProvider(props) {
             emulatorStarted: useEmulator ? true : false,
             tryLogin: tryLogin,
             tryLogout: tryLogout,
+            trySignup: trySignup,
+            tryRecover: tryRecover,
             updateName: updateName,
             updateTheme: updateTheme,
             updateLanguage: updateLanguage,
