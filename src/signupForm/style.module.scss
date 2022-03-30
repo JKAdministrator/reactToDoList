@@ -1,6 +1,5 @@
 .form {
-  width: 27rem;
-  min-height: 26rem;
+  width: 23rem;
   height: max-content;
   padding: 1rem;
   margin: 0rem;
@@ -8,18 +7,16 @@
   grid-template-areas:
     "imagesContainer imagesContainer"
     "title title"
+    "emailLabel emailInput"
     "usernameLabel usernameInput"
     "passwordLabel passwordInput"
-    "serverLabel serverInput"
-    "databaseLabel databaseInput"
+    "password2Label password2Input"
     "loginResponse loginResponse"
-    "loginButton loginButton"
-    "secondaryButtons secondaryButtons"
-    "orSeparator orSeparator"
-    "googleButton googleButton";
+    "signupButton signupButton"
+    "secondaryButtons secondaryButtons";
   gap: 1rem;
   grid-template-columns: max-content 1fr;
-  grid-template-rows: repeat(11, max-content);
+  grid-template-rows: repeat(8, max-content);
   align-items: center;
   justify-content: center;
   border: none;
@@ -38,58 +35,41 @@
   > label {
     font-size: 0.9rem;
     font-weight: lighter;
+    &[for="email"] {
+      grid-area: emailLabel;
+    }
     &[for="username"] {
       grid-area: usernameLabel;
     }
     &[for="password"] {
       grid-area: passwordLabel;
     }
-    &[for="server"] {
-      grid-area: serverLabel;
-    }
-    &[for="database"] {
-      grid-area: databaseLabel;
-    }
-  }
-  > div[name="orSeparator"] {
-    grid-area: orSeparator;
-    height: max-content;
-    width: 100%;
-    display: flex;
-    flex-flow: row;
-    align-items: center;
-    justify-content: center;
-    > span {
-      color: grey;
-    }
-  }
-  > select {
-    &#server {
-      grid-area: serverInput;
-    }
-    &#database {
-      grid-area: databaseInput;
+    &[for="confirmPassword"] {
+      grid-area: password2Label;
     }
   }
   > input {
     padding: 0.2rem;
     font-size: 1rem;
     font-weight: normal;
+    &#email {
+      grid-area: emailInput;
+    }
     &#username {
       grid-area: usernameInput;
     }
     &#password {
       grid-area: passwordInput;
     }
+    &#confirmPassword {
+      grid-area: password2Input;
+    }
     &.missing {
       border: 1px solid var(--border-color-input-error);
     }
   }
   > button {
-    &[name="login"] {
-      grid-area: loginButton;
-    }
-    &[name="signup"] {
+    &[name="signupButton"] {
       grid-area: signupButton;
     }
     &[name="forgot"] {
@@ -142,6 +122,7 @@
   justify-self: end;
   text-decoration: underline;
   padding: 0px;
+  border: none !important;
   &:hover {
     color: var(--text-color-secondary-hover);
   }
@@ -213,4 +194,15 @@
       padding: 0.5rem;
     }
   }
+}
+
+.successMessageContainer {
+  display: flex;
+  flex-flow: column;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  height: max-content;
+  grid-column: 2;
+  gap: 2rem;
 }

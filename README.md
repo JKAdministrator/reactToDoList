@@ -6,6 +6,10 @@ git commit -a -m "added loguin with email & gmail"
 
 git push -u origin <your-branch-name>
 
+# see current branch and changes not staged for commit
+
+git status
+
 # create a new branch
 
 git checkout -b <your-new-branch-name>
@@ -22,6 +26,36 @@ firebase deploy --only hosting
 # start a firebase emulator
 
 firebase emulators:start
+
+# Features
+
+    React 16 using functional components & hooks
+    - Global state (React Context)
+    - Routing (React Router)
+    - Login + Signin + Signup working Forms
+
+    - Customizable style by user (light/dark mode)
+    - Customizable language (english / spanish)
+    - Security Microservice: NoSQL database (Firestore) + Node.js Cloud Functions (Firebase Cloud functions) for Registration, validation and authorization
+
+    - MySQL database (Google Cloud) for core functionalities (Monolith style app working in conjuntion with the Security Miscroservice)
+    - Node.js API EndPoints for REST API consuption
+    - Server side rendering when seeing other users information
+
+
+    How to test it?
+    - Login with your gmail account (http://.../login) or Register at on http://.../signup
+    - Create a Proyect
+    - Create the lists for the proyect. Each list is a diferent state a task can have (example: "To Do" "Working on" "Testing" "Finished")
+    - Create the first task for the proyect
+    - Go to the recently created task and from there create subtasks
+    - CRUD List on the proyect
+    - CRUD Tasks on the proyect assining every task to a list
+    - Create subtask
+
+    - Assign users to the Proyect (by email) (it gives proyect tasks visualization)
+    - Assign users to tasks (it gives full task control)
+    - Give
 
 # Getting Started with Create React App
 

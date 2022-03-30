@@ -1,0 +1,168 @@
+{
+  "languages": [
+    {
+      "id": "es",
+      "components": [
+        {
+          "id": "signinForm",
+          "strings": {
+            "title": "Ingreso",
+            "email": "Email",
+            "password": "Contraseña",
+            "login": "INGRESAR",
+            "forgot": "Olvidaste la Contraseña?",
+            "signup": "Registrarse",
+            "or": "O"
+          }
+        },
+        {
+          "id": "signupForm",
+          "strings": {
+            "title": "Registrarse",
+            "email": "Email",
+            "username": "Nombre",
+            "password": "Password",
+            "confirmPassword": "Confirmar password",
+            "signupButton": "CREAR USUARIO",
+            "return": "Volver",
+            "passwordMissmatch": "Las contraseñas ingresadas no coinciden",
+            "success": "Usuario creado con exito",
+            "login": "INGRESAR"
+          }
+        },
+        {
+          "id": "recoverForm",
+          "strings": {
+            "title": "Recuperar password",
+            "email": "Email",
+            "recoverButton": "RECUPERAR PASSWORD",
+            "return": "Volver",
+            "success": "Un Email fue enviado a su correo electronico con un nuevo password"
+          }
+        },
+        {
+          "id": "sidebar",
+          "strings": {
+            "configuration": "Configuración",
+            "security": "Seguridad",
+            "users": "Usuarios",
+            "groups": "Grupos",
+            "logout": "Salir"
+          }
+        },
+        {
+          "id": "sectionConfiguration",
+          "strings": {
+            "title": "Configuración",
+            "application": "Preferencias",
+            "darkMode": "Modo oscuro",
+            "language": "Idioma",
+            "accesAccounts": "Credenciales de acceso",
+            "usernameAndPassword": "Email y password",
+            "username": "Email",
+            "password": "Password",
+            "name": "Nombre",
+            "userId": "ID",
+            "creationDate": "Creación"
+          }
+        },
+        {
+          "id": "sectionConfiguration/accesAccounts/google",
+          "strings": {}
+        },
+        {
+          "id": "sectionConfiguration/accesAccounts/usernameAndPassword",
+          "strings": {
+            "usernameAndPassword": "Email y password",
+            "username": "Email",
+            "password": "Password",
+            "id": "ID"
+          }
+        }
+      ]
+    },
+    {
+      "id": "en",
+      "components": [
+        {
+          "id": "signinForm",
+          "strings": {
+            "title": "LOGIN",
+            "email": "Email",
+            "password": "Password",
+            "server": "Server",
+            "database": "Database",
+            "login": "LOGIN",
+            "forgot": "Forgot Password?",
+            "signup": "Sign Up",
+            "or": "OR"
+          }
+        },
+        {
+          "id": "signupForm",
+          "strings": {
+            "title": "Signup",
+            "email": "Email",
+            "username": "Username",
+            "password": "Password",
+            "confirmPassword": "Confirm password",
+            "signupButton": "CREATE USER",
+            "return": "Return",
+            "passwordMissmatch": "Confirm password missmatch",
+            "success": "User created successfully",
+            "login": "LOGIN"
+          }
+        },
+        {
+          "id": "recoverForm",
+          "strings": {
+            "title": "Recover password",
+            "email": "Email",
+            "recoverButton": "RECOVER PASSWORD",
+            "return": "Return",
+            "success": "A Email has been sent to your mailbox with a new password"
+          }
+        },
+        {
+          "id": "sidebar",
+          "strings": {
+            "configuration": "Configuration",
+            "security": "Security",
+            "users": "Users",
+            "groups": "Groups",
+            "logout": "Logout"
+          }
+        },
+        {
+          "id": "sectionConfiguration",
+          "strings": {
+            "title": "Configuration",
+            "application": "Preferences",
+            "darkMode": "Dark mode",
+            "language": "Language",
+            "accesAccounts": "Loguin credentials",
+            "usernameAndPassword": "Email and password",
+            "username": "Email",
+            "password": "Password",
+            "name": "Name",
+            "userId": "ID",
+            "creationDate": "Creation"
+          }
+        },
+        {
+          "id": "sectionConfiguration/accesAccounts/google",
+          "strings": {}
+        },
+        {
+          "id": "sectionConfiguration/accesAccounts/usernameAndPassword",
+          "strings": {
+            "usernameAndPassword": "Email and password",
+            "username": "Email",
+            "password": "Password",
+            "id": "ID"
+          }
+        }
+      ]
+    }
+  ]
+}

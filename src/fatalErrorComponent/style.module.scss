@@ -1,0 +1,21 @@
+.container {
+  background-color: black;
+  width: calc(100% - 2rem);
+  height: calc(100% - 2rem);
+  display: flex;
+  flex-flow: column;
+  align-items: flex-start;
+  justify-content: flex-start;
+  position: absolute;
+  padding: 1rem;
+  h1 {
+    color: red;
+    padding: 0px;
+    margin: 0px;
+  }
+  span {
+    color: white;
+    padding: 0px;
+    margin: 0px;
+  }
+}
