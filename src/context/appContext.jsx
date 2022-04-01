@@ -17,11 +17,12 @@ import {
   connectAuthEmulator,
   sendPasswordResetEmail,
 } from "firebase/auth";
-
+import { Box, Container, createTheme } from "@mui/material";
+import { blueGrey, deepOrange, grey, red } from "@mui/material/colors";
+import useMediaQuery from "@mui/material/useMediaQuery";
 const AppContext = React.createContext();
 
 const initialContextData = {
-  theme: "dark",
   firebaseConnectionState: "LOADING",
   firebaseConnectionStateError: "",
   firebaseApp: {},
@@ -39,9 +40,11 @@ const initialContextData = {
   tryRecover: () => {},
   updateName: () => {},
   updateLanguage: () => {},
-  userTheme: "",
   userLanguage: "",
   userDisplayName: "",
+  theme: {},
+  darkMode: false,
+  setDarkMode: () => {},
 };
 
 async function getFiles() {
@@ -66,18 +69,46 @@ function getDefautTheme() {
     window.matchMedia("(prefers-color-scheme: dark)").matches
       ? "dark"
       : "light";
-  console.log("themeMode", themeMode);
   return themeMode;
 }
+function getThemeObject(themeString) {
+  return createTheme({
+    palette: {
+      background: {
+        default: themeString === "dark" ? grey[900] : grey[50],
+        paper: themeString === "dark" ? grey[800] : "#fff",
+      },
+      text: {
+        primary: themeString === "dark" ? "#fff" : grey[800],
+        secondary: themeString === "dark" ? grey[500] : grey[900],
+      },
+    },
+  });
+}
+
 function getDefautLanguage() {
   return "en";
 }
 
 export function AppProvider(props) {
-  // use the local emulator
-  const useEmulator = true;
-  const [appContextData, setAppContextData] = useState(initialContextData);
+  const prefersDarkMode = useMediaQuery("(prefers-color-scheme: dark)");
 
+  // use the local emulator
+  const useEmulator = false;
+  const [appContextData, setAppContextData] = useState({
+    ...initialContextData,
+    darkMode: prefersDarkMode,
+  });
+  console.log("appContextData", {
+    darkMode: appContextData.darkMode,
+    theme: appContextData.theme,
+  });
+
+  const theme = createTheme({
+    palette: {
+      mode: appContextData.darkMode ? "dark" : "light",
+    },
+  });
   useEffect(() => {
     let app,
       functions,
@@ -122,6 +153,25 @@ export function AppProvider(props) {
           throw e.toString();
         }
 
+        let setDarkMode = () => {
+          setAppContextData((prevProps) => {
+            let newDarkMode = !prevProps.darkMode;
+            let themeString = newDarkMode ? "dark" : "light";
+            console.log("new dark mode is", newDarkMode);
+            httpsCallableFunctions.updateUserField({
+              field: "theme",
+              newValue: themeString,
+              userDocId: userDocId,
+            });
+
+            return {
+              ...prevProps,
+              darkMode: newDarkMode,
+              theme: getThemeObject(themeString),
+            };
+          });
+        };
+
         //UPDATE NAME LOCALLY AND OPTIONALLY ON SERVER
         let updateName = (_newName, userDocId = null) => {
           console.log("AppContext.updateName", { _newName, userData });
@@ -138,23 +188,6 @@ export function AppProvider(props) {
               userDocId: userDocId,
             });
           }
-        };
-
-        //update theme locally and on the server
-        let updateTheme = (_newTheme, userDocId) => {
-          console.log("AppContext.updateTheme", { _newTheme, userData });
-          setAppContextData((prevProps) => {
-            return {
-              ...prevProps,
-              userTheme: _newTheme,
-            };
-          });
-
-          httpsCallableFunctions.updateUserField({
-            field: "theme",
-            newValue: _newTheme,
-            userDocId: userDocId,
-          });
         };
 
         //update theme locally and on the server
@@ -366,11 +399,12 @@ export function AppProvider(props) {
             trySignup: trySignup,
             tryRecover: tryRecover,
             updateName: updateName,
-            updateTheme: updateTheme,
             updateLanguage: updateLanguage,
-            userTheme: userTheme,
             userLanguage: userLanguage,
             userDisplayName: userDisplayName,
+            darkMode: userTheme === "dark" ? true : false,
+            theme: getThemeObject(userTheme),
+            setDarkMode: setDarkMode,
           };
         });
       })
@@ -424,6 +458,7 @@ export function AppProvider(props) {
     appContextData.userDisplayName,
     appContextData.userTheme,
     appContextData.userLanguage,
+    appContextData.darkMode,
   ]);
 
   return <AppContext.Provider value={value} {...props}></AppContext.Provider>;

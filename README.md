@@ -14,6 +14,12 @@ git status
 
 git checkout -b <your-new-branch-name>
 
+# merge branch into main branch
+
+1. check with git status si on the correct branch (the father branch where you want to add/gmerge the son branch changes)
+   1.a) if not on the main branch, change the current (son) branch to the main (father) branch using git checkout -b <your-father-branch-name>
+2. execute the command git merge <yout-son-branch-name>
+
 # deploy a firebase
 
 firebase deploy

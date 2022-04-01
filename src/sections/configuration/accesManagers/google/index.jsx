@@ -2,7 +2,13 @@ import React, { useEffect, useState } from "react";
 import style from "./style.module.scss";
 import { useAppContext } from "../../../../context/appContext";
 import noUserImage from "./noUserImage.png";
-import LoaderAnimation from "../../../../loaderAnimation";
+import {
+  Avatar,
+  Card,
+  CircularProgress,
+  FormGroup,
+  Typography,
+} from "@mui/material";
 
 export const AppContext = React.createContext();
 
@@ -34,52 +40,42 @@ const SectionConfigurationAccesAccountGoogle = () => {
       return { ..._prevData, state: "DELETING" };
     });
   }
-
+  /**
+   *backgroundColor: "#f7f7f7"
+   */
   return (
     <>
       {dataObject.state === "READY" || dataObject.state === "DELETING" ? (
-        <section className={style.section}>
-          <h3>Google</h3>
-          <img
-            src={dataObject.photoURL ? dataObject.photoURL : noUserImage}
-            alt="google user image"
-          />
-          <span id="googleDisplayName" name="googleDisplayName">
-            {dataObject ? dataObject.displayName : ""}
-          </span>
-          <span id="googleEmail" name="googleEmail">
-            {dataObject ? dataObject.email : ""}
-          </span>
-          <span id="credentialId" name="credentialId">
-            ID : {dataObject ? dataObject.loginDocId : ""}
-          </span>
-          {userData?.logins && userData.logins.length > 0 ? (
-            <button type="button" onClick={handleDeleteClick} name="delete">
-              <img
-                src="./icons/common/delete.png"
-                className="icon"
-                alt="delete account"
-              ></img>
-            </button>
-          ) : (
-            <></>
-          )}
-
-          {dataObject.state === "DELETING" ? (
-            <div className={style.loaderContainer}>
-              <LoaderAnimation></LoaderAnimation>
-            </div>
-          ) : (
-            <></>
-          )}
-        </section>
+        <Card variant="outlined" sx={{}}>
+          <FormGroup className={style.googleCard}>
+            <Typography variant="h7" component="h3" style={{ gridArea: "a1" }}>
+              Google
+            </Typography>
+            <Avatar
+              alt="Google user image"
+              src={dataObject.photoURL ? dataObject.photoURL : noUserImage}
+              style={{
+                gridArea: "a2",
+                margin: "0.5rem",
+                justifySelf: "center",
+              }}
+              sx={{ width: 80, height: 80 }}
+            />
+            <Typography variant="body2" gutterBottom style={{ gridArea: "a3" }}>
+              {dataObject ? dataObject.displayName : ""}
+            </Typography>
+            <Typography variant="body2" gutterBottom style={{ gridArea: "a4" }}>
+              {dataObject ? dataObject.email : ""}
+            </Typography>
+          </FormGroup>
+        </Card>
       ) : (
         <></>
       )}
 
       {dataObject.state === "LOADING" ? (
         <div className={style.loaderContainer}>
-          <LoaderAnimation></LoaderAnimation>
+          <CircularProgress />
         </div>
       ) : (
         <></>

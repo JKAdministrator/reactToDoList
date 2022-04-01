@@ -1,10 +1,17 @@
 import React, { useEffect, useState } from "react";
-import LoaderAnimation from "../loaderAnimation";
 import style from "./style.module.scss";
 import { AppProvider, useAppContext } from "../context/appContext";
 import FatalErrorComponent from "../fatalErrorComponent";
 import { Outlet, Link } from "react-router-dom";
-
+import {
+  Box,
+  Button,
+  CircularProgress,
+  Paper,
+  TextField,
+  Typography,
+} from "@mui/material";
+import { width } from "@mui/system";
 const SignupForm = (props) => {
   //variables de estado
   const { getLanguageString, trySignup, userDocId } = useAppContext();
@@ -149,101 +156,140 @@ const SignupForm = (props) => {
 
   //html retornado
   return (
-    <form
-      action="submit"
-      id="LoginForm"
-      onSubmit={handleSubmit}
-      className={style.form + " card"}
-    >
-      <div className={style.imagesContainer}>
-        <img
-          src="./logos/company.png"
-          alt="company logo"
-          className="companyLogo"
-        />
-        <img
-          src="./logos/client.png"
-          alt="client logo"
-          className="clientLogo"
-        />
-      </div>
+    <>
+      <img
+        src="./logos/signupLogo.png"
+        alt="company logo"
+        className={style.floatBackground}
+      />
       {stateData.state === "READY" ? (
-        <>
-          <h1>{getString("title")}</h1>
-          <label htmlFor="email" className={style.label}>
-            {getString("username")} :
-          </label>
-          <input
-            type="text"
-            name="username"
-            id="username"
-            value={stateData.username}
-            onChange={changeHandler}
-            autoFocus
-            required
-            className={`${stateData.isUsernameMissing ? "error" : ""}`}
-          />
-
-          <label htmlFor="username" className={style.label}>
-            {getString("email")} :
-          </label>
-          <input
-            type="email"
-            name="email"
-            id="email"
-            value={stateData.email}
-            onChange={changeHandler}
-            required
-            className={`${stateData.isUsernameMissing ? "error" : ""}`}
-          />
-          <label htmlFor="password" className={style.label}>
-            {getString("password")} :
-          </label>
-          <input
-            type="password"
-            name="password"
-            id="password"
-            value={stateData.password}
-            onChange={changeHandler}
-            required
-            className={`${stateData.isPasswordMissing ? "error" : ""}`}
-          />
-          <label htmlFor="confirmPassword" className={style.label}>
-            {getString("confirmPassword")} :
-          </label>
-          <input
-            type="password"
-            name="confirmPassword"
-            id="confirmPassword"
-            value={stateData.confirmPassword}
-            onChange={changeHandler}
-            required
-            className={`${stateData.isConfirmPasswordMissing ? "error" : ""}`}
-          />
-          <span name="loginResponse">{stateData.loginResponseMessage}</span>
-          <button
-            type="button"
-            className={style.primaryButton}
-            onClick={handleSubmit}
-            name="signupButton"
+        <Paper
+          style={{
+            marginTop: "3rem",
+            width: "max-content",
+            display: "flex",
+            flexFlow: "column",
+            alignItems: "center",
+          }}
+          className={style.container}
+        >
+          <form
+            action="submit"
+            id="LoginForm"
+            onSubmit={handleSubmit}
+            class={style.form}
           >
-            {getString("signupButton")}
-          </button>
-
-          <div className={style.secondaryButtons}>
-            <Link to="/" className={style.secondaryButton} name="return">
-              {getString("return")}
-            </Link>
-          </div>
-        </>
+            <Typography
+              variant="h3"
+              component="h1"
+              style={{
+                alignSelf: "center",
+                fontFamily: "LobsterRegular",
+              }}
+            >
+              Tasky
+            </Typography>
+            <Typography
+              variant="h5"
+              component="h2"
+              style={{
+                alignSelf: "baseline",
+                fontFamily: "RobotoRegular",
+              }}
+            >
+              {getString("title")}
+            </Typography>
+            <TextField
+              type="username"
+              name="username"
+              id="username"
+              variant="outlined"
+              value={stateData.username}
+              onChange={changeHandler}
+              autoFocus
+              required
+              style={{ width: "100%" }}
+              error={stateData.isUsernameMissing}
+              label={getString("username")}
+            />
+            <TextField
+              type="email"
+              name="email"
+              id="email"
+              variant="outlined"
+              value={stateData.email}
+              onChange={changeHandler}
+              required
+              style={{ width: "100%" }}
+              error={stateData.isEmailMissing}
+              label={getString("email")}
+            />
+            <TextField
+              type="password"
+              name="password"
+              id="password"
+              variant="outlined"
+              value={stateData.password}
+              onChange={changeHandler}
+              required
+              style={{ width: "100%" }}
+              error={stateData.isPasswordMissing}
+              label={getString("password")}
+            />
+            <TextField
+              type="password"
+              name="confirmPassword"
+              id="confirmPassword"
+              variant="outlined"
+              value={stateData.confirmPassword}
+              onChange={changeHandler}
+              required
+              style={{ width: "100%" }}
+              error={stateData.isConfirmPasswordMissing}
+              label={getString("confirmPassword")}
+            />
+            <span name="loginResponse">{stateData.loginResponseMessage}</span>
+            <Button
+              variant="contained"
+              onClick={handleSubmit}
+              name="signupButton"
+              style={{ width: "100%" }}
+              disableElevation
+            >
+              {getString("signupButton")}
+            </Button>
+            <Box
+              style={{
+                width: "100%",
+                height: "100%",
+                display: "flex",
+                flexFlow: "column",
+                justifyContent: "felx-start",
+                alignItems: "flex-start",
+              }}
+            >
+              <Link to="/" name="signup">
+                {getString("return")}
+              </Link>
+            </Box>
+          </form>
+        </Paper>
       ) : (
         <></>
       )}
       {stateData.state === "INITIAL_LOADING" ||
       stateData.state === "AWAIT_REGISTER_RESPONSE" ? (
-        <div className={style.loader}>
-          <LoaderAnimation />
-        </div>
+        <CircularProgress
+          disableShrink
+          variant="indeterminate"
+          thickness={6}
+          sx={{
+            marginTop: "4rem",
+            color: (theme) =>
+              theme.palette.mode === "light" ? "#1a90ff" : "#308fe8",
+            animationDuration: "800ms",
+          }}
+        />
       ) : (
         <></>
       )}
@@ -255,18 +301,22 @@ const SignupForm = (props) => {
         <></>
       )}
       {stateData.state === "LOGIN_READY" ? (
-        <>
-          <div className={style.successMessageContainer}>
-            <span>{getString("success")}</span>
-            <Link to="/" name="login">
+        <Paper className={style.successMessageContainer}>
+          <span>{getString("success")}</span>
+          <Link to="/" name="login">
+            <Button
+              variant="contained"
+              style={{ width: "100%" }}
+              disableElevation
+            >
               {getString("login")}
-            </Link>
-          </div>
-        </>
+            </Button>
+          </Link>
+        </Paper>
       ) : (
         <></>
       )}
-    </form>
+    </>
   );
 };
 export default SignupForm;

@@ -1,107 +1,32 @@
-.container {
+.preferences {
+  display: grid !important;
+  grid-template-columns: max-content 1fr;
+  grid-template-rows: max-content max-content;
+  grid-template-areas:
+    "a1 a1"
+    "a2 a3";
+  gap: 1rem;
+  padding: 1rem;
+  align-items: center;
+  justify-content: flex-start;
+}
+.myData {
+  display: grid !important;
+  grid-template-columns: max-content max-content;
+  grid-template-rows: max-content max-content;
+  grid-template-areas:
+    "a1 a1"
+    "a2 a2"
+    "a3 a4"
+    "a5 a6";
+  gap: 1rem;
+  padding: 1rem;
+  align-items: center;
+  justify-content: flex-start;
+}
+.credentials {
   display: flex;
   flex-flow: column;
-  align-items: flex-start;
-  justify-content: flex-start;
-  max-width: calc(100% - 2rem);
-  min-height: calc(100% - 2rem);
-  height: max-content;
+  gap: 1rem;
   padding: 1rem;
-  margin: 0px;
-  gap: 2rem;
-  > h1 {
-    color: var(--text-color-primary);
-    font-size: 1.5rem;
-    font-weight: lighter;
-    width: 100%;
-    height: max-content;
-    padding: 0px;
-    margin: 0px;
-  }
-  > section {
-    width: calc(100% - 1rem);
-    height: max-content;
-    padding: 1rem;
-    gap: 1rem;
-    > h2 {
-      color: var(--text-color-primary);
-      opacity: 0.9;
-      font-weight: 100;
-    }
-    &[name="CONFIGURATION"] {
-      display: grid;
-      grid-template-areas:
-        "title          title         title         title"
-        "labelDarkMode  inputDarkMode labelLaguage  inputLanguage";
-      grid-template-columns: max-content 1fr max-content 1fr;
-      grid-template-rows: repeat(2, max-content);
-      align-items: center;
-      > h2 {
-        grid-area: title;
-      }
-      > label[for="darkMode"] {
-        grid-area: labelDarkMode;
-      }
-      > label[for="language"] {
-        grid-area: labelLaguage;
-      }
-      > input#darkMode {
-        grid-area: inputDarkMode;
-      }
-      > select#language {
-        grid-area: inputLanguage;
-      }
-    }
-    &[name="ACCES_ACCOUNTS"] {
-      display: flex;
-      flex-flow: column;
-      align-items: flex-start;
-      justify-content: flex-start;
-      > h3 {
-        font-size: 0.8rem;
-        font-weight: lighter;
-        opacity: 0.6;
-      }
-    }
-    &[name="MY_DATA"] {
-      display: grid;
-      grid-template-areas:
-        "title title"
-        "labelName nameData"
-        "labelCreation creationData"
-        "labelId idData";
-      grid-template-columns: max-content 1fr;
-      grid-template-rows: repeat(2, max-content);
-      gap: 0.4rem;
-      > h2 {
-        color: var(--text-color-primary);
-        opacity: 0.9;
-        font-weight: 100;
-        grid-area: title;
-      }
-      span {
-        opacity: 0.7;
-        font-size: 0.95rem;
-      }
-      label[for="username"] {
-        grid-area: labelName;
-      }
-      input[name="username"] {
-        grid-area: nameData;
-        padding: 0.3rem;
-      }
-      label[for="userId"] {
-        grid-area: labelId;
-      }
-      span[name="userId"] {
-        grid-area: idData;
-      }
-      label[for="creationDate"] {
-        grid-area: labelCreation;
-      }
-      span[name="creationDate"] {
-        grid-area: creationData;
-      }
-    }
-  }
 }

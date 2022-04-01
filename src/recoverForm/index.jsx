@@ -1,10 +1,17 @@
 import React, { useEffect, useState } from "react";
-import LoaderAnimation from "../loaderAnimation";
 import style from "./style.module.scss";
 import { AppProvider, useAppContext } from "../context/appContext";
 import FatalErrorComponent from "../fatalErrorComponent";
 import { Outlet, Link } from "react-router-dom";
-
+import {
+  Box,
+  Button,
+  CircularProgress,
+  Paper,
+  TextField,
+  Typography,
+} from "@mui/material";
+import { width } from "@mui/system";
 const RecoverForm = (props) => {
   //variables de estado
   const { getLanguageString, tryRecover, userDocId } = useAppContext();
@@ -110,66 +117,106 @@ const RecoverForm = (props) => {
 
   //html retornado
   return (
-    <form
-      action="submit"
-      id="LoginForm"
-      onSubmit={handleSubmit}
-      className={style.form + " card"}
-    >
-      <div className={style.imagesContainer}>
-        <img
-          src="./logos/company.png"
-          alt="company logo"
-          className="companyLogo"
-        />
-        <img
-          src="./logos/client.png"
-          alt="client logo"
-          className="clientLogo"
-        />
-      </div>
+    <>
+      <img
+        src="./logos/recoverLogo.png"
+        alt="company logo"
+        className={style.floatBackground}
+      />
       {stateData.state === "READY" ? (
-        <>
-          <h1>{getString("title")}</h1>
-          <label htmlFor="email" className={style.label}>
-            {getString("email")} :
-          </label>
-          <input
-            type="email"
-            name="email"
-            id="email"
-            value={stateData.email}
-            onChange={changeHandler}
-            required
-            className={`${stateData.isEmailMissing ? "error" : ""}`}
-          />
-          <span name="loginResponse">{stateData.loginResponseMessage}</span>
-          <button
-            type="button"
-            className={style.primaryButton}
-            onClick={handleSubmit}
-            name="signupButton"
+        <Paper
+          style={{
+            marginTop: "3rem",
+            width: "max-content",
+            display: "flex",
+            flexFlow: "column",
+            alignItems: "center",
+          }}
+          className={style.container}
+        >
+          <form
+            action="submit"
+            id="LoginForm"
+            onSubmit={handleSubmit}
+            className={style.form}
           >
-            {getString("recoverButton")}
-          </button>
-
-          <div className={style.secondaryButtons}>
-            <Link to="/" className={style.secondaryButton} name="return">
-              {getString("return")}
-            </Link>
-          </div>
-        </>
+            <Typography
+              variant="h3"
+              component="h1"
+              style={{
+                alignSelf: "center",
+                fontFamily: "LobsterRegular",
+              }}
+            >
+              Tasky
+            </Typography>
+            <Typography
+              variant="h5"
+              component="h1"
+              style={{
+                alignSelf: "baseline",
+                fontFamily: "RobotoRegular",
+              }}
+            >
+              {getString("title")}
+            </Typography>
+            <TextField
+              type="email"
+              name="email"
+              id="email"
+              variant="outlined"
+              value={stateData.email}
+              onChange={changeHandler}
+              required
+              autoFocus
+              style={{ width: "100%" }}
+              error={stateData.isEmailMissing}
+              label={getString("email")}
+            />
+            <span name="loginResponse">{stateData.loginResponseMessage}</span>
+            <Button
+              variant="contained"
+              onClick={handleSubmit}
+              name="signupButton"
+              style={{ width: "100%" }}
+              disableElevation
+            >
+              {getString("recoverButton")}
+            </Button>
+            <Box
+              style={{
+                width: "100%",
+                display: "flex",
+                justifyContent: "space-between",
+              }}
+            >
+              <Link to="/" name="signup">
+                {getString("return")}
+              </Link>
+            </Box>
+          </form>
+        </Paper>
       ) : (
         <></>
       )}
+
       {stateData.state === "INITIAL_LOADING" ||
       stateData.state === "AWAIT_RECOVER_RESPONSE" ? (
-        <div className={style.loader}>
-          <LoaderAnimation />
-        </div>
+        <CircularProgress
+          disableShrink
+          variant="indeterminate"
+          thickness={6}
+          sx={{
+            marginTop: "4rem",
+            color: (theme) =>
+              theme.palette.mode === "light" ? "#1a90ff" : "#308fe8",
+            animationDuration: "800ms",
+          }}
+        />
       ) : (
         <></>
       )}
+
       {stateData.state === "ERROR" ? (
         <FatalErrorComponent
           mensaje={stateData.stateErrorMessage}
@@ -177,19 +224,24 @@ const RecoverForm = (props) => {
       ) : (
         <></>
       )}
+
       {stateData.state === "RECOVER_READY" ? (
-        <>
-          <div className={style.successMessageContainer}>
-            <span>{getString("success")}</span>
-            <Link to="/" name="login">
+        <Paper className={style.successMessageContainer}>
+          <span>{getString("success")}</span>
+          <Link to="/" name="login">
+            <Button
+              variant="contained"
+              style={{ width: "100%" }}
+              disableElevation
+            >
               {getString("return")}
-            </Link>
-          </div>
-        </>
+            </Button>
+          </Link>
+        </Paper>
       ) : (
         <></>
       )}
-    </form>
+    </>
   );
 };
 export default RecoverForm;

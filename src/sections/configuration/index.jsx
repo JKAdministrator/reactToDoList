@@ -3,26 +3,42 @@ import style from "./style.module.scss";
 import { useAppContext } from "../../context/appContext";
 import SectionConfigurationAccesAccountGoogle from "./accesManagers/google";
 import SectionConfigurationAccesAccountUsernameAndPassword from "./accesManagers/usernameAndPassword";
-
+import {
+  Box,
+  Button,
+  CircularProgress,
+  Paper,
+  TextField,
+  Typography,
+  FormGroup,
+  FormControlLabel,
+  Switch,
+  Select,
+  MenuItem,
+  FormControl,
+  InputLabel,
+  Card,
+  Stack,
+} from "@mui/material";
 export const AppContext = React.createContext();
 const SectionConfiguration = () => {
   const {
     userLanguage,
-    userTheme,
     userDisplayName,
     getLanguageString,
     userDocId,
     userData,
     updateName,
-    updateTheme,
     updateLanguage,
+    setDarkMode,
+    darkMode,
   } = useAppContext();
 
   function onChangeThemeHandler(e) {
     console.log("onChangeThemeHandler", e);
-    let newValue = e.target.checked ? `dark` : `light`;
+    setDarkMode();
+    //let newValue = e.target.checked ? `dark` : `light`;
     //setTheme(newValue);
-    updateTheme(newValue, userDocId);
   }
 
   function onChangeLanguageHandler(e) {
@@ -40,65 +56,148 @@ const SectionConfiguration = () => {
     updateName(e.target.value, userDocId);
   }
 
+  console.log("redrawing", { darkMode: darkMode });
+
   return (
-    <>
-      <form className={style.container}>
-        <h1>{getString("title")}</h1>
+    <div
+      style={{
+        display: "flex",
+        flexFlow: "column",
+        margin: "1rem 0rem 0rem 3rem",
+        gap: "1rem",
+      }}
+    >
+      <Typography
+        variant="h4"
+        component="h1"
+        style={{
+          alignSelf: "left",
+          width: "100%",
+          opacity: "0.7",
+        }}
+      >
+        {getString("title")}
+      </Typography>
 
-        <section className="card" name="CONFIGURATION">
-          <h2>{getString("application")}</h2>
-          <label htmlFor="darkMode">{getString("darkMode")} :</label>
-          <input
-            type="checkbox"
-            name="darkMode"
-            id="darkMode"
-            itemID="darkMode"
-            onChange={onChangeThemeHandler}
-            checked={userTheme === "dark" ? true : false}
-          ></input>
-          <label htmlFor="language">{getString("language")} :</label>
-          <select
-            id="language"
-            name="language"
-            onChange={onChangeLanguageHandler}
-            defaultValue={userLanguage}
-          >
-            <option value="en">English</option>
-            <option value="es">Español</option>
-          </select>
-        </section>
-
-        <section className="card" name="ACCES_ACCOUNTS">
-          <h2>{getString("accesAccounts")}</h2>
-          <SectionConfigurationAccesAccountGoogle></SectionConfigurationAccesAccountGoogle>
-          <SectionConfigurationAccesAccountUsernameAndPassword></SectionConfigurationAccesAccountUsernameAndPassword>
-        </section>
-
-        <section className="card" name="MY_DATA">
-          <h2>{getString("myData")}Mis Datos</h2>
-          <label htmlFor="username">{getString("name")} :</label>
-          <input
+      <Card>
+        <FormGroup className={style.myData}>
+          <Typography variant="h6" component="h2" style={{ gridArea: "a1" }}>
+            {getString("myData")}
+          </Typography>
+          <TextField
+            type="username"
             name="username"
             id="username"
-            type="text"
             value={userDisplayName}
+            variant="filled"
             onChange={handleChangeName}
             onBlur={handleBlurName}
+            label={getString("name")}
+            style={{ gridArea: "a2" }}
           />
-          <label htmlFor="userId">{getString("userId")} :</label>
-          <span name="userId" id="userId">
+          <Typography variant="body1" gutterBottom style={{ gridArea: "a3" }}>
+            {getString("userId")}
+          </Typography>
+          <Typography
+            variant="body2"
+            gutterBottom
+            style={{ gridArea: "a4", opacity: "0.5" }}
+          >
             {userDocId}
-          </span>
-          <label htmlFor="creationDate">{getString("creationDate")} :</label>
-          <span name="creationDate" id="creationDate">
+          </Typography>
+          <Typography variant="body1" gutterBottom style={{ gridArea: "a5" }}>
+            {getString("creationDate")}
+          </Typography>
+          <Typography
+            variant="body2"
+            gutterBottom
+            style={{ gridArea: "a6", opacity: "0.5" }}
+          >
             {userData.user
               ? new Date(userData.user.creationDate._seconds * 1000).toString()
               : ""}
-          </span>
-        </section>
-      </form>
-    </>
+          </Typography>
+        </FormGroup>
+      </Card>
+
+      <Card sx={{ backgroundColor: "background.paper" }}>
+        <FormGroup className={style.preferences}>
+          <Typography variant="h6" component="h2" style={{ gridArea: "a1" }}>
+            {getString("application")}
+          </Typography>
+          <FormControlLabel
+            style={{ gridArea: "a2" }}
+            control={
+              <Switch checked={darkMode} onChange={onChangeThemeHandler} />
+            }
+            label={getString("darkMode")}
+          />
+          <FormControl
+            variant="standard"
+            sx={{ m: 1, minWidth: 120, gridArea: "a3" }}
+          >
+            <InputLabel id="language-label">{getString("language")}</InputLabel>
+            <Select
+              style={{ gridArea: "language" }}
+              labelId="language-label"
+              id="language"
+              value={userLanguage}
+              label={getString("language")}
+              onChange={onChangeLanguageHandler}
+              variant="filled"
+            >
+              <MenuItem value={"en"}>English</MenuItem>
+              <MenuItem value={"es"}>Español</MenuItem>
+            </Select>
+          </FormControl>
+        </FormGroup>
+      </Card>
+
+      <Card sx={{ backgroundColor: "background.paper" }}>
+        <FormGroup className={style.credentials}>
+          <Typography variant="h6" component="h2" style={{ gridArea: "a1" }}>
+            {getString("accesAccounts")}
+          </Typography>
+          <Stack spacing={2}>
+            <SectionConfigurationAccesAccountGoogle></SectionConfigurationAccesAccountGoogle>
+            <SectionConfigurationAccesAccountUsernameAndPassword></SectionConfigurationAccesAccountUsernameAndPassword>
+          </Stack>
+        </FormGroup>
+      </Card>
+    </div>
   );
 };
+/**
+ 
 
+      <section className="card" name="ACCES_ACCOUNTS">
+        <h2>{getString("accesAccounts")}</h2>
+        <SectionConfigurationAccesAccountGoogle></SectionConfigurationAccesAccountGoogle>
+        <SectionConfigurationAccesAccountUsernameAndPassword></SectionConfigurationAccesAccountUsernameAndPassword>
+      </section>
+
+      <section className="card" name="MY_DATA">
+        <h2>{getString("myData")}Mis Datos</h2>
+        <label htmlFor="username">{getString("name")} :</label>
+        <input
+          name="username"
+          id="username"
+          type="text"
+          value={userDisplayName}
+          onChange={handleChangeName}
+          onBlur={handleBlurName}
+        />
+        <label htmlFor="userId">{getString("userId")} :</label>
+        <span name="userId" id="userId">
+          {userDocId}
+        </span>
+        <label htmlFor="creationDate">{getString("creationDate")} :</label>
+        <span name="creationDate" id="creationDate">
+          {userData.user
+            ? new Date(userData.user.creationDate._seconds * 1000).toString()
+            : ""}
+        </span>
+      </section>
+
+ */
 export default SectionConfiguration;

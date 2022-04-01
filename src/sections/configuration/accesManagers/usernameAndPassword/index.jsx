@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import style from "./style.module.scss";
 import { useAppContext } from "../../../../context/appContext";
-import LoaderAnimation from "../../../../loaderAnimation";
+import { CircularProgress, Typography, Card, FormGroup } from "@mui/material";
 
 export const AppContext = React.createContext();
 const SectionConfigurationAccesAccountUsernameAndPassword = () => {
@@ -45,43 +45,53 @@ const SectionConfigurationAccesAccountUsernameAndPassword = () => {
   return (
     <>
       {dataObject.state === "READY" || dataObject.state === "DELETING" ? (
-        <section className={style.section}>
-          <h3>{getString("usernameAndPassword")}</h3>
-          <label htmlFor="username">{getString("username")} :</label>
-          <span type="username" id="username" name="username">
-            {dataObject ? dataObject.email : ""}
-          </span>
-          <label htmlFor="password">{getString("password")} :</label>
-          <span id="password" name="password">
-            {dataObject?.password ? "*****" : ""}
-          </span>
-          <label htmlFor="credentialId">{getString("id")} :</label>
-          <span id="credentialId" name="credentialId">
-            {dataObject ? dataObject.loginDocId : ""}
-          </span>
-          <button type="button" onClick={handleDeleteClick} name="delete">
-            <img
-              src="./icons/common/delete.png"
-              className="icon"
-              alt="delete account"
-            ></img>
-          </button>
+        <Card variant="outlined" sx={{}}>
+          <FormGroup className={style.userAndPasswordCard}>
+            <Typography variant="h7" component="h3" style={{ gridArea: "a1" }}>
+              {getString("usernameAndPassword")}
+            </Typography>
 
-          {dataObject.state === "DELETING" ? (
-            <div className={style.loaderContainer}>
-              <LoaderAnimation></LoaderAnimation>
-            </div>
-          ) : (
-            <></>
-          )}
-        </section>
+            <Typography variant="body1" gutterBottom style={{ gridArea: "a2" }}>
+              {getString("username")}
+            </Typography>
+            <Typography
+              variant="body2"
+              gutterBottom
+              style={{ gridArea: "a3", opacity: "0.7" }}
+            >
+              {dataObject ? dataObject.email : ""}
+            </Typography>
+
+            <Typography variant="body1" gutterBottom style={{ gridArea: "a4" }}>
+              {getString("password")}
+            </Typography>
+            <Typography
+              variant="body2"
+              gutterBottom
+              style={{ gridArea: "a5", opacity: "0.7" }}
+            >
+              {dataObject?.password ? "*****" : ""}
+            </Typography>
+
+            <Typography variant="body1" gutterBottom style={{ gridArea: "a6" }}>
+              {getString("id")}
+            </Typography>
+            <Typography
+              variant="body2"
+              gutterBottom
+              style={{ gridArea: "a7", opacity: "0.7" }}
+            >
+              {dataObject ? dataObject.loginDocId : ""}
+            </Typography>
+          </FormGroup>
+        </Card>
       ) : (
         <></>
       )}
 
       {dataObject.state === "LOADING" ? (
         <div className={style.loaderContainer}>
-          <LoaderAnimation></LoaderAnimation>
+          <CircularProgress></CircularProgress>
         </div>
       ) : (
         <></>

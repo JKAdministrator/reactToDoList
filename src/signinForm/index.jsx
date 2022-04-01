@@ -1,20 +1,27 @@
 import React, { useEffect, useState } from "react";
-import LoaderAnimation from "../loaderAnimation";
 import style from "./style.module.scss";
 import { AppProvider, useAppContext } from "../context/appContext";
 import FatalErrorComponent from "../fatalErrorComponent";
-import GoogleLoginButton from "../googleLoginButton";
+import GoogleLoginButton from "./googleLoginButton";
 import { Outlet, Link } from "react-router-dom";
+import {
+  Box,
+  Button,
+  CircularProgress,
+  Paper,
+  TextField,
+  Typography,
+} from "@mui/material";
 const SigninForm = (props) => {
   //variables de estado
   const { getLanguageString, tryLogin } = useAppContext();
 
   const [stateData, setStateData] = useState({
-    username: props.username || "",
+    email: props.email || "",
     password: props.password || "",
     state: "READY",
     stateErrorMessage: "",
-    isUsernameMissing: false,
+    isEmailMissing: false,
     isPasswordMissing: false,
     loginResponseMessage: "",
   });
@@ -27,7 +34,7 @@ const SigninForm = (props) => {
         try {
           await tryLogin({
             source: "usernameAndPassword",
-            email: stateData.username,
+            email: stateData.email,
             password: stateData.password,
           });
         } catch (e) {
@@ -78,18 +85,17 @@ const SigninForm = (props) => {
   //verifica si se puede o no hacer el submit de los datos
   const handleSubmit = (e) => {
     e.preventDefault();
-    let isUsernameMissing =
-      stateData.username.toString().length <= 0 ? true : false;
+    let isEmailMissing = stateData.email.toString().length <= 0 ? true : false;
     let isPasswordMissing =
       stateData.password.toString().length <= 0 ? true : false;
-    if (isUsernameMissing || isPasswordMissing) {
-      setStateData({ ...stateData, isPasswordMissing, isUsernameMissing });
+    if (isEmailMissing || isPasswordMissing) {
+      setStateData({ ...stateData, isPasswordMissing, isEmailMissing });
       return;
     } else {
       setStateData({
         ...stateData,
         isPasswordMissing,
-        isUsernameMissing,
+        isEmailMissing,
         state: "AWAIT_LOGIN_RESPONSE",
       });
       return;
@@ -102,93 +108,131 @@ const SigninForm = (props) => {
 
   //html retornado
   return (
-    <form
-      action="submit"
-      id="LoginForm"
-      onSubmit={handleSubmit}
-      className={style.form + " card"}
-    >
-      <div className={style.imagesContainer}>
-        <img
-          src="./logos/company.png"
-          alt="company logo"
-          className="companyLogo"
-        />
-        <img
-          src="./logos/client.png"
-          alt="client logo"
-          className="clientLogo"
-        />
-      </div>
+    <>
+      <img
+        src="./logos/signinLogo.png"
+        alt="company logo"
+        className={style.floatBackground}
+      />
       {stateData.state === "READY" ? (
-        <>
-          <h1>{getString("title")}</h1>
-          <label htmlFor="username" className={style.label}>
-            {getString("email")} :
-          </label>
-          <input
-            type="email"
-            name="username"
-            id="username"
-            value={stateData.username}
-            onChange={changeHandler}
-            autoFocus
-            required
-            className={`${stateData.isUsernameMissing ? "error" : ""}`}
-          />
-          <label htmlFor="password" className={style.label}>
-            {getString("password")} :
-          </label>
-          <input
-            type="password"
-            name="password"
-            id="password"
-            value={stateData.password}
-            onChange={changeHandler}
-            required
-            className={`${stateData.isPasswordMissing ? "error" : ""}`}
-          />
-          <span name="loginResponse">{stateData.loginResponseMessage}</span>
-          <button
-            type="button"
-            className={style.primaryButton}
-            onClick={handleSubmit}
-            name="login"
+        <Paper
+          style={{
+            marginTop: "3rem",
+            width: "max-content",
+            display: "flex",
+            flexFlow: "column",
+            alignItems: "center",
+          }}
+          className={style.container}
+        >
+          <form
+            action="submit"
+            id="LoginForm"
+            onSubmit={handleSubmit}
+            className={style.form}
           >
-            {getString("login")}
-          </button>
-
-          <div className={style.secondaryButtons}>
-            <Link
-              to="/recover"
-              className={style.secondaryButton}
-              name="recover"
+            <Typography
+              variant="h3"
+              component="h1"
+              style={{
+                alignSelf: "center",
+                fontFamily: "LobsterRegular",
+              }}
             >
-              {getString("forgot")}
-            </Link>
+              Tasky
+            </Typography>
+            <Typography
+              variant="h5"
+              component="h1"
+              style={{
+                alignSelf: "baseline",
+                fontFamily: "RobotoRegular",
+              }}
+            >
+              {getString("title")}
+            </Typography>
+            <TextField
+              type="email"
+              name="email"
+              id="email"
+              variant="outlined"
+              value={stateData.email}
+              onChange={changeHandler}
+              autoFocus
+              required
+              style={{ width: "100%" }}
+              error={stateData.isEmailMissing}
+              label={getString("email")}
+            />
+            <TextField
+              type="password"
+              name="password"
+              id="password"
+              value={stateData.password}
+              onChange={changeHandler}
+              required
+              error={stateData.isPasswordMissing}
+              style={{ width: "100%" }}
+              label={getString("password")}
+            />
+            <span name="loginResponse">{stateData.loginResponseMessage}</span>
+            <Button
+              variant="contained"
+              onClick={handleSubmit}
+              name="login"
+              style={{ width: "100%" }}
+              disableElevation
+            >
+              {getString("login")}
+            </Button>
+            <Box
+              style={{
+                width: "100%",
+                display: "flex",
+                justifyContent: "space-between",
+              }}
+            >
+              <Link to="/recover" name="recover">
+                {getString("forgot")}
+              </Link>
+              <Link to="/signup" name="signup">
+                {getString("signup")}
+              </Link>
+            </Box>
 
-            <Link to="/signup" className={style.secondaryButton} name="signup">
-              {getString("signup")}
-            </Link>
-          </div>
-
-          <div name="orSeparator">
-            <span className={style.line}></span>
-            <span className={style.text}>{getString("or")}</span>
-            <span className={style.line}></span>
-          </div>
-          <GoogleLoginButton
-            className={style.socialNetworkButton}
-          ></GoogleLoginButton>
-        </>
+            <div name="orSeparator">
+              <span className={style.line}></span>
+              <span className={style.text}>{getString("or")}</span>
+              <span className={style.line}></span>
+            </div>
+            <Box
+              style={{
+                width: "100%",
+                display: "flex",
+                justifyContent: "space-between",
+              }}
+            >
+              <GoogleLoginButton></GoogleLoginButton>
+            </Box>
+          </form>
+        </Paper>
       ) : (
         <></>
       )}
+
       {stateData.state === "INITIAL_LOADING" ||
       stateData.state === "AWAIT_LOGIN_RESPONSE" ? (
-        <div className={style.loader}>
-          <LoaderAnimation />
-        </div>
+        <CircularProgress
+          disableShrink
+          variant="indeterminate"
+          thickness={6}
+          sx={{
+            marginTop: "4rem",
+            color: (theme) =>
+              theme.palette.mode === "light" ? "#1a90ff" : "#308fe8",
+            animationDuration: "800ms",
+          }}
+        />
       ) : (
         <></>
       )}
@@ -199,7 +243,7 @@ const SigninForm = (props) => {
       ) : (
         <></>
       )}
-    </form>
+    </>
   );
 };
 export default SigninForm;

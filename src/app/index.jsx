@@ -2,11 +2,12 @@ import style from "./style.module.scss";
 import React, { useEffect, useState, useRef } from "react";
 import SigninForm from "../signinForm/index.jsx";
 import { AppProvider, useAppContext } from "../context/appContext";
-import LoaderAnimation from "../loaderAnimation";
 import SectionManager from "../sections/manager";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import SignupForm from "../signupForm";
 import RecoverForm from "../recoverForm";
+import { Box, CircularProgress, Container, createTheme } from "@mui/material";
+import { ThemeProvider } from "@emotion/react";
 
 // el React context es un objeto
 // tiene 2 partes "provider" y "consumer"
@@ -24,8 +25,12 @@ function providerFunction() {
 
 function App() {
   const [state, setState] = useState("LOADING");
-  const { firebaseConnectionState, firebaseConnectionStateError, userDocId } =
-    useAppContext();
+  const {
+    firebaseConnectionState,
+    firebaseConnectionStateError,
+    userDocId,
+    theme,
+  } = useAppContext();
 
   useEffect(() => {
     if (firebaseConnectionState === "LOADING") setState("LOADING");
@@ -42,22 +47,34 @@ function App() {
         <Routes>
           <Route
             index
+            path="/"
             element={
               <>
                 {state === "LOGUED_IN" ? (
-                  <SectionManager></SectionManager>
+                  <ThemeProvider theme={theme}>
+                    <SectionManager></SectionManager>
+                  </ThemeProvider>
                 ) : (
                   <></>
                 )}
                 {state === "LOGUED_OUT" ? (
-                  <SigninForm name="signinForm"></SigninForm>
+                  <Box
+                    style={{
+                      display: "flex",
+                      justifyContent: "center",
+                      alignItems: "flex-start",
+                      width: "100%",
+                      height: "100%",
+                    }}
+                  >
+                    <SigninForm name="signinForm"></SigninForm>
+                  </Box>
                 ) : (
                   <></>
                 )}
                 {state === "LOADING" ? (
                   <div className={style.loader}>
-                    <LoaderAnimation />
-                    <span>sarasa</span>
+                    <CircularProgress />
                   </div>
                 ) : (
                   <></>
@@ -74,35 +91,42 @@ function App() {
             }
           />
           <Route
-            path="signIn"
-            element={
-              <>
-                <LoaderAnimation />
-                <span>signIn</span>
-              </>
-            }
-          />
-          <Route
             path="signUp"
             element={
-              <>
-                <SignupForm />
-              </>
+              <Box
+                style={{
+                  display: "flex",
+                  justifyContent: "center",
+                  alignItems: "flex-start",
+                  width: "100%",
+                  height: "100%",
+                }}
+              >
+                <SignupForm></SignupForm>
+              </Box>
             }
           />
           <Route
             path="recover"
             element={
-              <>
+              <Box
+                style={{
+                  display: "flex",
+                  justifyContent: "center",
+                  alignItems: "flex-start",
+                  width: "100%",
+                  height: "100%",
+                }}
+              >
                 <RecoverForm />
-              </>
+              </Box>
             }
           />
           <Route
             path="*"
             element={
               <>
-                <LoaderAnimation /> <span>sarasa</span>
+                <CircularProgress />
               </>
             }
           />

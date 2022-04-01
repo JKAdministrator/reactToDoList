@@ -1,14 +1,16 @@
-code {
-  font-family: source-code-pro, Menlo, Monaco, Consolas, "Courier New",
-    monospace;
+@font-face {
+  font-family: LobsterRegular;
+  src: url(fonts/Lobster-Regular.ttf);
 }
-* {
-  padding: 0;
-  margin: 0;
-  display: inline-block;
-  position: relative;
-  visibility: visible;
+@font-face {
+  font-family: LobsterRegular;
+  src: url(fonts/PermanentMarker-Regular.ttf);
 }
+@font-face {
+  font-family: RobotoRegular;
+  src: url(fonts/roboto/Roboto-Regular.ttf);
+}
+
 html {
   width: 100vw;
   height: 100vh;
@@ -24,6 +26,7 @@ head {
 }
 
 body {
+  --background-color-app: whitesmoke;
   margin: 0;
   padding: 0;
   width: 100%;
@@ -37,90 +40,22 @@ body {
   font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Roboto", "Oxygen",
     "Ubuntu", "Cantarell", "Fira Sans", "Droid Sans", "Helvetica Neue",
     sans-serif;
-  &:not([data-theme="dark"]) {
-    -webkit-font-smoothing: antialiased;
-    -moz-osx-font-smoothing: grayscale;
-    --background-color-app: whitesmoke;
-    --background-color-card: white;
-    --background-color-input: white;
-    --background-color-sidebar-sublist: #f9f9f9;
-    --border-color-input: rgba(128, 128, 128, 0.6);
-    --border-color-input-error: red;
-    --text-color-primary: black;
-    --text-color-secondary: #424242;
-    --text-color-secondary-hover: rgb(168, 168, 168);
-    --button-primary-background-color: #3d3fb6;
-    --button-primary-background-color-hover: #393cd4;
-    --button-primary-text-color: whitesmoke;
-  }
-  &[data-theme="dark"] {
-    --background-color-app: black;
-    --background-color-card: #1a1a1a;
-    --background-color-input: #292929;
-    --background-color-sidebar-sublist: #383535;
-    --border-color-input-error: red;
-    --border-color-input: rgba(56, 53, 53, 0.6);
-    --text-color-primary: white;
-    --text-color-secondary: grey;
-    --text-color-secondary-hover: rgb(165, 165, 165);
-    --button-primary-background-color: #3d3fb6;
-    --button-primary-background-color-hover: #393cd4;
-    --button-primary-text-color: whitesmoke;
-    img.icon {
-      filter: invert(100%);
-    }
-  }
   --border-radius: 3px;
-
-  * {
-    color: var(--text-color-primary);
-  }
-  button {
-    color: var(--button-primary-text-color);
-    pointer-events: all;
-    cursor: pointer;
-    border: none;
-  }
-  input,
-  select,
-  textarea {
-    border-radius: 3px;
-    border: 1px solid;
-    background-color: var(--background-color-input);
-    border-color: var(--border-color-input);
-    color: var(--text-color-primary);
-    &.error {
-      border-color: var(--border-color-input-error);
-    }
-  }
-  select {
-    padding: 0.2rem;
-    border-radius: var(--border-radius);
-    font-size: 1rem;
-    font-weight: normal;
-  }
-  input[type="checkbox"] {
-    transform: scale(2);
-  }
-  .card {
-    border-radius: var(--border-radius);
-    background-color: var(--background-color-card);
-    box-shadow: 0 1px 2px 0 rgb(60 64 67 / 30%),
-      0 1px 3px 1px rgb(60 64 67 / 15%);
-  }
-  button,
-  input[type="checkbox"],
-  select {
-    cursor: pointer;
-  }
 }
 
 div#root {
   width: 100%;
   height: 100%;
+
+  min-width: 100vw;
+  min-height: 100vh;
   display: flex;
   flex-flow: column;
   align-items: center;
   justify-content: flex-start;
   overflow: hidden;
+}
+button {
+  pointer-events: all;
+  cursor: pointer;
 }

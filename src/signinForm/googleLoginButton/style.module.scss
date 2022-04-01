@@ -6,7 +6,6 @@ button {
   flex-flow: column;
   align-items: center;
   justify-content: center;
-  pointer-events: none;
   background-color: transparent;
   > img {
     width: 100%;
@@ -15,8 +14,6 @@ button {
     object-position: center;
     pointer-events: none;
   }
-  border: 1px solid #80808057 !important;
-  border-radius: 3px;
 }
 .disabled {
   opacity: 0.5;

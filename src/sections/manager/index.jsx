@@ -1,3 +1,4 @@
+import { Box, Card, Paper } from "@mui/material";
 import React, { useState } from "react";
 import Sidebar from "../../sidebar";
 import SectionConfiguration from "../configuration";
@@ -6,13 +7,13 @@ const SectionManager = () => {
   const [currentSection, setCurrentSection] = useState("");
 
   function onSectionChange(e) {
-    console.log("onSectionChange");
     setCurrentSection(e);
   }
 
   function getSectionHTMLElement() {
     switch (currentSection) {
-      case "CONFIGURATION": {
+      case "ACCOUNT": {
+        console.log("adding section ACCOUNT");
         return <SectionConfiguration></SectionConfiguration>;
       }
       default: {
@@ -22,10 +23,17 @@ const SectionManager = () => {
   }
 
   return (
-    <div className={style.container}>
+    <Paper
+      style={{
+        width: "100%",
+        height: "100%",
+        display: "flex",
+      }}
+      sx={{ backgroundColor: "background.default" }}
+    >
       <Sidebar onSectionChangeCallback={onSectionChange}></Sidebar>
       {getSectionHTMLElement()}
-    </div>
+    </Paper>
   );
 };
 

@@ -63,7 +63,8 @@
             "password": "Password",
             "name": "Nombre",
             "userId": "ID",
-            "creationDate": "Creación"
+            "creationDate": "Creación",
+            "myData": "Mis Datos"
           }
         },
         {
@@ -87,7 +88,7 @@
         {
           "id": "signinForm",
           "strings": {
-            "title": "LOGIN",
+            "title": "Login",
             "email": "Email",
             "password": "Password",
             "server": "Server",
@@ -146,7 +147,8 @@
             "password": "Password",
             "name": "Name",
             "userId": "ID",
-            "creationDate": "Creation"
+            "creationDate": "Creation",
+            "myData": "My data"
           }
         },
         {

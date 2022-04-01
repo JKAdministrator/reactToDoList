@@ -1,6 +1,13 @@
 import React, { useState } from "react";
 import style from "./style.module.scss";
 import { useAppContext } from "../context/appContext";
+
+import List from "@mui/material/List";
+import ListItem from "@mui/material/ListItem";
+import ListItemText from "@mui/material/ListItemText";
+import Box from "@mui/material/Box";
+import Paper from "@mui/material/Paper";
+
 const Sidebar = ({ onSectionChangeCallback }) => {
   const { tryLogout, getLanguageString, userData, userDisplayName } =
     useAppContext();
@@ -9,115 +16,20 @@ const Sidebar = ({ onSectionChangeCallback }) => {
     return getLanguageString("sidebar", string);
   };
 
-  const options = [
-    {
-      iconSrc: "./icons/sidebar/configuration.png",
-      label: "configuration",
-      code: "CONFIGURATION",
-      childOf: "",
-    },
-    {
-      iconSrc: "./icons/sidebar/security.png",
-      label: "security",
-      code: "SECURITY",
-      childOf: "",
-    },
-    {
-      iconSrc: "./icons/sidebar/users.png",
-      label: "users",
-      code: "USERS",
-      childOf: "SECURITY",
-    },
-    {
-      iconSrc: "./icons/sidebar/groups.png",
-      label: "groups",
-      code: "GROUPS",
-      childOf: "SECURITY",
-    },
-  ];
   const [stateData, setStateData] = useState({
     selectedOption: {},
     openOptions: [],
   });
 
-  function renderOption(option) {
-    const childs = options.filter((_option) => {
-      return _option.childOf === option.code;
-    });
-
-    let isOptionOpen =
-      stateData.openOptions.indexOf(option.code) > -1 ? true : false;
-    return (
-      <li
-        data-state={isOptionOpen ? "OPEN" : "CLOSED"}
-        key={option.code}
-        data-code={option.code}
-      >
-        <button type="button" onClick={handleClick}>
-          <img
-            src={option.iconSrc}
-            alt={getString(option.label)}
-            className="icon"
-            name="optionIcon"
-          />
-          <label>{getString(option.label)}</label>
-          {childs.length > 0 ? (
-            <img
-              src={
-                isOptionOpen
-                  ? "./icons/sidebar/optionOpen.png"
-                  : "./icons/sidebar/optionClosed.png"
-              }
-              className="icon"
-              name="stateIcon"
-              alt={isOptionOpen ? "open" : "closed"}
-            ></img>
-          ) : (
-            <>
-              {stateData.selectedOption === option.code ? <div></div> : <></>}
-            </>
-          )}
-        </button>
-        {childs.length > 0 ? (
-          <ul>
-            {childs.map((suboption) => {
-              return renderOption(suboption);
-            })}
-          </ul>
-        ) : (
-          <></>
-        )}
-      </li>
-    );
-  }
-
   function handleClick(e) {
-    let li = e.target.parentNode;
-    if (li.querySelectorAll("ul").length === 0) {
-      onSectionChangeCallback(li.dataset.code);
-      setStateData((_prevstateData) => {
-        //props.onOptionChangeCallback();
-        return {
-          ..._prevstateData,
-          selectedOption: li.dataset.code,
-        };
-      });
-    } else {
-      setStateData((_prevstateData) => {
-        let newOpenOptions;
-        if (li.dataset.state === "CLOSED") {
-          newOpenOptions = [..._prevstateData.openOptions, li.dataset.code];
-        } else {
-          let index = _prevstateData.openOptions.indexOf(li.dataset.code);
-          _prevstateData.openOptions.splice(index, 1);
-          newOpenOptions = _prevstateData.openOptions;
-        }
-        return {
-          ..._prevstateData,
-          openOptions: newOpenOptions,
-        };
-      });
-    }
+    console.log("e.target", { t: e.target.parentNode });
+    onSectionChangeCallback(e.target.parentNode.getAttribute("data-option"));
+    setStateData((_prevstateData) => {
+      return {
+        ..._prevstateData,
+        selectedOption: e.target.parentNode.getAttribute("data-option"),
+      };
+    });
   }
 
   function handleClickLogout() {
@@ -125,30 +37,99 @@ const Sidebar = ({ onSectionChangeCallback }) => {
   }
 
   return (
-    <ul className={style.rootUnsortedList}>
-      <img className={style.logo} src="./logos/client.png" alt="Owner logo" />
-      <span name="userName" id="usrName" className={style.username}>
-        {userDisplayName}
-      </span>
-      {options
-        .filter((option) => {
-          return option.childOf === "";
-        })
-        .map((option) => {
-          return renderOption(option);
-        })}
-      <li data-state="CLOSED" data-code="LOGOUT" style={{ marginTop: "auto" }}>
-        <button type="button" onClick={handleClickLogout}>
-          <img
-            src="./icons/sidebar/logout.png"
-            alt={getString("logout")}
-            className="icon"
-            name="optionIcon"
-          />
-          <label>{getString("logout")}</label>
-        </button>
-      </li>
-    </ul>
+    <Box
+      style={{
+        height: "100%",
+        width: "max-content",
+        minWidth: "9rem",
+      }}
+    >
+      <Paper
+        style={{
+          width: "100%",
+          height: "100%",
+          borderLeft: "none",
+          borderTop: "none",
+          borderBottom: "none",
+          borderRadius: "0px",
+          display: "flex",
+          flexFlow: "column",
+          alignItems: "flex-start",
+          justifyContent: "flex-start",
+        }}
+      >
+        <List
+          component="nav"
+          style={{
+            width: "100%",
+          }}
+        >
+          <ListItem
+            button
+            divider
+            onClick={handleClick}
+            selected={stateData.selectedOption == "ACCOUNT" ? true : false}
+          >
+            <ListItemText
+              data-option="ACCOUNT"
+              primary="Account"
+              secondary={userDisplayName}
+            />
+          </ListItem>
+          <ListItem
+            button
+            divider
+            data-option="PROYECTS"
+            onClick={handleClick}
+            selected={stateData.selectedOption == "PROYECTS" ? true : false}
+            disabled
+          >
+            <ListItemText primary="Proyects" />
+          </ListItem>
+          <ListItem
+            button
+            divider
+            data-option="USERS"
+            onClick={handleClick}
+            selected={stateData.selectedOption == "USERS" ? true : false}
+            disabled
+          >
+            <ListItemText primary="Users" />
+          </ListItem>
+          <ListItem
+            button
+            divider
+            data-option="TEAMS"
+            onClick={handleClick}
+            selected={stateData.selectedOption == "TEAMS" ? true : false}
+            disabled
+          >
+            <ListItemText primary="Teams" />
+          </ListItem>
+          <ListItem
+            button
+            divider
+            data-option="CHATS"
+            onClick={handleClick}
+            selected={stateData.selectedOption == "CHATS" ? true : false}
+            disabled
+          >
+            <ListItemText primary="Chats" />
+          </ListItem>
+        </List>
+        <List
+          component="nav"
+          style={{
+            width: "100%",
+            marginTop: "auto",
+          }}
+        >
+          <ListItem button onClick={handleClickLogout}>
+            <ListItemText primary={getString("logout")} />
+          </ListItem>
+        </List>
+      </Paper>
+    </Box>
   );
 };
 
