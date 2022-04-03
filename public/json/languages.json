@@ -43,10 +43,10 @@
         {
           "id": "sidebar",
           "strings": {
-            "configuration": "Configuración",
-            "security": "Seguridad",
+            "projects": "Proyectos",
             "users": "Usuarios",
-            "groups": "Grupos",
+            "teams": "Equipos",
+            "chats": "Chats",
             "logout": "Salir"
           }
         },
@@ -127,10 +127,10 @@
         {
           "id": "sidebar",
           "strings": {
-            "configuration": "Configuration",
-            "security": "Security",
+            "projects": "Projects",
             "users": "Users",
-            "groups": "Groups",
+            "teams": "Teams",
+            "chats": "Chats",
             "logout": "Logout"
           }
         },

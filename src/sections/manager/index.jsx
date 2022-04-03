@@ -1,19 +1,34 @@
-import { Box, Card, Paper } from "@mui/material";
+import { Box, Paper } from "@mui/material";
+
 import React, { useState } from "react";
-import Sidebar from "../../sidebar";
 import SectionConfiguration from "../configuration";
 import style from "./style.module.scss";
+import Headerbar from "./headerbar";
+import Sidebar from "./sidebar";
+
 const SectionManager = () => {
   const [currentSection, setCurrentSection] = useState("");
+  const [isSidebarOpen, setIsSidebarOpen] = useState(false);
 
   function onSectionChange(e) {
     setCurrentSection(e);
   }
 
+  function onToggleSidebarFromHeader(e) {
+    setIsSidebarOpen((_prevValue) => {
+      return !_prevValue;
+    });
+  }
+
+  function onToggleSidebarFromSidebar(e) {
+    setIsSidebarOpen((_prevValue) => {
+      return !_prevValue;
+    });
+  }
+
   function getSectionHTMLElement() {
     switch (currentSection) {
-      case "ACCOUNT": {
-        console.log("adding section ACCOUNT");
+      case "sectionConfiguration": {
         return <SectionConfiguration></SectionConfiguration>;
       }
       default: {
@@ -24,15 +39,19 @@ const SectionManager = () => {
 
   return (
     <Paper
-      style={{
-        width: "100%",
-        height: "100%",
-        display: "flex",
-      }}
       sx={{ backgroundColor: "background.default" }}
+      className={style.container}
     >
-      <Sidebar onSectionChangeCallback={onSectionChange}></Sidebar>
-      {getSectionHTMLElement()}
+      <Headerbar
+        toggleSidebarCallback={onToggleSidebarFromHeader}
+        currentSection={currentSection}
+      ></Headerbar>
+      <Sidebar
+        isOpen={isSidebarOpen}
+        onChangeStateCallback={onToggleSidebarFromSidebar}
+        onSectionChangeCallback={onSectionChange}
+      ></Sidebar>
+      <Box className={style.sectionContainer}>{getSectionHTMLElement()}</Box>
     </Paper>
   );
 };

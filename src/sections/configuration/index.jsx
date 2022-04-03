@@ -59,29 +59,14 @@ const SectionConfiguration = () => {
   console.log("redrawing", { darkMode: darkMode });
 
   return (
-    <div
-      style={{
-        display: "flex",
-        flexFlow: "column",
-        margin: "1rem 0rem 0rem 3rem",
-        gap: "1rem",
-      }}
-    >
-      <Typography
-        variant="h4"
-        component="h1"
-        style={{
-          alignSelf: "left",
-          width: "100%",
-          opacity: "0.7",
-        }}
-      >
-        {getString("title")}
-      </Typography>
-
+    <Box className={style.container}>
       <Card>
         <FormGroup className={style.myData}>
-          <Typography variant="h6" component="h2" style={{ gridArea: "a1" }}>
+          <Typography
+            variant="h6"
+            component="h2"
+            style={{ gridArea: "a1", whiteSpace: "pre-wrap", width: "100%" }}
+          >
             {getString("myData")}
           </Typography>
           <TextField
@@ -122,7 +107,11 @@ const SectionConfiguration = () => {
 
       <Card sx={{ backgroundColor: "background.paper" }}>
         <FormGroup className={style.preferences}>
-          <Typography variant="h6" component="h2" style={{ gridArea: "a1" }}>
+          <Typography
+            variant="h6"
+            component="h2"
+            style={{ gridArea: "a1", whiteSpace: "pre-wrap", width: "100%" }}
+          >
             {getString("application")}
           </Typography>
           <FormControlLabel
@@ -155,7 +144,11 @@ const SectionConfiguration = () => {
 
       <Card sx={{ backgroundColor: "background.paper" }}>
         <FormGroup className={style.credentials}>
-          <Typography variant="h6" component="h2" style={{ gridArea: "a1" }}>
+          <Typography
+            variant="h6"
+            component="h2"
+            style={{ gridArea: "a1", whiteSpace: "pre-wrap", width: "100%" }}
+          >
             {getString("accesAccounts")}
           </Typography>
           <Stack spacing={2}>
@@ -164,7 +157,7 @@ const SectionConfiguration = () => {
           </Stack>
         </FormGroup>
       </Card>
-    </div>
+    </Box>
   );
 };
 /**
