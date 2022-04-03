@@ -123,6 +123,7 @@ async function createNewUser(_data) {
       creationDate: admin.firestore.FieldValue.serverTimestamp(),
       theme: _data.navigatorTheme ? _data.navigatorTheme : "light",
       language: _data.navigatorLanguage ? _data.navigatorLanguage : "en",
+      userImage: _data.userImage ? _data.userImage : "",
     });
   return userDoc;
 }

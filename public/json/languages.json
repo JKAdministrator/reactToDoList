@@ -27,7 +27,8 @@
             "return": "Volver",
             "passwordMissmatch": "Las contraseñas ingresadas no coinciden",
             "success": "Usuario creado con exito",
-            "login": "INGRESAR"
+            "login": "INGRESAR",
+            "uploadImage": "CARGAR IMAGEN"
           }
         },
         {
@@ -64,7 +65,8 @@
             "name": "Nombre",
             "userId": "ID",
             "creationDate": "Creación",
-            "myData": "Mis Datos"
+            "myData": "Mis Datos",
+            "changeImage": "CAMBIAR IMAGEN"
           }
         },
         {
@@ -111,7 +113,8 @@
             "return": "Return",
             "passwordMissmatch": "Confirm password missmatch",
             "success": "User created successfully",
-            "login": "LOGIN"
+            "login": "LOGIN",
+            "uploadImage": "UPLOAD IMAGE"
           }
         },
         {
@@ -148,7 +151,8 @@
             "name": "Name",
             "userId": "ID",
             "creationDate": "Creation",
-            "myData": "My data"
+            "myData": "My data",
+            "changeImage": "CHANGE IMAGE"
           }
         },
         {

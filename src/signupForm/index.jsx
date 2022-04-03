@@ -4,9 +4,11 @@ import { AppProvider, useAppContext } from "../context/appContext";
 import FatalErrorComponent from "../fatalErrorComponent";
 import { Outlet, Link } from "react-router-dom";
 import {
+  Avatar,
   Box,
   Button,
   CircularProgress,
+  Input,
   Paper,
   TextField,
   Typography,
@@ -28,6 +30,7 @@ const SignupForm = (props) => {
     isPasswordMissing: false,
     isConfirmPasswordMissing: false,
     loginResponseMessage: "",
+    userImage: "",
   });
 
   //ejecucion inicial
@@ -39,6 +42,7 @@ const SignupForm = (props) => {
             email: stateData.email,
             password: stateData.password,
             username: stateData.username,
+            userImage: stateData.userImage,
           });
 
           setStateData((_prevData) => {
@@ -150,6 +154,19 @@ const SignupForm = (props) => {
     }
   };
 
+  function onUserImageChange(e) {
+    if (e.target.files && e.target.files[0]) {
+      let reader = new FileReader();
+      reader.onloadend = () => {
+        setStateData({
+          ...stateData,
+          userImage: reader.result,
+        });
+      };
+      reader.readAsDataURL(e.target.files[0]);
+    }
+  }
+
   const getString = (string) => {
     return getLanguageString("signupForm", string);
   };
@@ -157,11 +174,6 @@ const SignupForm = (props) => {
   //html retornado
   return (
     <>
-      <img
-        src="./logos/signupLogo.png"
-        alt="company logo"
-        className={style.floatBackground}
-      />
       {stateData.state === "READY" ? (
         <Paper
           style={{
@@ -177,7 +189,7 @@ const SignupForm = (props) => {
             action="submit"
             id="LoginForm"
             onSubmit={handleSubmit}
-            class={style.form}
+            className={style.form}
           >
             <Typography
               variant="h3"
@@ -248,6 +260,36 @@ const SignupForm = (props) => {
               error={stateData.isConfirmPasswordMissing}
               label={getString("confirmPassword")}
             />
+            <Box
+              style={{
+                display: "flex",
+                flexFlow: "row",
+                gap: "1rem",
+                justifyContent: "center",
+                alignItems: "center",
+              }}
+            >
+              <Avatar
+                alt="New user image"
+                src={stateData.userImage ? stateData.userImage : ""}
+                style={{
+                  justifySelf: "center",
+                }}
+                sx={{ width: 50, height: 50 }}
+              ></Avatar>
+              <label htmlFor="contained-button-file" style={{ gridArea: "a8" }}>
+                <Input
+                  inputProps={{ accept: "image/*" }}
+                  id="contained-button-file"
+                  type="file"
+                  style={{ display: "none" }}
+                  onChange={onUserImageChange}
+                />
+                <Button variant="outlined" component="span">
+                  {getString("uploadImage")}
+                </Button>
+              </label>
+            </Box>
             <span name="loginResponse">{stateData.loginResponseMessage}</span>
             <Button
               variant="contained"
@@ -301,18 +343,25 @@ const SignupForm = (props) => {
         <></>
       )}
       {stateData.state === "LOGIN_READY" ? (
-        <Paper className={style.successMessageContainer}>
-          <span>{getString("success")}</span>
-          <Link to="/" name="login">
-            <Button
-              variant="contained"
-              style={{ width: "100%" }}
-              disableElevation
-            >
-              {getString("login")}
-            </Button>
-          </Link>
-        </Paper>
+        <>
+          <Paper className={style.successMessageContainer}>
+            <span>{getString("success")}</span>
+            <Link to="/" name="login">
+              <Button
+                variant="contained"
+                style={{ width: "100%" }}
+                disableElevation
+              >
+                {getString("login")}
+              </Button>
+            </Link>
+          </Paper>
+          <img
+            src="./logos/signupLogo.png"
+            alt="company logo"
+            className={style.floatBackground}
+          />
+        </>
       ) : (
         <></>
       )}
