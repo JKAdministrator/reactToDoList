@@ -1,13 +1,17 @@
 .container {
-  display: flex;
+  display: grid;
+  grid-template-columns: max-content max-content;
+  grid-template-rows: max-content max-content;
+  grid-template-areas: "a1 a2" "a1 a3";
   flex-flow: column;
   padding: 1rem;
   gap: 1rem;
   width: max-content;
   height: max-content;
 }
-@media (max-width: 950px) {
+@media (max-width: 800px) {
   .container {
+    display: flex;
     justify-self: center;
     width: calc(100% - 2rem);
     max-width: 24rem;
@@ -34,7 +38,9 @@
     "a1 a1"
     "a2 a2"
     "a3 a4"
-    "a5 a6";
+    "a5 a6"
+    "a7 a7"
+    "a8 a8";
   gap: 1rem;
   padding: 1rem;
   align-items: center;
@@ -59,13 +65,15 @@
   }
   .myData {
     grid-template-columns: 1fr;
-    grid-template-rows: repeat(6, max-content);
+    grid-template-rows: repeat(8, max-content);
     grid-template-areas:
       "a1"
       "a2"
       "a3"
       "a4"
       "a5"
-      "a6";
+      "a6"
+      "a7"
+      "a8";
   }
 }

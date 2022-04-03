@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useMemo } from "react";
 import { initializeApp } from "firebase/app";
+import { getStorage, ref } from "firebase/storage";
 import {
   getFunctions,
   httpsCallable,
@@ -45,6 +46,8 @@ const initialContextData = {
   theme: {},
   darkMode: false,
   setDarkMode: () => {},
+  updateUserImage: () => {},
+  userImage: "",
 };
 
 async function getFiles() {
@@ -172,6 +175,22 @@ export function AppProvider(props) {
           });
         };
 
+        // UPDATE USER IMAGE
+        let updateUserImage = (userImageSrc) => {
+          console.log("updating user image...", { src: userImageSrc });
+          setAppContextData((prevProps) => {
+            return {
+              ...prevProps,
+              userImage: userImageSrc,
+            };
+          });
+          httpsCallableFunctions.updateUserField({
+            field: "userImage",
+            newValue: userImageSrc,
+            userDocId: userDocId,
+          });
+        };
+
         //UPDATE NAME LOCALLY AND OPTIONALLY ON SERVER
         let updateName = (_newName, userDocId = null) => {
           console.log("AppContext.updateName", { _newName, userData });
@@ -262,6 +281,7 @@ export function AppProvider(props) {
               displayName: _data.username,
               navigatorTheme: userTheme,
               navigatorLanguage: userLanguage,
+              userImage: _data.userImage,
             });
             console.log("trySignup responseLogin ", { responseLogin });
             if (responseLogin.data.errorCode === 0) {
@@ -273,6 +293,7 @@ export function AppProvider(props) {
                   userLanguage: responseLogin.data.userData.user.language,
                   userTheme: responseLogin.data.userData.user.theme,
                   userDisplayName: responseLogin.data.userData.user.displayName,
+                  userImage: responseLogin.data.userData.user.userImage,
                 };
               });
             } else {
@@ -345,6 +366,7 @@ export function AppProvider(props) {
 
         // IF ALREADY LOGUED IN FROM READIRECT
         let errorMessage, isUserLoguedIn;
+        let userImage = "";
 
         //get the google user data from redirect and do a login with that
         try {
@@ -360,6 +382,7 @@ export function AppProvider(props) {
             uid: redirectResult.user.uid,
             navigatorTheme: userTheme,
             navigatorLanguage: userLanguage,
+            userImage: redirectResult.user.photoURL,
           });
 
           if (responseLogin.errorCode > 0) {
@@ -377,6 +400,7 @@ export function AppProvider(props) {
             userTheme = userData.user.theme;
             userLanguage = userData.user.language;
             userDisplayName = userData.user.displayName;
+            userImage = userData.user.userImage;
             console.log("USER DATA FROM LOGIN", { responseLogin });
           }
         } catch (e) {}
@@ -405,6 +429,8 @@ export function AppProvider(props) {
             darkMode: userTheme === "dark" ? true : false,
             theme: getThemeObject(userTheme),
             setDarkMode: setDarkMode,
+            updateUserImage: updateUserImage,
+            userImage: userImage,
           };
         });
       })
@@ -459,6 +485,7 @@ export function AppProvider(props) {
     appContextData.userTheme,
     appContextData.userLanguage,
     appContextData.darkMode,
+    appContextData.userImage,
   ]);
 
   return <AppContext.Provider value={value} {...props}></AppContext.Provider>;

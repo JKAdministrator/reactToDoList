@@ -5,6 +5,7 @@ import {
   Typography,
   Button,
   Box,
+  Avatar,
 } from "@mui/material";
 import MenuIcon from "@mui/icons-material/Menu";
 
@@ -13,7 +14,7 @@ import style from "./style.module.scss";
 import React from "react";
 
 const Headerbar = ({ toggleSidebarCallback, currentSection }) => {
-  const { getLanguageString, darkMode } = useAppContext();
+  const { getLanguageString, darkMode, userImage } = useAppContext();
 
   const getString = (section, string) => {
     return getLanguageString(section, string);
@@ -41,7 +42,14 @@ const Headerbar = ({ toggleSidebarCallback, currentSection }) => {
           <Typography variant="h6" component="div" sx={{ flexGrow: 1 }}>
             {currentSection ? getString(currentSection, "title") : ""}
           </Typography>
-          <Button color="inherit">Login</Button>
+          <Avatar
+            alt="User image"
+            src={userImage ? userImage : ""}
+            style={{
+              justifySelf: "center",
+            }}
+            sx={{ width: 40, height: 40 }}
+          ></Avatar>
         </Toolbar>
       </AppBar>
     </Box>
