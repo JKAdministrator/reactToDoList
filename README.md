@@ -1,3 +1,11 @@
+# create a new branch
+
+git checkout -b <your-new-branch-name>
+
+# create a new branch and switch to it
+
+git checkout -b <yout-new-branch-name>
+
 # commmit the changes of all files
 
 git commit -a -m "added loguin with email & gmail"
@@ -9,10 +17,6 @@ git push -u origin <your-branch-name>
 # see current branch and changes not staged for commit
 
 git status
-
-# create a new branch
-
-git checkout -b <your-new-branch-name>
 
 # merge branch into main branch
 
