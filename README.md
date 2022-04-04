@@ -1,11 +1,3 @@
-# create a new branch
-
-git checkout -b <your-new-branch-name>
-
-# create a new branch and switch to it
-
-git checkout -b <yout-new-branch-name>
-
 # commmit the changes of all files
 
 git commit -a -m "added loguin with email & gmail"
@@ -18,10 +10,14 @@ git push -u origin <your-branch-name>
 
 git status
 
+# create a new branch
+
+git checkout -b <your-new-branch-name>
+
 # merge branch into main branch
 
 1. check with git status si on the correct branch (the father branch where you want to add/gmerge the son branch changes)
-   1.a) if not on the main branch, change the current (son) branch to the main (father) branch using git checkout -b <your-father-branch-name>
+   1.a) if not on the main branch, change the current (son) branch to the main (father) branch using git checkout <your-father-branch-name>
 2. execute the command git merge <yout-son-branch-name>
 
 # deploy a firebase
@@ -39,33 +35,15 @@ firebase emulators:start
 
 # Features
 
-    React 16 using functional components & hooks
-    - Global state (React Context)
-    - Routing (React Router)
-    - Login + Signin + Signup working Forms
-
-    - Customizable style by user (light/dark mode)
-    - Customizable language (english / spanish)
-    - Security Microservice: NoSQL database (Firestore) + Node.js Cloud Functions (Firebase Cloud functions) for Registration, validation and authorization
-
-    - MySQL database (Google Cloud) for core functionalities (Monolith style app working in conjuntion with the Security Miscroservice)
-    - Node.js API EndPoints for REST API consuption
-    - Server side rendering when seeing other users information
-
-
-    How to test it?
-    - Login with your gmail account (http://.../login) or Register at on http://.../signup
-    - Create a Proyect
-    - Create the lists for the proyect. Each list is a diferent state a task can have (example: "To Do" "Working on" "Testing" "Finished")
-    - Create the first task for the proyect
-    - Go to the recently created task and from there create subtasks
-    - CRUD List on the proyect
-    - CRUD Tasks on the proyect assining every task to a list
-    - Create subtask
-
-    - Assign users to the Proyect (by email) (it gives proyect tasks visualization)
-    - Assign users to tasks (it gives full task control)
-    - Give
+- React v16 using functional components & hooks
+- Global state management with [React Context](https://es.reactjs.org/docs/context.html) for Global state
+- Page router with [React Router](https://v5.reactrouter.com/)
+- Code Splitting with [React Suspense](https://17.reactjs.org/docs/concurrent-mode-suspense.html)
+- Styled commponents with [Material Design](https://v4.mui.com/)
+- Language Customization (using a local json from the server)
+- Server code: Firebase
+- Database type: NoSQL
+- Cloud functions (Node.js) using
 
 # Getting Started with Create React App
 

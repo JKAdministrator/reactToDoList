@@ -2,6 +2,8 @@ const functions = require("firebase-functions");
 const admin = require("firebase-admin");
 admin.initializeApp();
 
+const cors = require("cors")({ origin: true });
+
 exports.login = functions.https.onCall(async (_data, context) => {
   // Grab the text parameter.
   console.log("LOGIN: --------------------------------");

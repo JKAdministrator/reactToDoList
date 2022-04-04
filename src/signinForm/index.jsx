@@ -1,9 +1,9 @@
 import React, { useEffect, useState } from "react";
 import style from "./style.module.scss";
-import { AppProvider, useAppContext } from "../context/appContext";
+import { useAppContext } from "../context/appContext";
 import FatalErrorComponent from "../fatalErrorComponent";
 import GoogleLoginButton from "./googleLoginButton";
-import { Outlet, Link } from "react-router-dom";
+import { Link } from "react-router-dom";
 import {
   Box,
   Button,

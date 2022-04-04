@@ -1,8 +1,8 @@
 import React, { useEffect, useState } from "react";
 import style from "./style.module.scss";
-import { AppProvider, useAppContext } from "../context/appContext";
+import { useAppContext } from "../context/appContext";
 import FatalErrorComponent from "../fatalErrorComponent";
-import { Outlet, Link } from "react-router-dom";
+import { Link } from "react-router-dom";
 import {
   Avatar,
   Box,
@@ -13,7 +13,6 @@ import {
   TextField,
   Typography,
 } from "@mui/material";
-import { width } from "@mui/system";
 const SignupForm = (props) => {
   //variables de estado
   const { getLanguageString, trySignup, userDocId } = useAppContext();

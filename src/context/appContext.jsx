@@ -1,6 +1,5 @@
 import React, { useState, useEffect, useMemo } from "react";
 import { initializeApp } from "firebase/app";
-import { getStorage, ref } from "firebase/storage";
 import {
   getFunctions,
   httpsCallable,
@@ -18,8 +17,8 @@ import {
   connectAuthEmulator,
   sendPasswordResetEmail,
 } from "firebase/auth";
-import { Box, Container, createTheme } from "@mui/material";
-import { blueGrey, deepOrange, grey, red } from "@mui/material/colors";
+import { createTheme } from "@mui/material";
+import { grey } from "@mui/material/colors";
 import useMediaQuery from "@mui/material/useMediaQuery";
 const AppContext = React.createContext();
 
@@ -31,7 +30,6 @@ const initialContextData = {
   firebaseHttpsCallableFunctions: {},
   languages: {},
   getString: () => {},
-  useEmulator: false,
   emulatorStarted: false,
   userDocId: "",
   userData: {},
@@ -50,17 +48,11 @@ const initialContextData = {
   userImage: "",
 };
 
-async function getFiles() {
+async function getFile(filePath) {
   try {
-    let responses = await Promise.all([
-      fetch("./json/firebasePublicCredentials.json"),
-      fetch("./json/languages.json"),
-    ]);
-    let dataObjects = await Promise.all([
-      responses[0].json(),
-      responses[1].json(),
-    ]);
-    return { firebase: dataObjects[0], languages: dataObjects[1] };
+    let file = await fetch(filePath);
+    let data = await file.json();
+    return data;
   } catch (e) {
     throw e.toString();
   }
@@ -74,6 +66,7 @@ function getDefautTheme() {
       : "light";
   return themeMode;
 }
+
 function getThemeObject(themeString) {
   return createTheme({
     palette: {
@@ -96,22 +89,11 @@ function getDefautLanguage() {
 export function AppProvider(props) {
   const prefersDarkMode = useMediaQuery("(prefers-color-scheme: dark)");
 
-  // use the local emulator
-  const useEmulator = false;
   const [appContextData, setAppContextData] = useState({
     ...initialContextData,
     darkMode: prefersDarkMode,
   });
-  console.log("appContextData", {
-    darkMode: appContextData.darkMode,
-    theme: appContextData.theme,
-  });
 
-  const theme = createTheme({
-    palette: {
-      mode: appContextData.darkMode ? "dark" : "light",
-    },
-  });
   useEffect(() => {
     let app,
       functions,
@@ -120,53 +102,70 @@ export function AppProvider(props) {
       userData = {},
       userDisplayName = "",
       userLanguage = getDefautLanguage(),
-      userTheme = getDefautTheme();
-    const _useEmulator = useEmulator;
-    getFiles()
-      .then(async (result) => {
-        // connect to firebase
-        try {
-          app = initializeApp(result.firebase);
-          functions = getFunctions(app);
-          if (useEmulator) {
-            let auth = getAuth();
-            connectFunctionsEmulator(functions, "localhost", 5001);
-            connectAuthEmulator(auth, "http://localhost:9099");
-          }
-        } catch (e) {
-          throw e.toString();
+      userTheme = getDefautTheme(),
+      auth,
+      errorMessage,
+      userImage;
+
+    getFile("./json/languages.json")
+      .then(async (languagesFile) => {
+        let firebaseConfig = {
+          apiKey: process.env.REACT_APP_FIREBASE_API_KEY,
+          authDomain: process.env.REACT_APP_FIREBASE_AUTH_DOMAIN,
+          projectId: process.env.REACT_APP_FIREBASE_PROJECT_ID,
+          storageBucket: process.env.REACT_APP_FIREBASE_STORAGE_BUCKET,
+          messagingSenderId: process.env.REACT_APP_FIREBASE_MESSAGING_SENDER_ID,
+          appId: process.env.REACT_APP_FIREBASE_APP_ID,
+          measurementId: process.env.REACT_APP_FIREBASE_MEASUREMENT_ID,
+        };
+        console.log("firebaseConfig", firebaseConfig);
+        // initialize firebase app
+        app = initializeApp(firebaseConfig);
+
+        // get cloud functions reference
+        functions = getFunctions(app);
+
+        auth = getAuth();
+
+        // connect to the emulator if developement
+        if (process.env.REACT_APP_USE_FIREBASE_EMULATOR !== "1") {
+          connectFunctionsEmulator(functions, "localhost", 5001);
+          connectAuthEmulator(auth, "http://localhost:9099");
         }
 
-        // get cloud functions references
-        try {
-          httpsCallableFunctions.getDatabases = httpsCallable(
-            functions,
-            "getDatabases"
-          );
-          httpsCallableFunctions.login = httpsCallable(functions, "login");
-          httpsCallableFunctions.deleteLoginCredential = httpsCallable(
-            functions,
-            "deleteLoginCredential"
-          );
-          httpsCallableFunctions.updateUserField = httpsCallable(
-            functions,
-            "updateUserField"
-          );
-        } catch (e) {
-          throw e.toString();
-        }
+        httpsCallableFunctions.getDatabases = httpsCallable(
+          functions,
+          "getDatabases"
+        );
 
+        httpsCallableFunctions.login = httpsCallable(functions, "login");
+
+        httpsCallableFunctions.deleteLoginCredential = httpsCallable(
+          functions,
+          "deleteLoginCredential"
+        );
+        httpsCallableFunctions.updateUserField = httpsCallable(
+          functions,
+          "updateUserField"
+        );
+
+        console.log("firebase INITED", {
+          app,
+          auth,
+          functions,
+          httpsCallableFunctions,
+        });
+
+        // DARK MODE SET STATE
         let setDarkMode = () => {
           setAppContextData((prevProps) => {
             let newDarkMode = !prevProps.darkMode;
             let themeString = newDarkMode ? "dark" : "light";
-            console.log("new dark mode is", newDarkMode);
             httpsCallableFunctions.updateUserField({
               field: "theme",
               newValue: themeString,
               userDocId: userDocId,
             });
-
             return {
               ...prevProps,
               darkMode: newDarkMode,
@@ -175,14 +174,10 @@ export function AppProvider(props) {
           });
         };
 
-        // UPDATE USER IMAGE
+        // USER IMAGE SET STATE
         let updateUserImage = (userImageSrc) => {
-          console.log("updating user image...", { src: userImageSrc });
           setAppContextData((prevProps) => {
-            return {
-              ...prevProps,
-              userImage: userImageSrc,
-            };
+            return { ...prevProps, userImage: userImageSrc };
           });
           httpsCallableFunctions.updateUserField({
             field: "userImage",
@@ -191,36 +186,23 @@ export function AppProvider(props) {
           });
         };
 
-        //UPDATE NAME LOCALLY AND OPTIONALLY ON SERVER
+        // DISPLAY NAME SET STATE
         let updateName = (_newName, userDocId = null) => {
-          console.log("AppContext.updateName", { _newName, userData });
           setAppContextData((prevProps) => {
-            return {
-              ...prevProps,
-              userDisplayName: _newName,
-            };
+            return { ...prevProps, userDisplayName: _newName };
           });
-          if (userDocId) {
-            httpsCallableFunctions.updateUserField({
-              field: "displayName",
-              newValue: _newName,
-              userDocId: userDocId,
-            });
-          }
+          httpsCallableFunctions.updateUserField({
+            field: "displayName",
+            newValue: _newName,
+            userDocId: userDocId,
+          });
         };
 
-        //update theme locally and on the server
+        // LANGUAGE
         let updateLanguage = (_newLanguage, userDocId) => {
-          console.log("AppContext.updateLanguage", { _newLanguage, userData });
-          //update context data (locally)
           setAppContextData((prevProps) => {
-            return {
-              ...prevProps,
-              userLanguage: _newLanguage,
-            };
+            return { ...prevProps, userLanguage: _newLanguage };
           });
-
-          //save change to server
           httpsCallableFunctions.updateUserField({
             field: "language",
             newValue: _newLanguage,
@@ -231,8 +213,6 @@ export function AppProvider(props) {
         //RECOVER PASSWORD FUNCTION
         let tryRecover = async (_data) => {
           try {
-            let auth = getAuth();
-
             await sendPasswordResetEmail(auth, _data.email);
           } catch (error) {
             throw error.toString();
@@ -242,8 +222,6 @@ export function AppProvider(props) {
         // LOGOUT FUNCTION
         let tryLogout = async () => {
           try {
-            let auth = getAuth();
-
             await signOut(auth);
             setAppContextData((prevProps) => {
               return {
@@ -263,9 +241,8 @@ export function AppProvider(props) {
         //SIGNUP FUNCTION
         let trySignup = async (_data) => {
           try {
-            let auth = getAuth();
             auth.languageCode = userLanguage;
-            let userCredential = await createUserWithEmailAndPassword(
+            await createUserWithEmailAndPassword(
               auth,
               _data.email,
               _data.password
@@ -273,7 +250,6 @@ export function AppProvider(props) {
 
             await sendEmailVerification(auth.currentUser);
 
-            console.log("trySignup response ", { userCredential });
             let responseLogin = await httpsCallableFunctions.login({
               source: "usernameAndPassword",
               email: _data.email,
@@ -283,7 +259,7 @@ export function AppProvider(props) {
               navigatorLanguage: userLanguage,
               userImage: _data.userImage,
             });
-            console.log("trySignup responseLogin ", { responseLogin });
+
             if (responseLogin.data.errorCode === 0) {
               setAppContextData((prevProps) => {
                 return {
@@ -307,21 +283,13 @@ export function AppProvider(props) {
         // LOGIN FUNCTION (AUTH + LOGIN)
         let tryLogin = async (_data) => {
           try {
-            console.log("AppContext.tryLogin(_data)", {
-              _data,
-            });
             switch (_data.source) {
               case "google": {
-                let auth = getAuth();
-
                 let provider = new GoogleAuthProvider();
-
                 signInWithRedirect(auth, provider);
                 break;
               }
               case "usernameAndPassword": {
-                let auth = getAuth();
-
                 let responseSignInWithEmailAndPassword =
                   await signInWithEmailAndPassword(
                     auth,
@@ -355,8 +323,7 @@ export function AppProvider(props) {
                 break;
               }
               default: {
-                throw "Must specify a login source";
-                break;
+                throw new Error("Must specify a login source");
               }
             }
           } catch (e) {
@@ -364,16 +331,9 @@ export function AppProvider(props) {
           }
         };
 
-        // IF ALREADY LOGUED IN FROM READIRECT
-        let errorMessage, isUserLoguedIn;
-        let userImage = "";
-
-        //get the google user data from redirect and do a login with that
+        //try get the google user data from redirect and do a login with that
         try {
-          let auth = getAuth();
-
           let redirectResult = await getRedirectResult(auth);
-          console.log(redirectResult.user);
           let responseLogin = await httpsCallableFunctions.login({
             source: "google",
             email: redirectResult.user.email,
@@ -401,9 +361,8 @@ export function AppProvider(props) {
             userLanguage = userData.user.language;
             userDisplayName = userData.user.displayName;
             userImage = userData.user.userImage;
-            console.log("USER DATA FROM LOGIN", { responseLogin });
           }
-        } catch (e) {}
+        } catch (e) {} //if fails continue as nothing happend
 
         setAppContextData((prevProps) => {
           return {
@@ -415,9 +374,7 @@ export function AppProvider(props) {
             firebaseConnectionStateError: errorMessage,
             userDocId: userDocId,
             userData: userData,
-            languages: result.languages.languages,
-            useEmulator: useEmulator,
-            emulatorStarted: useEmulator ? true : false,
+            languages: languagesFile.languages,
             tryLogin: tryLogin,
             tryLogout: tryLogout,
             trySignup: trySignup,
@@ -435,7 +392,6 @@ export function AppProvider(props) {
         });
       })
       .catch((e) => {
-        console.log("error", { e });
         setAppContextData((prevProps) => {
           return {
             ...prevProps,
@@ -475,18 +431,7 @@ export function AppProvider(props) {
       ...appContextData,
       getLanguageString: getLanguageString,
     };
-  }, [
-    appContextData.firebaseConnectionState,
-    appContextData.firebaseConnectionStateError,
-    appContextData.firebaseCurrentUser,
-    appContextData.userDocId,
-    appContextData.userData,
-    appContextData.userDisplayName,
-    appContextData.userTheme,
-    appContextData.userLanguage,
-    appContextData.darkMode,
-    appContextData.userImage,
-  ]);
+  }, [appContextData]);
 
   return <AppContext.Provider value={value} {...props}></AppContext.Provider>;
 }

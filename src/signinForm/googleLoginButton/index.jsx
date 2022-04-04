@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React from "react";
 import style from "./style.module.scss";
 import { useAppContext } from "../../context/appContext";
 import { Button } from "@mui/material";
@@ -15,7 +15,7 @@ const GoogleLoginButton = () => {
         variant="outlined"
         title="Login with Google"
         onClick={handleLoginClick}
-        style={{ pointerEvents: "all" }}
+        className={style.btn}
       >
         <img
           src="./logos/google.png"
