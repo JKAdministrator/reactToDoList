@@ -103,7 +103,6 @@ export function AppProvider(props) {
       userDisplayName = "",
       userLanguage = getDefautLanguage(),
       userTheme = getDefautTheme(),
-      auth,
       errorMessage,
       userImage;
 
@@ -125,12 +124,16 @@ export function AppProvider(props) {
         // get cloud functions reference
         functions = getFunctions(app);
 
-        auth = getAuth();
-
         // connect to the emulator if developement
-        if (process.env.REACT_APP_USE_FIREBASE_EMULATOR !== "1") {
+        let useEmulator = process.env.REACT_APP_USE_FIREBASE_EMULATOR;
+        console.log("process.env.REACT_APP_USE_FIREBASE_EMULATOR", {
+          usingEmaultor: useEmulator,
+        });
+
+        if (useEmulator === "1") {
+          let autho = getAuth();
           connectFunctionsEmulator(functions, "localhost", 5001);
-          connectAuthEmulator(auth, "http://localhost:9099");
+          connectAuthEmulator(autho, "http://localhost:9099");
         }
 
         httpsCallableFunctions.getDatabases = httpsCallable(
@@ -148,13 +151,6 @@ export function AppProvider(props) {
           functions,
           "updateUserField"
         );
-
-        console.log("firebase INITED", {
-          app,
-          auth,
-          functions,
-          httpsCallableFunctions,
-        });
 
         // DARK MODE SET STATE
         let setDarkMode = () => {
@@ -212,6 +208,7 @@ export function AppProvider(props) {
 
         //RECOVER PASSWORD FUNCTION
         let tryRecover = async (_data) => {
+          let auth = getAuth();
           try {
             await sendPasswordResetEmail(auth, _data.email);
           } catch (error) {
@@ -222,6 +219,7 @@ export function AppProvider(props) {
         // LOGOUT FUNCTION
         let tryLogout = async () => {
           try {
+            let auth = getAuth();
             await signOut(auth);
             setAppContextData((prevProps) => {
               return {
@@ -241,6 +239,7 @@ export function AppProvider(props) {
         //SIGNUP FUNCTION
         let trySignup = async (_data) => {
           try {
+            let auth = getAuth();
             auth.languageCode = userLanguage;
             await createUserWithEmailAndPassword(
               auth,
@@ -286,10 +285,13 @@ export function AppProvider(props) {
             switch (_data.source) {
               case "google": {
                 let provider = new GoogleAuthProvider();
+                let auth = getAuth();
+                console.log("trying google login", { provider, auth });
                 signInWithRedirect(auth, provider);
                 break;
               }
               case "usernameAndPassword": {
+                let auth = getAuth();
                 let responseSignInWithEmailAndPassword =
                   await signInWithEmailAndPassword(
                     auth,
@@ -333,6 +335,7 @@ export function AppProvider(props) {
 
         //try get the google user data from redirect and do a login with that
         try {
+          let auth = getAuth();
           let redirectResult = await getRedirectResult(auth);
           let responseLogin = await httpsCallableFunctions.login({
             source: "google",

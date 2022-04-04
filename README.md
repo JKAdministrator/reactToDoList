@@ -1,10 +1,10 @@
 # commmit the changes of all files
 
-git commit -a -m "added loguin with email & gmail"
+git commit -a -m [added loguin with email & gmail]
 
 # push to repository (branch principal: main)
 
-git push -u origin <your-branch-name>
+git push -u origin [your-branch-name]
 
 # see current branch and changes not staged for commit
 
@@ -12,13 +12,13 @@ git status
 
 # create a new branch
 
-git checkout -b <your-new-branch-name>
+git checkout -b [your-new-branch-name]
 
 # merge branch into main branch
 
 1. check with git status si on the correct branch (the father branch where you want to add/gmerge the son branch changes)
-   1.a) if not on the main branch, change the current (son) branch to the main (father) branch using git checkout <your-father-branch-name>
-2. execute the command git merge <yout-son-branch-name>
+   1.a) if not on the main branch, change the current (son) branch to the main (father) branch using git checkout [your-father-branch-name]
+2. execute the command git merge [yout-son-branch-name]
 
 # deploy a firebase
 
