@@ -46,6 +46,8 @@ const initialContextData = {
   setDarkMode: () => {},
   updateUserImage: () => {},
   userImage: "",
+  userOpenProjects: [],
+  userClosedProjects: [],
 };
 
 async function getFile(filePath) {
@@ -104,7 +106,9 @@ export function AppProvider(props) {
       userLanguage = getDefautLanguage(),
       userTheme = getDefautTheme(),
       errorMessage,
-      userImage;
+      userImage,
+      userOpenProjects = [],
+      userClosedProjects = [];
 
     getFile("./json/languages.json")
       .then(async (languagesFile) => {
@@ -117,7 +121,6 @@ export function AppProvider(props) {
           appId: process.env.REACT_APP_FIREBASE_APP_ID,
           measurementId: process.env.REACT_APP_FIREBASE_MEASUREMENT_ID,
         };
-        console.log("firebaseConfig", firebaseConfig);
         // initialize firebase app
         app = initializeApp(firebaseConfig);
 
@@ -126,9 +129,6 @@ export function AppProvider(props) {
 
         // connect to the emulator if developement
         let useEmulator = process.env.REACT_APP_USE_FIREBASE_EMULATOR;
-        console.log("process.env.REACT_APP_USE_FIREBASE_EMULATOR", {
-          usingEmaultor: useEmulator,
-        });
 
         if (useEmulator === "1") {
           let autho = getAuth();
@@ -151,6 +151,37 @@ export function AppProvider(props) {
           functions,
           "updateUserField"
         );
+        httpsCallableFunctions.createProject = httpsCallable(
+          functions,
+          "createProject"
+        );
+
+        let createProject = async (_data) => {
+          try {
+            let response = await httpsCallableFunctions.createProject({
+              name: _data.name,
+              userDocId: userDocId,
+            });
+            console.log("AppContext.createProject response", { response });
+            let newProjectObject = {
+              id: response.data.id,
+              name: _data.name,
+            };
+
+            setAppContextData((prevProps) => {
+              let newUserOpenProjects = [
+                ...prevProps.userOpenProjects,
+                newProjectObject,
+              ];
+              return {
+                ...prevProps,
+                userOpenProjects: newUserOpenProjects,
+              };
+            });
+          } catch (error) {
+            throw error.toString();
+          }
+        };
 
         // DARK MODE SET STATE
         let setDarkMode = () => {
@@ -269,6 +300,10 @@ export function AppProvider(props) {
                   userTheme: responseLogin.data.userData.user.theme,
                   userDisplayName: responseLogin.data.userData.user.displayName,
                   userImage: responseLogin.data.userData.user.userImage,
+                  userOpenProjects:
+                    responseLogin.data.userData.user.userOpenProjects,
+                  userClosedProjects:
+                    responseLogin.data.userData.user.userClosedProjects,
                 };
               });
             } else {
@@ -286,7 +321,6 @@ export function AppProvider(props) {
               case "google": {
                 let provider = new GoogleAuthProvider();
                 let auth = getAuth();
-                console.log("trying google login", { provider, auth });
                 signInWithRedirect(auth, provider);
                 break;
               }
@@ -315,8 +349,10 @@ export function AppProvider(props) {
                       userData: responseLogin.data.userData,
                       userLanguage: responseLogin.data.userData.user.language,
                       userTheme: responseLogin.data.userData.user.theme,
-                      userDisplayName:
-                        responseLogin.data.userData.user.displayName,
+                      userOpenProjects:
+                        responseLogin.data.userData.user.userOpenProjects,
+                      userClosedProjects:
+                        responseLogin.data.userData.user.userClosedProjects,
                     };
                   });
                 } else {
@@ -358,12 +394,15 @@ export function AppProvider(props) {
             });
             return;
           } else {
+            console.log("response from google", { data: responseLogin.data });
             userDocId = responseLogin.data.userDocId;
             userData = responseLogin.data.userData;
             userTheme = userData.user.theme;
             userLanguage = userData.user.language;
             userDisplayName = userData.user.displayName;
             userImage = userData.user.userImage;
+            userOpenProjects = userData.user.userOpenProjects;
+            userClosedProjects = userData.user.userClosedProjects;
           }
         } catch (e) {} //if fails continue as nothing happend
 
@@ -391,6 +430,9 @@ export function AppProvider(props) {
             setDarkMode: setDarkMode,
             updateUserImage: updateUserImage,
             userImage: userImage,
+            userOpenProjects: userOpenProjects,
+            userClosedProjects: userClosedProjects,
+            createProject: createProject,
           };
         });
       })

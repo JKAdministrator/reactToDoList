@@ -44,6 +44,7 @@
         {
           "id": "sidebar",
           "strings": {
+            "configuration": "Configuracion",
             "projects": "Proyectos",
             "users": "Usuarios",
             "teams": "Equipos",
@@ -52,7 +53,7 @@
           }
         },
         {
-          "id": "sectionConfiguration",
+          "id": "screenConfiguration",
           "strings": {
             "title": "Configuración",
             "application": "Preferencias",
@@ -67,6 +68,15 @@
             "creationDate": "Creación",
             "myData": "Mis Datos",
             "changeImage": "CAMBIAR IMAGEN"
+          }
+        },
+        {
+          "id": "screenProjects",
+          "strings": {
+            "title": "Proyectos",
+            "open": "ABIERTOS",
+            "closed": "CERRADOS",
+            "btnNewTooltip": "Nuevo proyecto"
           }
         },
         {
@@ -130,6 +140,7 @@
         {
           "id": "sidebar",
           "strings": {
+            "configuration": "Configuration",
             "projects": "Projects",
             "users": "Users",
             "teams": "Teams",
@@ -138,7 +149,7 @@
           }
         },
         {
-          "id": "sectionConfiguration",
+          "id": "screenConfiguration",
           "strings": {
             "title": "Configuration",
             "application": "Preferences",
@@ -153,6 +164,15 @@
             "creationDate": "Creation",
             "myData": "My data",
             "changeImage": "CHANGE IMAGE"
+          }
+        },
+        {
+          "id": "screenProjects",
+          "strings": {
+            "title": "Projects",
+            "open": "OPEN",
+            "closed": "CLOSED",
+            "btnNewTooltip": "New project"
           }
         },
         {

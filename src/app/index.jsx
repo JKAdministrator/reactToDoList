@@ -37,8 +37,8 @@ const SignupForm = React.lazy(() => {
   return import("../signupForm");
 });
 
-const SectionManager = React.lazy(() => {
-  return import("../sections/manager");
+const ScreenManager = React.lazy(() => {
+  return import("../screenManager");
 });
 
 function App() {
@@ -71,7 +71,7 @@ function App() {
                 <>
                   {state === "LOGUED_IN" ? (
                     <ThemeProvider theme={theme}>
-                      <SectionManager></SectionManager>
+                      <ScreenManager></ScreenManager>
                     </ThemeProvider>
                   ) : (
                     <></>

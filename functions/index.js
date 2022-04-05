@@ -33,6 +33,7 @@ exports.login = functions.https.onCall(async (_data, context) => {
       userData: await getUserData(userDocId), // returns all the data of the user (user document, login accounts, etc...)
     };
   } catch (e) {
+    console.log("error", { e });
     return {
       errorCode: 1,
       errorMessage: e.toString(),
@@ -53,6 +54,33 @@ exports.updateUserField = functions.https.onCall(async (_data, context) => {
       [field]: newValue,
     });
   return {};
+});
+
+exports.createProject = functions.https.onCall(async (_data, context) => {
+  let name = _data.name;
+  let userDocId = _data.userDocId;
+
+  // create project entity
+  let projectDocumentRef = await admin.firestore().collection("projects").add({
+    name: name,
+    owner: userDocId,
+    creationDate: admin.firestore.FieldValue.serverTimestamp(),
+  });
+
+  //update user projects
+  await admin
+    .firestore()
+    .collection("users")
+    .doc(userDocId)
+    .update({
+      userOpenProjects: admin.firestore.FieldValue.arrayUnion({
+        id: projectDocumentRef.id,
+        name: name,
+      }),
+    });
+  return {
+    id: projectDocumentRef.id,
+  };
 });
 
 exports.deleteLoginCredential = functions.https.onCall(
@@ -126,6 +154,8 @@ async function createNewUser(_data) {
       theme: _data.navigatorTheme ? _data.navigatorTheme : "light",
       language: _data.navigatorLanguage ? _data.navigatorLanguage : "en",
       userImage: _data.userImage ? _data.userImage : "",
+      userOpenProjects: [],
+      userClosedProjects: [],
     });
   return userDoc;
 }
@@ -136,7 +166,10 @@ async function createNewLogin(_data) {
       .firestore()
       .collection("logins")
       .add({
-        ..._data,
+        source: _data.source,
+        photoURL: _data.photoURL,
+        email: _data.email,
+        password: _data.password ? _data.password : "",
         creationDate: admin.firestore.FieldValue.serverTimestamp(),
         lastLoginDate: admin.firestore.FieldValue.serverTimestamp(),
         userDocId: "",
