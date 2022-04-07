@@ -1,0 +1,30 @@
+.projectCard {
+  width: 10rem;
+  height: 8rem;
+  display: flex;
+  flex-flow: column;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  > button {
+    width: 100%;
+    height: 100%;
+  }
+}
+
+.controlsContainer {
+  position: absolute;
+  top: 0px;
+  right: 0px;
+  width: max-content;
+  display: flex;
+  flex-flow: row;
+  align-items: center;
+  justify-content: flex-end;
+}
+
+.menuButton {
+}
+.menu {
+  position: absolute;
+}

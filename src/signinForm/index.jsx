@@ -14,39 +14,40 @@ import {
 } from "@mui/material";
 const SigninForm = (props) => {
   //variables de estado
-  const { getLanguageString, tryLogin } = useAppContext();
+  const { getLanguageString, loginUser } = useAppContext();
 
   const [stateData, setStateData] = useState({
-    email: props.email || "",
-    password: props.password || "",
+    email: props.email || "julio.kania@gmail.com  ",
+    password: props.password || "password1",
     state: "READY",
     stateErrorMessage: "",
     isEmailMissing: false,
     isPasswordMissing: false,
     loginResponseMessage: "",
   });
-  console.log("login form");
 
   //ejecucion inicial
-  useEffect(async () => {
+  useEffect(() => {
     switch (stateData.state) {
       case "AWAIT_LOGIN_RESPONSE": {
-        try {
-          await tryLogin({
-            source: "usernameAndPassword",
-            email: stateData.email,
-            password: stateData.password,
-          });
-        } catch (e) {
-          console.log("loginForm: AWAIT_LOGIN_RESPONSE ... error ", { e });
-          setStateData((_prevData) => {
-            return {
-              ..._prevData,
-              state: "READY",
-              loginResponseMessage: e.toString(),
-            };
-          });
+        async function callLoginUser() {
+          try {
+            await loginUser({
+              source: "usernameAndPassword",
+              email: stateData.email,
+              password: stateData.password,
+            });
+          } catch (e) {
+            setStateData((_prevData) => {
+              return {
+                ..._prevData,
+                state: "READY",
+                loginResponseMessage: e.toString(),
+              };
+            });
+          }
         }
+        callLoginUser();
         break;
       }
       case "INITIAL_LOADING": {

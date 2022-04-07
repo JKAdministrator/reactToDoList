@@ -1,3 +1,24 @@
+# traerse un repositorio en github a la maquina local
+
+- parado en la carpeta donde debo cargar los archivos:
+- git clone
+
+# inicializar proyecto en git
+
+- En la indicación Command (Comando), agrega la URL para el repositorio remoto donde se subirá tu repositorio local.
+
+  # Sets the new remote
+
+  - git remote add origin <REMOTE_URL>
+
+  # Verifies the new remote URL
+
+  - -
+
+  # Pushes the changes in your local repository up to the remote repository you specified as the origin
+
+  - git push origin main
+
 # commmit the changes of all files
 
 git commit -a -m [added loguin with email & gmail]

@@ -2,6 +2,7 @@
   "languages": [
     {
       "id": "es",
+      "label": "Español",
       "components": [
         {
           "id": "signinForm",
@@ -59,7 +60,7 @@
             "application": "Preferencias",
             "darkMode": "Modo oscuro",
             "language": "Idioma",
-            "accesAccounts": "Credenciales de acceso",
+            "accesAccounts": "Credenciales",
             "usernameAndPassword": "Email y password",
             "username": "Email",
             "password": "Password",
@@ -91,11 +92,21 @@
             "password": "Password",
             "id": "ID"
           }
+        },
+        {
+          "id": "projectsPanelItem",
+          "strings": {
+            "delete": "Eliminar",
+            "rename": "Renombrar",
+            "close": "Cerrar",
+            "reopen": "Reabrir"
+          }
         }
       ]
     },
     {
       "id": "en",
+      "label": "English",
       "components": [
         {
           "id": "signinForm",
@@ -155,7 +166,7 @@
             "application": "Preferences",
             "darkMode": "Dark mode",
             "language": "Language",
-            "accesAccounts": "Loguin credentials",
+            "accesAccounts": "Credentials",
             "usernameAndPassword": "Email and password",
             "username": "Email",
             "password": "Password",
@@ -186,6 +197,15 @@
             "username": "Email",
             "password": "Password",
             "id": "ID"
+          }
+        },
+        {
+          "id": "projectsPanelItem",
+          "strings": {
+            "delete": "Delete",
+            "rename": "Rename",
+            "close": "Close",
+            "reopen": "Reopen"
           }
         }
       ]

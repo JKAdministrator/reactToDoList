@@ -46,16 +46,16 @@ function App() {
   const {
     firebaseConnectionState,
     firebaseConnectionStateError,
-    userDocId,
-    theme,
+    userUid,
+    themeObject,
   } = useAppContext();
 
   useEffect(() => {
     if (firebaseConnectionState === "LOADING") setState("LOADING");
     else if (firebaseConnectionState === "ERROR") setState("ERROR");
-    else if (userDocId !== "") setState("LOGUED_IN");
-    else if (userDocId === "") setState("LOGUED_OUT");
-  }, [userDocId, firebaseConnectionState]);
+    else if (userUid !== "") setState("LOGUED_IN");
+    else if (userUid === "") setState("LOGUED_OUT");
+  }, [userUid, firebaseConnectionState]);
 
   console.log("state 2", state);
   //la salida debe especificar el valor inicial del proveedor (objeto vacio)
@@ -70,7 +70,7 @@ function App() {
               element={
                 <>
                   {state === "LOGUED_IN" ? (
-                    <ThemeProvider theme={theme}>
+                    <ThemeProvider theme={themeObject}>
                       <ScreenManager></ScreenManager>
                     </ThemeProvider>
                   ) : (

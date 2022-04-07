@@ -20,47 +20,39 @@ import {
 import { createTheme } from "@mui/material";
 import { grey } from "@mui/material/colors";
 import useMediaQuery from "@mui/material/useMediaQuery";
-const AppContext = React.createContext();
 
+const AppContext = React.createContext();
 const initialContextData = {
+  //firebase connection data
   firebaseConnectionState: "LOADING",
   firebaseConnectionStateError: "",
   firebaseApp: {},
   firebaseFunctions: {},
   firebaseHttpsCallableFunctions: {},
-  languages: {},
-  getString: () => {},
   emulatorStarted: false,
-  userDocId: "",
-  userData: {},
-  tryLogin: () => {},
-  tryLogout: () => {},
-  trySignup: () => {},
-  tryRecover: () => {},
-  updateName: () => {},
-  updateLanguage: () => {},
+  //global server functions
+  createUser: async () => {},
+  loginUser: async () => {},
+  logoutUser: async () => {},
+  recoverUser: async () => {},
+  getUserCredentials: async () => {},
+  updateUser: async () => {},
+  createProject: () => {},
+  closeProject: () => {},
+  // user data
+  userUid: "",
   userLanguage: "",
   userDisplayName: "",
-  theme: {},
-  darkMode: false,
-  setDarkMode: () => {},
-  updateUserImage: () => {},
   userImage: "",
   userOpenProjects: [],
   userClosedProjects: [],
+  userDarkMode: false,
+  //customization objects (themes, languages, etc...)
+  themeObject: {},
+  languages: {},
 };
 
-async function getFile(filePath) {
-  try {
-    let file = await fetch(filePath);
-    let data = await file.json();
-    return data;
-  } catch (e) {
-    throw e.toString();
-  }
-}
-
-function getDefautTheme() {
+function getDefautThemeString() {
   let themeMode =
     window.matchMedia &&
     window.matchMedia("(prefers-color-scheme: dark)").matches
@@ -88,6 +80,16 @@ function getDefautLanguage() {
   return "en";
 }
 
+async function getFile(filePath) {
+  try {
+    let file = await fetch(filePath);
+    let data = await file.json();
+    return data;
+  } catch (e) {
+    throw e.toString();
+  }
+}
+
 export function AppProvider(props) {
   const prefersDarkMode = useMediaQuery("(prefers-color-scheme: dark)");
 
@@ -97,18 +99,20 @@ export function AppProvider(props) {
   });
 
   useEffect(() => {
+    let userThemeString = getDefautThemeString();
     let app,
       functions,
       httpsCallableFunctions = {},
-      userDocId = "",
-      userData = {},
+      userUid = "",
       userDisplayName = "",
       userLanguage = getDefautLanguage(),
-      userTheme = getDefautTheme(),
       errorMessage,
       userImage,
       userOpenProjects = [],
-      userClosedProjects = [];
+      userClosedProjects = [],
+      userDarkMode = userThemeString === "dark" ? true : false,
+      themeObject = getThemeObject(userThemeString),
+      emulatorStarted = false;
 
     getFile("./json/languages.json")
       .then(async (languagesFile) => {
@@ -131,6 +135,7 @@ export function AppProvider(props) {
         let useEmulator = process.env.REACT_APP_USE_FIREBASE_EMULATOR;
 
         if (useEmulator === "1") {
+          emulatorStarted = true;
           let autho = getAuth();
           connectFunctionsEmulator(functions, "localhost", 5001);
           connectAuthEmulator(autho, "http://localhost:9099");
@@ -143,28 +148,173 @@ export function AppProvider(props) {
 
         httpsCallableFunctions.login = httpsCallable(functions, "login");
 
-        httpsCallableFunctions.deleteLoginCredential = httpsCallable(
-          functions,
-          "deleteLoginCredential"
-        );
-        httpsCallableFunctions.updateUserField = httpsCallable(
-          functions,
-          "updateUserField"
-        );
         httpsCallableFunctions.createProject = httpsCallable(
           functions,
           "createProject"
         );
+        httpsCallableFunctions.closeProject = httpsCallable(
+          functions,
+          "closeProject"
+        );
+        httpsCallableFunctions.createUser = httpsCallable(
+          functions,
+          "createUser"
+        );
+        httpsCallableFunctions.loginUser = httpsCallable(
+          functions,
+          "loginUser"
+        );
+        httpsCallableFunctions.updateUser = httpsCallable(
+          functions,
+          "updateUser"
+        );
+
+        let loginUser = async (_data) => {
+          try {
+            let auth = getAuth();
+            switch (_data.source) {
+              case "google": {
+                let provider = new GoogleAuthProvider();
+                signInWithRedirect(auth, provider);
+                break;
+              }
+              case "usernameAndPassword": {
+                try {
+                  let responseSignInWithEmailAndPassword =
+                    await signInWithEmailAndPassword(
+                      auth,
+                      _data.email.toString(),
+                      _data.password.toString()
+                    );
+                  let responseLogin = await httpsCallableFunctions.loginUser({
+                    source: "usernameAndPassword",
+                    uid: responseSignInWithEmailAndPassword.user.uid,
+                  });
+
+                  setAppContextData((prevProps) => {
+                    return {
+                      ...prevProps,
+                      userUid: responseSignInWithEmailAndPassword.user.uid,
+                      userDisplayName: responseLogin.data.userData.name,
+                      userImage: responseLogin.data.userData.image,
+                      userLanguage: responseLogin.data.userData.language,
+                      userDarkMode: responseLogin.data.userData.darkMode,
+                      userOpenProjects:
+                        responseLogin.data.userData.userOpenProjects,
+                      userClosedProjects:
+                        responseLogin.data.userData.userClosedProjects,
+                    };
+                  });
+                } catch (e) {
+                  throw e.toString();
+                }
+                break;
+              }
+              default: {
+                throw new Error("Must specify a login source");
+              }
+            }
+          } catch (e) {
+            throw e.toString();
+          }
+        };
+
+        let createUser = async (_data) => {
+          console.log("appContext.createUser()");
+          try {
+            let auth = getAuth();
+            auth.languageCode = userLanguage;
+            let response = await createUserWithEmailAndPassword(
+              auth,
+              _data.email,
+              _data.password
+            );
+            await sendEmailVerification(auth.currentUser);
+            await httpsCallableFunctions.createUser({
+              source: "password",
+              uid: response.user.uid,
+              email: _data.email,
+              password: _data.password,
+              name: _data.name,
+              darkMode: userDarkMode,
+              language: userLanguage,
+              image: _data.image,
+            });
+          } catch (error) {
+            throw error.toString();
+          }
+        };
+
+        let logoutUser = async (_data) => {
+          console.log("appContext.logoutUser()");
+          try {
+            let auth = getAuth();
+            await signOut(auth);
+            setAppContextData((prevProps) => {
+              return {
+                ...prevProps,
+                userUid: "",
+                userDisplayName: "",
+                userImage: "",
+                userLanguage: getDefautLanguage(),
+                userOpenProjects: [],
+                userClosedProjects: [],
+                userDarkMode: getDefautThemeString() === "dark" ? true : false,
+              };
+            });
+          } catch (error) {
+            throw error.toString();
+          }
+        };
+
+        let recoverUser = async (_data) => {
+          console.log("appContext.recoverUser()");
+          let auth = getAuth();
+          try {
+            await sendPasswordResetEmail(auth, _data.email);
+          } catch (error) {
+            throw error.toString();
+          }
+        };
+
+        let getUserCredentials = () => {
+          let auth = getAuth();
+          let user = auth.currentUser;
+          if (user !== null) {
+            return Array.from(user.providerData).map((profile) => {
+              return {
+                provider: profile.providerId,
+                uid: profile.uid,
+                name: profile.displayName,
+                email: profile.email,
+                image: profile.photoURL,
+              };
+            });
+          }
+          return [];
+        };
+
+        let closeProject = async (_data) => {
+          console.log("close project", { data: _data });
+          /*
+          let response = await httpsCallableFunctions.closeProject({
+            dato1: "valor1",
+            dato2: "valor2",
+          });
+          return response;*/
+        };
 
         let createProject = async (_data) => {
           try {
             let response = await httpsCallableFunctions.createProject({
-              name: _data.name,
-              userDocId: userDocId,
+              project: {
+                name: _data.name,
+              },
+              uid: userUid,
             });
-            console.log("AppContext.createProject response", { response });
+
             let newProjectObject = {
-              id: response.data.id,
+              id: response.data.projectData.id,
               name: _data.name,
             };
 
@@ -183,258 +333,95 @@ export function AppProvider(props) {
           }
         };
 
-        // DARK MODE SET STATE
-        let setDarkMode = () => {
-          setAppContextData((prevProps) => {
-            let newDarkMode = !prevProps.darkMode;
-            let themeString = newDarkMode ? "dark" : "light";
-            httpsCallableFunctions.updateUserField({
-              field: "theme",
-              newValue: themeString,
-              userDocId: userDocId,
-            });
-            return {
-              ...prevProps,
-              darkMode: newDarkMode,
-              theme: getThemeObject(themeString),
-            };
-          });
-        };
-
-        // USER IMAGE SET STATE
-        let updateUserImage = (userImageSrc) => {
-          setAppContextData((prevProps) => {
-            return { ...prevProps, userImage: userImageSrc };
-          });
-          httpsCallableFunctions.updateUserField({
-            field: "userImage",
-            newValue: userImageSrc,
-            userDocId: userDocId,
-          });
-        };
-
-        // DISPLAY NAME SET STATE
-        let updateName = (_newName, userDocId = null) => {
-          setAppContextData((prevProps) => {
-            return { ...prevProps, userDisplayName: _newName };
-          });
-          httpsCallableFunctions.updateUserField({
-            field: "displayName",
-            newValue: _newName,
-            userDocId: userDocId,
-          });
-        };
-
-        // LANGUAGE
-        let updateLanguage = (_newLanguage, userDocId) => {
-          setAppContextData((prevProps) => {
-            return { ...prevProps, userLanguage: _newLanguage };
-          });
-          httpsCallableFunctions.updateUserField({
-            field: "language",
-            newValue: _newLanguage,
-            userDocId: userDocId,
-          });
-        };
-
-        //RECOVER PASSWORD FUNCTION
-        let tryRecover = async (_data) => {
+        // UPDATE USER DATA
+        let updateUser = async (field, value, updateOnServer = true) => {
           let auth = getAuth();
-          try {
-            await sendPasswordResetEmail(auth, _data.email);
-          } catch (error) {
-            throw error.toString();
-          }
-        };
-
-        // LOGOUT FUNCTION
-        let tryLogout = async () => {
-          try {
-            let auth = getAuth();
-            await signOut(auth);
-            setAppContextData((prevProps) => {
-              return {
-                ...prevProps,
-                userDocId: "",
-                userData: {},
-                userLanguage: getDefautLanguage(),
-                userTheme: getDefautTheme(),
-                userDisplayName: "",
-              };
+          let userUid = auth.currentUser !== null ? auth.currentUser.uid : null;
+          let databaseFields = [];
+          databaseFields["userImage"] = "image";
+          databaseFields["userDisplayName"] = "name";
+          databaseFields["userLanguage"] = "language";
+          databaseFields["userDarkMode"] = "darkMode";
+          if (updateOnServer) {
+            httpsCallableFunctions.updateUser({
+              newData: { [databaseFields[field]]: value },
+              uid: userUid,
             });
-          } catch (error) {
-            throw error.toString();
           }
-        };
 
-        //SIGNUP FUNCTION
-        let trySignup = async (_data) => {
-          try {
-            let auth = getAuth();
-            auth.languageCode = userLanguage;
-            await createUserWithEmailAndPassword(
-              auth,
-              _data.email,
-              _data.password
-            );
-
-            await sendEmailVerification(auth.currentUser);
-
-            let responseLogin = await httpsCallableFunctions.login({
-              source: "usernameAndPassword",
-              email: _data.email,
-              password: _data.password,
-              displayName: _data.username,
-              navigatorTheme: userTheme,
-              navigatorLanguage: userLanguage,
-              userImage: _data.userImage,
-            });
-
-            if (responseLogin.data.errorCode === 0) {
-              setAppContextData((prevProps) => {
-                return {
-                  ...prevProps,
-                  userDocId: responseLogin.data.userDocId,
-                  userData: responseLogin.data.userData,
-                  userLanguage: responseLogin.data.userData.user.language,
-                  userTheme: responseLogin.data.userData.user.theme,
-                  userDisplayName: responseLogin.data.userData.user.displayName,
-                  userImage: responseLogin.data.userData.user.userImage,
-                  userOpenProjects:
-                    responseLogin.data.userData.user.userOpenProjects,
-                  userClosedProjects:
-                    responseLogin.data.userData.user.userClosedProjects,
-                };
-              });
-            } else {
-              throw responseLogin.data.errorMessage;
-            }
-          } catch (error) {
-            throw error.toString();
-          }
-        };
-
-        // LOGIN FUNCTION (AUTH + LOGIN)
-        let tryLogin = async (_data) => {
-          try {
-            switch (_data.source) {
-              case "google": {
-                let provider = new GoogleAuthProvider();
-                let auth = getAuth();
-                signInWithRedirect(auth, provider);
-                break;
-              }
-              case "usernameAndPassword": {
-                let auth = getAuth();
-                let responseSignInWithEmailAndPassword =
-                  await signInWithEmailAndPassword(
-                    auth,
-                    _data.email.toString(),
-                    _data.password.toString()
-                  );
-                let responseLogin = await httpsCallableFunctions.login({
-                  source: "usernameAndPassword",
-                  email: _data.email,
-                  password: _data.password,
-                  displayName:
-                    responseSignInWithEmailAndPassword.user.displayName,
-                  navigatorTheme: userTheme,
-                  navigatorLanguage: userLanguage,
-                });
-                if (responseLogin.data.errorCode === 0) {
-                  setAppContextData((prevProps) => {
-                    return {
-                      ...prevProps,
-                      userDocId: responseLogin.data.userDocId,
-                      userData: responseLogin.data.userData,
-                      userLanguage: responseLogin.data.userData.user.language,
-                      userTheme: responseLogin.data.userData.user.theme,
-                      userOpenProjects:
-                        responseLogin.data.userData.user.userOpenProjects,
-                      userClosedProjects:
-                        responseLogin.data.userData.user.userClosedProjects,
-                    };
-                  });
-                } else {
-                  throw responseLogin.data.errorMessage;
-                }
-                break;
-              }
-              default: {
-                throw new Error("Must specify a login source");
-              }
-            }
-          } catch (e) {
-            throw e.toString();
-          }
+          let dataToChange = { [field]: value };
+          if (field === "userDarkMode")
+            dataToChange = {
+              ...dataToChange,
+              themeObject: getThemeObject(value ? "dark" : "light"),
+            };
+          setAppContextData((prevProps) => {
+            return { ...prevProps, ...dataToChange };
+          });
         };
 
         //try get the google user data from redirect and do a login with that
-        try {
-          let auth = getAuth();
-          let redirectResult = await getRedirectResult(auth);
-          let responseLogin = await httpsCallableFunctions.login({
+        let auth = getAuth();
+        let redirectResult = await getRedirectResult(auth);
+        console.log("redirectResult", { redirectResult });
+        if (redirectResult) {
+          let loginData = {
             source: "google",
-            email: redirectResult.user.email,
-            displayName: redirectResult.user.displayName,
-            photoURL: redirectResult.user.photoURL,
             uid: redirectResult.user.uid,
-            navigatorTheme: userTheme,
-            navigatorLanguage: userLanguage,
-            userImage: redirectResult.user.photoURL,
-          });
-
-          if (responseLogin.errorCode > 0) {
-            setAppContextData((prevProps) => {
-              return {
-                ...prevProps,
-                firebaseConnectionState: "ERROR",
-                firebaseConnectionStateError: responseLogin.errorMessage,
-              };
-            });
-            return;
-          } else {
-            console.log("response from google", { data: responseLogin.data });
-            userDocId = responseLogin.data.userDocId;
-            userData = responseLogin.data.userData;
-            userTheme = userData.user.theme;
-            userLanguage = userData.user.language;
-            userDisplayName = userData.user.displayName;
-            userImage = userData.user.userImage;
-            userOpenProjects = userData.user.userOpenProjects;
-            userClosedProjects = userData.user.userClosedProjects;
+            darkMode: userDarkMode,
+            language: userLanguage,
+            name: redirectResult.user.displayName,
+            image: redirectResult.user.photoURL
+              ? redirectResult.user.photoURL
+              : "",
+          };
+          console.log("loginData", loginData);
+          let responseLogin = await httpsCallableFunctions.loginUser(loginData);
+          console.log("responseLogin", responseLogin);
+          console.log("redirectResult", redirectResult);
+          if (responseLogin.data.errorCode === 0) {
+            userUid = redirectResult.user.uid;
+            userDarkMode = responseLogin.data.userData.darkMode;
+            userLanguage = responseLogin.data.userData.language;
+            userDisplayName = responseLogin.data.userData.name;
+            userImage = responseLogin.data.userData.image;
+            userOpenProjects = responseLogin.data.userData.userOpenProjects;
+            userClosedProjects = responseLogin.data.userData.userClosedProjects;
           }
-        } catch (e) {} //if fails continue as nothing happend
-
+        }
         setAppContextData((prevProps) => {
           return {
             ...prevProps,
+            //firebase connection data
+            firebaseConnectionState: errorMessage ? "ERROR" : "READY",
+            firebaseConnectionStateError: errorMessage,
             firebaseApp: app,
             firebaseFunctions: functions,
             firebaseHttpsCallableFunctions: httpsCallableFunctions,
-            firebaseConnectionState: errorMessage ? "ERROR" : "READY",
-            firebaseConnectionStateError: errorMessage,
-            userDocId: userDocId,
-            userData: userData,
-            languages: languagesFile.languages,
-            tryLogin: tryLogin,
-            tryLogout: tryLogout,
-            trySignup: trySignup,
-            tryRecover: tryRecover,
-            updateName: updateName,
-            updateLanguage: updateLanguage,
+            emulatorStarted: emulatorStarted,
+            //global server functions
+            createUser: createUser,
+            loginUser: loginUser,
+            logoutUser: logoutUser,
+            recoverUser: recoverUser,
+            getUserCredentials: getUserCredentials,
+            updateUser: updateUser,
+            createProject: createProject,
+            closeProject: closeProject,
+            // user data
+            userUid: userUid,
             userLanguage: userLanguage,
             userDisplayName: userDisplayName,
-            darkMode: userTheme === "dark" ? true : false,
-            theme: getThemeObject(userTheme),
-            setDarkMode: setDarkMode,
-            updateUserImage: updateUserImage,
             userImage: userImage,
             userOpenProjects: userOpenProjects,
             userClosedProjects: userClosedProjects,
-            createProject: createProject,
+            userDarkMode: userDarkMode,
+            //customization objects (themes, languages, etc...)
+            languages: languagesFile.languages,
+            themeObject: themeObject,
           };
         });
+        console.log("changing state to ready");
       })
       .catch((e) => {
         setAppContextData((prevProps) => {
@@ -468,7 +455,7 @@ export function AppProvider(props) {
         let string = component.strings[stringName];
         return string;
       } else {
-        return "NaStr";
+        return "---";
       }
     };
 

@@ -15,13 +15,13 @@ import {
 } from "@mui/material";
 const SignupForm = (props) => {
   //variables de estado
-  const { getLanguageString, trySignup, userDocId } = useAppContext();
+  const { getLanguageString, userDocId, createUser } = useAppContext();
 
   const [stateData, setStateData] = useState({
-    username: props.username || "",
-    email: props.email || "",
-    password: props.password || "",
-    confirmPassword: props.confirmPassword || "",
+    username: props.username || "Julio Kania",
+    email: props.email || "julio.kania@gmail.com",
+    password: props.password || "password1",
+    confirmPassword: props.confirmPassword || "password1",
     state: "READY",
     stateErrorMessage: "",
     isUsernameMissing: false,
@@ -33,33 +33,35 @@ const SignupForm = (props) => {
   });
 
   //ejecucion inicial
-  useEffect(async () => {
+  useEffect(() => {
     switch (stateData.state) {
       case "AWAIT_REGISTER_RESPONSE": {
-        try {
-          await trySignup({
-            email: stateData.email,
-            password: stateData.password,
-            username: stateData.username,
-            userImage: stateData.userImage,
-          });
-
-          setStateData((_prevData) => {
-            return {
-              ..._prevData,
-              state: "LOGIN_READY",
-              loginResponseMessage: "",
-            };
-          });
-        } catch (e) {
-          setStateData((_prevData) => {
-            return {
-              ..._prevData,
-              state: "READY",
-              loginResponseMessage: e.toString(),
-            };
-          });
+        async function callCreateUser() {
+          try {
+            await createUser({
+              email: stateData.email,
+              password: stateData.password,
+              name: stateData.username,
+              image: stateData.userImage,
+            });
+            setStateData((_prevData) => {
+              return {
+                ..._prevData,
+                state: "LOGIN_READY",
+                loginResponseMessage: "",
+              };
+            });
+          } catch (e) {
+            setStateData((_prevData) => {
+              return {
+                ..._prevData,
+                state: "READY",
+                loginResponseMessage: e.toString(),
+              };
+            });
+          }
         }
+        callCreateUser();
         break;
       }
       case "INITIAL_LOADING": {
@@ -79,7 +81,7 @@ const SignupForm = (props) => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [stateData.state]);
 
-  useEffect(async () => {}, [userDocId]);
+  useEffect(() => {}, [userDocId]);
 
   // graba el nuevo estado del componente cuando se detecta un cambio en algun input
   const changeHandler = (e) => {

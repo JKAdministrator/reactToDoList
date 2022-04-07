@@ -3,10 +3,10 @@ import style from "./style.module.scss";
 import { useAppContext } from "../../context/appContext";
 import { Button } from "@mui/material";
 const GoogleLoginButton = () => {
-  const { tryLogin } = useAppContext();
+  const { loginUser } = useAppContext();
 
   function handleLoginClick(e) {
-    tryLogin({ source: "google" });
+    loginUser({ source: "google" });
   }
 
   return (
