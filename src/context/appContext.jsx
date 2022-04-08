@@ -118,6 +118,7 @@ export function AppProvider(props) {
 
     getFile("./json/languages.json")
       .then(async (languagesFile) => {
+        console.log("firebaseConfig", { env: process.env });
         let firebaseConfig = {
           apiKey: process.env.REACT_APP_FIREBASE_API_KEY,
           authDomain: process.env.REACT_APP_FIREBASE_AUTH_DOMAIN,
@@ -462,6 +463,7 @@ export function AppProvider(props) {
         //try get the google user data from redirect and do a login with that
         let auth = getAuth();
         let redirectResult = await getRedirectResult(auth);
+        console.log("redirectResult", { redirectResult });
         if (redirectResult) {
           let loginData = {
             source: "google",
@@ -474,7 +476,7 @@ export function AppProvider(props) {
               : "",
           };
           let responseLogin = await httpsCallableFunctions.loginUser(loginData);
-
+          console.log("responseLogin", { responseLogin });
           if (responseLogin.data.errorCode === 0) {
             let responseUserDarkMode = responseLogin.data.userData.darkMode;
             let responseDefaultThemeString = responseUserDarkMode

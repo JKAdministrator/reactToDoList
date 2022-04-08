@@ -1,8 +1,9 @@
 const functions = require("firebase-functions");
 const admin = require("firebase-admin");
+if (admin.apps.length === 0) admin.initializeApp();
 exports.deleteProject = functions.https.onCall(async (data, context) => {
   try {
-    if (admin.apps.length === 0) admin.initializeApp();
+    //if (admin.apps.length === 0) admin.initializeApp();
 
     //delete the project
     await admin

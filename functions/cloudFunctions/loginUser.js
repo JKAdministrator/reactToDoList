@@ -1,9 +1,8 @@
 const functions = require("firebase-functions");
 const admin = require("firebase-admin");
-
+if (admin.apps.length === 0) admin.initializeApp();
 exports.loginUser = functions.https.onCall(async (data, context) => {
   try {
-    if (admin.apps.length === 0) admin.initializeApp();
     userDoc = await admin.firestore().collection("users").doc(data.uid).get(); //get the user document
     documentData = userDoc.data(); //get the user document data
     if (!documentData) {

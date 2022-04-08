@@ -1,9 +1,9 @@
 const functions = require("firebase-functions");
 const admin = require("firebase-admin");
-
+if (admin.apps.length === 0) admin.initializeApp();
 exports.createProject = functions.https.onCall(async (data, context) => {
   try {
-    if (admin.apps.length === 0) admin.initializeApp();
+    //if (admin.apps.length === 0) admin.initializeApp();
     // create project entity
     let projectDocumentRef = await admin
       .firestore()
