@@ -1,0 +1,23 @@
+.credentialCard {
+  padding: 1rem;
+  display: grid !important;
+  grid-template-areas: "a1 a1" "a2 a3";
+  align-items: center;
+  justify-content: center;
+  gap: 1rem;
+}
+.credentialDataRowContainer {
+  display: flex;
+  flex-flow: column;
+  align-items: flex-start;
+  justify-content: flex-start;
+  height: max-content;
+  width: max-content;
+}
+.credentialDataRow {
+  font-size: 0.8rem;
+  text-overflow: ellipsis;
+  overflow: hidden;
+  white-space: nowrap;
+  max-width: 12rem;
+}

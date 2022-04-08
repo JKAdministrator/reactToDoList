@@ -1,12 +1,13 @@
 import { Box, Paper } from "@mui/material";
 
 import React, { useState } from "react";
-import SectionConfiguration from "../configuration";
+import ScreeenConfiguration from "./screens/configuration";
+import ScreenProjects from "./screens/projects";
 import style from "./style.module.scss";
 import Headerbar from "./headerbar";
 import Sidebar from "./sidebar";
 
-const SectionManager = () => {
+const ScreenManager = () => {
   const [currentSection, setCurrentSection] = useState("");
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
 
@@ -28,8 +29,11 @@ const SectionManager = () => {
 
   function getSectionHTMLElement() {
     switch (currentSection) {
-      case "sectionConfiguration": {
-        return <SectionConfiguration></SectionConfiguration>;
+      case "screenConfiguration": {
+        return <ScreeenConfiguration></ScreeenConfiguration>;
+      }
+      case "screenProjects": {
+        return <ScreenProjects></ScreenProjects>;
       }
       default: {
         return <></>;
@@ -56,4 +60,4 @@ const SectionManager = () => {
   );
 };
 
-export default SectionManager;
+export default ScreenManager;

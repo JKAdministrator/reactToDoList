@@ -13,9 +13,11 @@ import {
   TextField,
   Typography,
 } from "@mui/material";
+import { validateEmail } from "../utils";
 const SignupForm = (props) => {
   //variables de estado
-  const { getLanguageString, trySignup, userDocId } = useAppContext();
+  const { getLanguageString, userDocId, createUser, userDarkMode } =
+    useAppContext();
 
   const [stateData, setStateData] = useState({
     username: props.username || "",
@@ -33,33 +35,35 @@ const SignupForm = (props) => {
   });
 
   //ejecucion inicial
-  useEffect(async () => {
+  useEffect(() => {
     switch (stateData.state) {
       case "AWAIT_REGISTER_RESPONSE": {
-        try {
-          await trySignup({
-            email: stateData.email,
-            password: stateData.password,
-            username: stateData.username,
-            userImage: stateData.userImage,
-          });
-
-          setStateData((_prevData) => {
-            return {
-              ..._prevData,
-              state: "LOGIN_READY",
-              loginResponseMessage: "",
-            };
-          });
-        } catch (e) {
-          setStateData((_prevData) => {
-            return {
-              ..._prevData,
-              state: "READY",
-              loginResponseMessage: e.toString(),
-            };
-          });
+        async function callCreateUser() {
+          try {
+            await createUser({
+              email: stateData.email,
+              password: stateData.password,
+              name: stateData.username,
+              image: stateData.userImage,
+            });
+            setStateData((_prevData) => {
+              return {
+                ..._prevData,
+                state: "LOGIN_READY",
+                loginResponseMessage: "",
+              };
+            });
+          } catch (e) {
+            setStateData((_prevData) => {
+              return {
+                ..._prevData,
+                state: "READY",
+                loginResponseMessage: e.toString(),
+              };
+            });
+          }
         }
+        callCreateUser();
         break;
       }
       case "INITIAL_LOADING": {
@@ -79,7 +83,7 @@ const SignupForm = (props) => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [stateData.state]);
 
-  useEffect(async () => {}, [userDocId]);
+  useEffect(() => {}, [userDocId]);
 
   // graba el nuevo estado del componente cuando se detecta un cambio en algun input
   const changeHandler = (e) => {
@@ -108,6 +112,10 @@ const SignupForm = (props) => {
     let isConfirmPasswordMissing =
       stateData.confirmPassword.toString().length <= 0 ? true : false;
     let loginResponseMessage = "";
+    if (!validateEmail(stateData.email)) {
+      isEmailMissing = true;
+      loginResponseMessage = "Invalid Email";
+    }
     if (
       !isUsernameMissing &&
       !isPasswordMissing &&
@@ -309,7 +317,11 @@ const SignupForm = (props) => {
                 alignItems: "flex-start",
               }}
             >
-              <Link to="/" name="signup">
+              <Link
+                to="/"
+                name="signup"
+                style={userDarkMode ? { color: "#ffffffbf" } : {}}
+              >
                 {getString("return")}
               </Link>
             </Box>
@@ -348,7 +360,11 @@ const SignupForm = (props) => {
             <Link to="/" name="login">
               <Button
                 variant="contained"
-                style={{ width: "100%" }}
+                style={
+                  userDarkMode
+                    ? { color: "#ffffffbf", width: "100%" }
+                    : { width: "100%" }
+                }
                 disableElevation
               >
                 {getString("login")}

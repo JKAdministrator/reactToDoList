@@ -2,8 +2,9 @@ import style from "./style.module.scss";
 import React, { useEffect, useState } from "react";
 import { AppProvider, useAppContext } from "../context/appContext";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
-import { Box, CircularProgress } from "@mui/material";
+import { Box, CircularProgress, Paper } from "@mui/material";
 import { ThemeProvider } from "@emotion/react";
+import NotFound from "../notFound";
 
 //import SigninForm from "../signinForm/index.jsx";
 //import SectionManager from "../sections/manager";
@@ -37,8 +38,8 @@ const SignupForm = React.lazy(() => {
   return import("../signupForm");
 });
 
-const SectionManager = React.lazy(() => {
-  return import("../sections/manager");
+const ScreenManager = React.lazy(() => {
+  return import("../screenManager");
 });
 
 function App() {
@@ -46,81 +47,115 @@ function App() {
   const {
     firebaseConnectionState,
     firebaseConnectionStateError,
-    userDocId,
-    theme,
+    userUid,
+    themeObject,
+    userDarkMode,
   } = useAppContext();
 
   useEffect(() => {
     if (firebaseConnectionState === "LOADING") setState("LOADING");
     else if (firebaseConnectionState === "ERROR") setState("ERROR");
-    else if (userDocId !== "") setState("LOGUED_IN");
-    else if (userDocId === "") setState("LOGUED_OUT");
-  }, [userDocId, firebaseConnectionState]);
+    else if (userUid !== "") setState("LOGUED_IN");
+    else if (userUid === "") setState("LOGUED_OUT");
+  }, [userUid, firebaseConnectionState]);
 
-  console.log("state 2", state);
   //la salida debe especificar el valor inicial del proveedor (objeto vacio)
   return (
     <AppContext.Provider value={{}}>
-      <React.Suspense fallback={<CircularProgress />}>
-        <BrowserRouter>
-          <Routes>
-            <Route
-              index
-              path="/"
-              element={
-                <>
-                  {state === "LOGUED_IN" ? (
-                    <ThemeProvider theme={theme}>
-                      <SectionManager></SectionManager>
-                    </ThemeProvider>
-                  ) : (
-                    <></>
-                  )}
-                  {state === "LOGUED_OUT" ? (
-                    <Box className={style.formContainer}>
-                      <SigninForm name="signinForm"></SigninForm>
-                    </Box>
-                  ) : (
-                    <></>
-                  )}
-                  {state === "LOADING" ? (
-                    <div className={style.loader}>
-                      <CircularProgress />
-                    </div>
-                  ) : (
-                    <></>
-                  )}
-                  {state === "ERROR" ? (
-                    <>
-                      <span>error:</span>
-                      <span>{firebaseConnectionStateError}</span>
-                    </>
-                  ) : (
-                    <></>
-                  )}
-                </>
-              }
+      <ThemeProvider theme={themeObject}>
+        <React.Suspense
+          fallback={
+            <CircularProgress
+              style={{ position: "absolute", top: "calc(50% - 20px)" }}
             />
-            <Route
-              path="signUp"
-              element={
-                <Box className={style.formContainer}>
-                  <SignupForm></SignupForm>
-                </Box>
-              }
-            />
-            <Route
-              path="recover"
-              element={
-                <Box className={style.formContainer}>
-                  <RecoverForm />
-                </Box>
-              }
-            />
-            <Route path="*" element={<CircularProgress />} />
-          </Routes>
-        </BrowserRouter>
-      </React.Suspense>
+          }
+        >
+          <BrowserRouter>
+            <Routes>
+              <Route
+                index
+                path="/"
+                element={
+                  <>
+                    {state === "LOGUED_IN" ? (
+                      <ScreenManager></ScreenManager>
+                    ) : (
+                      <></>
+                    )}
+                    {state === "LOGUED_OUT" ? (
+                      <Paper
+                        className={style.formContainer}
+                        style={
+                          userDarkMode ? { backgroundColor: "rgb(0 0 0)" } : {}
+                        }
+                      >
+                        <SigninForm name="signinForm"></SigninForm>
+                      </Paper>
+                    ) : (
+                      <></>
+                    )}
+                    {state === "LOADING" ? (
+                      <div className={style.loader}>
+                        <CircularProgress
+                          style={{
+                            position: "absolute",
+                            top: "calc(50% - 20px)",
+                          }}
+                        />
+                      </div>
+                    ) : (
+                      <></>
+                    )}
+                    {state === "ERROR" ? (
+                      <>
+                        <span>error:</span>
+                        <span>{firebaseConnectionStateError}</span>
+                      </>
+                    ) : (
+                      <></>
+                    )}
+                  </>
+                }
+              />
+              <Route
+                path="signUp"
+                element={
+                  <Paper
+                    className={style.formContainer}
+                    style={
+                      userDarkMode ? { backgroundColor: "rgb(0 0 0)" } : {}
+                    }
+                  >
+                    <SignupForm></SignupForm>
+                  </Paper>
+                }
+              />
+              <Route
+                path="recover"
+                element={
+                  <Paper
+                    className={style.formContainer}
+                    style={
+                      userDarkMode ? { backgroundColor: "rgb(0 0 0)" } : {}
+                    }
+                  >
+                    <RecoverForm />
+                  </Paper>
+                }
+              />
+              <Route
+                path="*"
+                element={
+                  <>
+                    <NotFound></NotFound>
+                  </>
+                }
+              />
+              <Route component={NotFound} />
+            </Routes>
+          </BrowserRouter>
+        </React.Suspense>
+      </ThemeProvider>
     </AppContext.Provider>
   );
 }

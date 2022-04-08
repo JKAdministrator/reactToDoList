@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import style from "./style.module.scss";
-import { useAppContext } from "../../../context/appContext";
+import { useAppContext } from "../../context/appContext";
 
 import List from "@mui/material/List";
 import ListItem from "@mui/material/ListItem";
@@ -8,15 +8,13 @@ import ListItemText from "@mui/material/ListItemText";
 import Box from "@mui/material/Box";
 import Paper from "@mui/material/Paper";
 import SwipeableDrawer from "@mui/material/SwipeableDrawer";
-import { getTextFieldUtilityClass } from "@mui/material";
 
 const Sidebar = ({
   isOpen,
   onChangeStateCallback,
   onSectionChangeCallback,
 }) => {
-  const { tryLogout, getLanguageString, userData, userDisplayName } =
-    useAppContext();
+  const { logoutUser, getLanguageString } = useAppContext();
 
   const [stateData, setStateData] = useState({
     selectedOption: {},
@@ -28,17 +26,13 @@ const Sidebar = ({
   };
   function handleClick(e) {
     onChangeStateCallback();
-    onSectionChangeCallback(e.target.parentNode.getAttribute("data-option"));
+    onSectionChangeCallback(e.target.getAttribute("data-option"));
     setStateData((_prevstateData) => {
       return {
         ..._prevstateData,
         selectedOption: e.target.parentNode.getAttribute("data-option"),
       };
     });
-  }
-
-  function handleClickLogout() {
-    tryLogout();
   }
 
   return (
@@ -79,23 +73,31 @@ const Sidebar = ({
               button
               divider
               onClick={handleClick}
-              selected={stateData.selectedOption === "ACCOUNT" ? true : false}
+              data-option="screenConfiguration"
+              selected={
+                stateData.selectedOption === "screenConfiguration"
+                  ? true
+                  : false
+              }
             >
               <ListItemText
-                data-option="sectionConfiguration"
-                primary=""
-                secondary={userDisplayName}
+                primary={getString("configuration")}
+                style={{ pointerEvents: "none" }}
               />
             </ListItem>
             <ListItem
               button
               divider
-              data-option="PROYECTS"
               onClick={handleClick}
-              selected={stateData.selectedOption === "PROYECTS" ? true : false}
-              disabled
+              data-option="screenProjects"
+              selected={
+                stateData.selectedOption === "screenProjects" ? true : false
+              }
             >
-              <ListItemText primary={getString("projects")} />
+              <ListItemText
+                primary={getString("projects")}
+                style={{ pointerEvents: "none" }}
+              />
             </ListItem>
             <ListItem
               button
@@ -105,7 +107,7 @@ const Sidebar = ({
               selected={stateData.selectedOption === "USERS" ? true : false}
               disabled
             >
-              <ListItemText primary="Users" />
+              <ListItemText primary="Users" style={{ pointerEvents: "none" }} />
             </ListItem>
             <ListItem
               button
@@ -115,7 +117,10 @@ const Sidebar = ({
               selected={stateData.selectedOption === "TEAMS" ? true : false}
               disabled
             >
-              <ListItemText primary={getString("users")} />
+              <ListItemText
+                primary={getString("users")}
+                style={{ pointerEvents: "none" }}
+              />
             </ListItem>
             <ListItem
               button
@@ -145,8 +150,11 @@ const Sidebar = ({
               marginTop: "auto",
             }}
           >
-            <ListItem button onClick={handleClickLogout}>
-              <ListItemText primary={getString("logout")} />
+            <ListItem button onClick={logoutUser}>
+              <ListItemText
+                primary={getString("logout")}
+                style={{ pointerEvents: "none" }}
+              />
             </ListItem>
           </List>
         </Paper>

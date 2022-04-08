@@ -12,9 +12,10 @@ import {
   TextField,
   Typography,
 } from "@mui/material";
+import { validateEmail } from "../utils";
 const SigninForm = (props) => {
   //variables de estado
-  const { getLanguageString, tryLogin } = useAppContext();
+  const { getLanguageString, loginUser, userDarkMode } = useAppContext();
 
   const [stateData, setStateData] = useState({
     email: props.email || "",
@@ -25,28 +26,29 @@ const SigninForm = (props) => {
     isPasswordMissing: false,
     loginResponseMessage: "",
   });
-  console.log("login form");
 
   //ejecucion inicial
-  useEffect(async () => {
+  useEffect(() => {
     switch (stateData.state) {
       case "AWAIT_LOGIN_RESPONSE": {
-        try {
-          await tryLogin({
-            source: "usernameAndPassword",
-            email: stateData.email,
-            password: stateData.password,
-          });
-        } catch (e) {
-          console.log("loginForm: AWAIT_LOGIN_RESPONSE ... error ", { e });
-          setStateData((_prevData) => {
-            return {
-              ..._prevData,
-              state: "READY",
-              loginResponseMessage: e.toString(),
-            };
-          });
+        async function callLoginUser() {
+          try {
+            await loginUser({
+              source: "usernameAndPassword",
+              email: stateData.email,
+              password: stateData.password,
+            });
+          } catch (e) {
+            setStateData((_prevData) => {
+              return {
+                ..._prevData,
+                state: "READY",
+                loginResponseMessage: e.toString(),
+              };
+            });
+          }
         }
+        callLoginUser();
         break;
       }
       case "INITIAL_LOADING": {
@@ -88,6 +90,8 @@ const SigninForm = (props) => {
     let isEmailMissing = stateData.email.toString().length <= 0 ? true : false;
     let isPasswordMissing =
       stateData.password.toString().length <= 0 ? true : false;
+
+    if (!validateEmail(stateData.email)) isEmailMissing = true;
     if (isEmailMissing || isPasswordMissing) {
       setStateData({ ...stateData, isPasswordMissing, isEmailMissing });
       return;
@@ -122,6 +126,7 @@ const SigninForm = (props) => {
             display: "flex",
             flexFlow: "column",
             alignItems: "center",
+            zIndex: "1",
           }}
           className={style.container}
         >
@@ -192,10 +197,18 @@ const SigninForm = (props) => {
                 justifyContent: "space-between",
               }}
             >
-              <Link to="/recover" name="recover">
+              <Link
+                to="/recover"
+                name="recover"
+                style={userDarkMode ? { color: "#ffffffbf" } : {}}
+              >
                 {getString("forgot")}
               </Link>
-              <Link to="/signup" name="signup">
+              <Link
+                to="/signup"
+                name="signup"
+                style={userDarkMode ? { color: "#ffffffbf" } : {}}
+              >
                 {getString("signup")}
               </Link>
             </Box>

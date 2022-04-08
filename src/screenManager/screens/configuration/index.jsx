@@ -1,13 +1,9 @@
-import React, { useEffect } from "react";
+import React from "react";
 import style from "./style.module.scss";
-import { useAppContext } from "../../context/appContext";
-import SectionConfigurationAccesAccountGoogle from "./accesManagers/google";
-import SectionConfigurationAccesAccountUsernameAndPassword from "./accesManagers/usernameAndPassword";
+import { useAppContext } from "../../../context/appContext";
 import {
   Box,
   Button,
-  CircularProgress,
-  Paper,
   TextField,
   Typography,
   FormGroup,
@@ -20,65 +16,65 @@ import {
   Card,
   Stack,
   Fade,
-  Slide,
   Zoom,
   Input,
   Avatar,
 } from "@mui/material";
+import CredentialCard from "./credentialCard";
 export const AppContext = React.createContext();
 
-const SectionConfiguration = () => {
+const ScreenConfiguration = () => {
   const {
     userLanguage,
     userDisplayName,
     getLanguageString,
-    userDocId,
-    userData,
-    updateName,
-    updateLanguage,
-    setDarkMode,
-    darkMode,
-    updateUserImage,
+    userUid,
+    userDarkMode,
     userImage,
+    getUserCredentials,
+    languages,
+    updateUser,
+    userCreationDate,
   } = useAppContext();
 
   function onUserImageChange(e) {
     if (e.target.files && e.target.files[0]) {
       let reader = new FileReader();
       reader.onloadend = () => {
-        updateUserImage(reader.result);
+        updateUser("userImage", reader.result, true);
       };
       reader.readAsDataURL(e.target.files[0]);
     }
   }
   function onChangeThemeHandler(e) {
-    console.log("onChangeThemeHandler", e);
-    setDarkMode();
-    //let newValue = e.target.checked ? `dark` : `light`;
-    //setTheme(newValue);
+    let newDarkMode = !userDarkMode;
+    updateUser("userDarkMode", newDarkMode, true);
   }
 
   function onChangeLanguageHandler(e) {
-    updateLanguage(e.target.value, userDocId);
+    updateUser("userLanguage", e.target.value, true);
   }
 
   const getString = (string) => {
-    return getLanguageString("sectionConfiguration", string);
+    return getLanguageString("screenConfiguration", string);
   };
 
   function handleChangeName(e) {
-    updateName(e.target.value, null);
+    updateUser("userDisplayName", e.target.value, false);
   }
   function handleBlurName(e) {
-    updateName(e.target.value, userDocId);
+    updateUser("userDisplayName", e.target.value, true);
   }
-
-  console.log("redrawing", { darkMode: darkMode });
 
   return (
     <Box className={style.container}>
       <Zoom in={true}>
-        <Card style={{ gridArea: "a1" }}>
+        <Card
+          style={{
+            gridArea: "a1",
+            height: "max-content",
+          }}
+        >
           <Fade in={true}>
             <FormGroup className={style.myData}>
               <Typography
@@ -115,7 +111,7 @@ const SectionConfiguration = () => {
                 gutterBottom
                 style={{ gridArea: "a4", opacity: "0.5" }}
               >
-                {userDocId}
+                {userUid}
               </Typography>
               <Typography
                 variant="body1"
@@ -129,15 +125,15 @@ const SectionConfiguration = () => {
                 gutterBottom
                 style={{ gridArea: "a6", opacity: "0.5" }}
               >
-                {userData.user
-                  ? new Date(
-                      userData.user.creationDate._seconds * 1000
-                    ).toString()
-                  : ""}
+                {new Date(userCreationDate._seconds).toUTCString()}
               </Typography>
               <Avatar
-                alt="Remy Sharp"
-                src={userImage ? userImage : false}
+                alt="User Image"
+                src={
+                  userImage && userImage !== ""
+                    ? userImage
+                    : "./noUserImage.png"
+                }
                 style={{
                   gridArea: "a7",
                   justifySelf: "center",
@@ -187,7 +183,10 @@ const SectionConfiguration = () => {
               <FormControlLabel
                 style={{ gridArea: "a2" }}
                 control={
-                  <Switch checked={darkMode} onChange={onChangeThemeHandler} />
+                  <Switch
+                    checked={userDarkMode}
+                    onChange={onChangeThemeHandler}
+                  />
                 }
                 label={getString("darkMode")}
               />
@@ -207,8 +206,13 @@ const SectionConfiguration = () => {
                   onChange={onChangeLanguageHandler}
                   variant="filled"
                 >
-                  <MenuItem value={"en"}>English</MenuItem>
-                  <MenuItem value={"es"}>Español</MenuItem>
+                  {Array.from(languages).map((language) => {
+                    return (
+                      <MenuItem value={language.id} key={language.id}>
+                        {language.label}
+                      </MenuItem>
+                    );
+                  })}
                 </Select>
               </FormControl>
             </FormGroup>
@@ -235,8 +239,14 @@ const SectionConfiguration = () => {
                 {getString("accesAccounts")}
               </Typography>
               <Stack spacing={2}>
-                <SectionConfigurationAccesAccountGoogle></SectionConfigurationAccesAccountGoogle>
-                <SectionConfigurationAccesAccountUsernameAndPassword></SectionConfigurationAccesAccountUsernameAndPassword>
+                {getUserCredentials().map((credentialData) => {
+                  return (
+                    <CredentialCard
+                      key={credentialData.uid}
+                      {...credentialData}
+                    ></CredentialCard>
+                  );
+                })}
               </Stack>
             </FormGroup>
           </Fade>
@@ -246,4 +256,4 @@ const SectionConfiguration = () => {
   );
 };
 
-export default SectionConfiguration;
+export default ScreenConfiguration;

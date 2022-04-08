@@ -1,8 +1,9 @@
 import React, { useEffect, useState } from "react";
 import style from "./style.module.scss";
-import { AppProvider, useAppContext } from "../context/appContext";
+import { useAppContext } from "../context/appContext";
 import FatalErrorComponent from "../fatalErrorComponent";
-import { Outlet, Link } from "react-router-dom";
+import { validateEmail } from "../utils";
+import { Link } from "react-router-dom";
 import {
   Box,
   Button,
@@ -11,10 +12,11 @@ import {
   TextField,
   Typography,
 } from "@mui/material";
-import { width } from "@mui/system";
+
 const RecoverForm = (props) => {
   //variables de estado
-  const { getLanguageString, tryRecover, userDocId } = useAppContext();
+  const { getLanguageString, recoverUser, userDocId, userDarkMode } =
+    useAppContext();
 
   const [stateData, setStateData] = useState({
     email: props.email || "",
@@ -25,14 +27,21 @@ const RecoverForm = (props) => {
   });
 
   //ejecucion inicial
-  useEffect(async () => {
+  useEffect(() => {
     switch (stateData.state) {
       case "AWAIT_RECOVER_RESPONSE": {
-        try {
-          await tryRecover({
-            email: stateData.email,
-          });
+        async function recoverUserCallbak() {
+          try {
+            await recoverUser({
+              email: stateData.email,
+            });
+          } catch (e) {
+            throw e.toString();
+          }
+        }
 
+        try {
+          recoverUserCallbak();
           setStateData((_prevData) => {
             return {
               ..._prevData,
@@ -68,7 +77,7 @@ const RecoverForm = (props) => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [stateData.state]);
 
-  useEffect(async () => {}, [userDocId]);
+  useEffect(() => {}, [userDocId]);
 
   // graba el nuevo estado del componente cuando se detecta un cambio en algun input
   const changeHandler = (e) => {
@@ -92,6 +101,10 @@ const RecoverForm = (props) => {
     let isEmailMissing = stateData.email.toString().length <= 0 ? true : false;
     let loginResponseMessage = "";
 
+    if (!validateEmail(stateData.email)) {
+      loginResponseMessage = "Invalid Email";
+      isEmailMissing = true;
+    }
     if (isEmailMissing || loginResponseMessage !== "") {
       setStateData({
         ...stateData,
@@ -190,7 +203,11 @@ const RecoverForm = (props) => {
                 justifyContent: "space-between",
               }}
             >
-              <Link to="/" name="signup">
+              <Link
+                to="/"
+                name="signup"
+                style={userDarkMode ? { color: "#ffffffbf" } : {}}
+              >
                 {getString("return")}
               </Link>
             </Box>
@@ -231,8 +248,12 @@ const RecoverForm = (props) => {
           <Link to="/" name="login">
             <Button
               variant="contained"
-              style={{ width: "100%" }}
               disableElevation
+              style={
+                userDarkMode
+                  ? { color: "#ffffffbf", width: "100%" }
+                  : { width: "100%" }
+              }
             >
               {getString("return")}
             </Button>

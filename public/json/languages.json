@@ -2,6 +2,7 @@
   "languages": [
     {
       "id": "es",
+      "label": "Español",
       "components": [
         {
           "id": "signinForm",
@@ -44,6 +45,7 @@
         {
           "id": "sidebar",
           "strings": {
+            "configuration": "Configuracion",
             "projects": "Proyectos",
             "users": "Usuarios",
             "teams": "Equipos",
@@ -52,13 +54,13 @@
           }
         },
         {
-          "id": "sectionConfiguration",
+          "id": "screenConfiguration",
           "strings": {
             "title": "Configuración",
             "application": "Preferencias",
             "darkMode": "Modo oscuro",
             "language": "Idioma",
-            "accesAccounts": "Credenciales de acceso",
+            "accesAccounts": "Credenciales",
             "usernameAndPassword": "Email y password",
             "username": "Email",
             "password": "Password",
@@ -67,6 +69,15 @@
             "creationDate": "Creación",
             "myData": "Mis Datos",
             "changeImage": "CAMBIAR IMAGEN"
+          }
+        },
+        {
+          "id": "screenProjects",
+          "strings": {
+            "title": "Proyectos",
+            "open": "ABIERTOS",
+            "closed": "CERRADOS",
+            "btnNewTooltip": "Nuevo proyecto"
           }
         },
         {
@@ -81,11 +92,34 @@
             "password": "Password",
             "id": "ID"
           }
+        },
+        {
+          "id": "projectsPanelItem",
+          "strings": {
+            "delete": "Eliminar",
+            "rename": "Editar",
+            "close": "Cerrar",
+            "reopen": "Abrir"
+          }
+        },
+        {
+          "id": "projectPopup",
+          "strings": {
+            "titleCreate": "Nuevo Proyecto",
+            "titleEdit": "Editar Proyecto",
+            "buttonCancel": "CANCELAR",
+            "buttonSaveCreate": "CREAR",
+            "buttonSaveEdit": "GUARDAR",
+            "errorTitle": "ERROR",
+            "errorClose": "CERRAR",
+            "name": "Nombre"
+          }
         }
       ]
     },
     {
       "id": "en",
+      "label": "English",
       "components": [
         {
           "id": "signinForm",
@@ -130,6 +164,7 @@
         {
           "id": "sidebar",
           "strings": {
+            "configuration": "Configuration",
             "projects": "Projects",
             "users": "Users",
             "teams": "Teams",
@@ -138,13 +173,13 @@
           }
         },
         {
-          "id": "sectionConfiguration",
+          "id": "screenConfiguration",
           "strings": {
             "title": "Configuration",
             "application": "Preferences",
             "darkMode": "Dark mode",
             "language": "Language",
-            "accesAccounts": "Loguin credentials",
+            "accesAccounts": "Credentials",
             "usernameAndPassword": "Email and password",
             "username": "Email",
             "password": "Password",
@@ -153,6 +188,15 @@
             "creationDate": "Creation",
             "myData": "My data",
             "changeImage": "CHANGE IMAGE"
+          }
+        },
+        {
+          "id": "screenProjects",
+          "strings": {
+            "title": "Projects",
+            "open": "OPEN",
+            "closed": "CLOSED",
+            "btnNewTooltip": "New project"
           }
         },
         {
@@ -166,6 +210,28 @@
             "username": "Email",
             "password": "Password",
             "id": "ID"
+          }
+        },
+        {
+          "id": "projectsPanelItem",
+          "strings": {
+            "delete": "Delete",
+            "rename": "Edit",
+            "close": "Close",
+            "reopen": "Open"
+          }
+        },
+        {
+          "id": "projectPopup",
+          "strings": {
+            "titleCreate": "New Project",
+            "titleEdit": "Edit Project",
+            "buttonCancel": "CANCEL",
+            "buttonSaveCreate": "CREATE",
+            "buttonSaveEdit": "SAVE",
+            "errorTitle": "ERROR",
+            "errorClose": "CLOSE",
+            "name": "Name"
           }
         }
       ]
