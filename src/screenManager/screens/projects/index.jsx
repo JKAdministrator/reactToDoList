@@ -7,7 +7,7 @@ import style from "./style.module.scss";
 import ProjectTabPanel from "./tabPanel";
 import { Fab, Tooltip } from "@mui/material";
 import AddIcon from "@mui/icons-material/Add";
-import CreateProjectPopup from "./createProjectPopup";
+import ProjectPopup from "./projectPopup";
 export const AppContext = React.createContext();
 
 function a11yProps(index) {
@@ -19,13 +19,14 @@ function a11yProps(index) {
 
 export default function ScreenProjects() {
   const [value, setValue] = useState(0);
-  const [isCreateProjectPopupOpen, setIsCreateProjectPopupOpen] =
-    useState(false);
+  const [projectPopupState, setProjectPopupState] = useState({
+    isOpen: false,
+    isEdit: false,
+    projectId: "",
+  });
 
   const { getLanguageString, userOpenProjects, userClosedProjects } =
     useAppContext();
-
-  console.log("projects: ", { userOpenProjects, userClosedProjects });
 
   const handleChange = (event, newValue) => {
     setValue(newValue);
@@ -35,16 +36,28 @@ export default function ScreenProjects() {
   };
 
   const newProjectClickCallback = useCallback((e) => {
-    console.log("click nuevo proyecto", { e });
-    setIsCreateProjectPopupOpen(true);
+    setProjectPopupState((prevState) => {
+      return { ...prevState, isOpen: true, isEdit: false };
+    });
   }, []);
 
-  const openProjectClickCallback = useCallback((e) => {
-    console.log("click abrir proyecto", { e });
+  const editCallback = useCallback((_projectId) => {
+    setProjectPopupState((prevState) => {
+      return {
+        ...prevState,
+        isOpen: true,
+        isEdit: true,
+        projectId: _projectId,
+      };
+    });
   }, []);
 
-  function handleCloseCreateProjectPopup() {
-    setIsCreateProjectPopupOpen(false);
+  const openProjectClickCallback = useCallback((e) => {}, []);
+
+  function handleCloseProjectPopup() {
+    setProjectPopupState((prevState) => {
+      return { ...prevState, isOpen: false };
+    });
   }
 
   return (
@@ -52,8 +65,16 @@ export default function ScreenProjects() {
       <Box className={style.container}>
         <Box sx={{ borderBottom: 1, borderColor: "divider" }}>
           <Tabs value={value} onChange={handleChange} aria-label="Project tabs">
-            <Tab label={getString("open")} {...a11yProps(0)} />
-            <Tab label={getString("closed")} {...a11yProps(1)} />
+            <Tab
+              label={getString("open") + " (" + userOpenProjects.length + ")"}
+              {...a11yProps(0)}
+            />
+            <Tab
+              label={
+                getString("closed") + " (" + userClosedProjects.length + ")"
+              }
+              {...a11yProps(1)}
+            />
           </Tabs>
         </Box>
         <ProjectTabPanel
@@ -65,6 +86,7 @@ export default function ScreenProjects() {
           allowDelete={false}
           allowReopen={false}
           allowRename={true}
+          editCallback={editCallback}
         ></ProjectTabPanel>
         <ProjectTabPanel
           value={value}
@@ -75,6 +97,7 @@ export default function ScreenProjects() {
           allowDelete={true}
           allowReopen={true}
           allowRename={false}
+          editCallback={editCallback}
         ></ProjectTabPanel>
       </Box>
       <Tooltip title={getString("btnNewTooltip")}>
@@ -87,10 +110,12 @@ export default function ScreenProjects() {
           <AddIcon></AddIcon>
         </Fab>
       </Tooltip>
-      <CreateProjectPopup
-        handleClose={handleCloseCreateProjectPopup}
-        open={isCreateProjectPopupOpen}
-      ></CreateProjectPopup>
+      <ProjectPopup
+        handleClose={handleCloseProjectPopup}
+        open={projectPopupState.isOpen}
+        isEdit={projectPopupState.isEdit}
+        projectId={projectPopupState.projectId}
+      ></ProjectPopup>
     </>
   );
 }

@@ -12,13 +12,14 @@ import {
   TextField,
   Typography,
 } from "@mui/material";
+import { validateEmail } from "../utils";
 const SigninForm = (props) => {
   //variables de estado
-  const { getLanguageString, loginUser } = useAppContext();
+  const { getLanguageString, loginUser, userDarkMode } = useAppContext();
 
   const [stateData, setStateData] = useState({
-    email: props.email || "julio.kania@gmail.com  ",
-    password: props.password || "password1",
+    email: props.email || "",
+    password: props.password || "",
     state: "READY",
     stateErrorMessage: "",
     isEmailMissing: false,
@@ -89,6 +90,8 @@ const SigninForm = (props) => {
     let isEmailMissing = stateData.email.toString().length <= 0 ? true : false;
     let isPasswordMissing =
       stateData.password.toString().length <= 0 ? true : false;
+
+    if (!validateEmail(stateData.email)) isEmailMissing = true;
     if (isEmailMissing || isPasswordMissing) {
       setStateData({ ...stateData, isPasswordMissing, isEmailMissing });
       return;
@@ -123,6 +126,7 @@ const SigninForm = (props) => {
             display: "flex",
             flexFlow: "column",
             alignItems: "center",
+            zIndex: "1",
           }}
           className={style.container}
         >
@@ -193,10 +197,18 @@ const SigninForm = (props) => {
                 justifyContent: "space-between",
               }}
             >
-              <Link to="/recover" name="recover">
+              <Link
+                to="/recover"
+                name="recover"
+                style={userDarkMode ? { color: "#ffffffbf" } : {}}
+              >
                 {getString("forgot")}
               </Link>
-              <Link to="/signup" name="signup">
+              <Link
+                to="/signup"
+                name="signup"
+                style={userDarkMode ? { color: "#ffffffbf" } : {}}
+              >
                 {getString("signup")}
               </Link>
             </Box>

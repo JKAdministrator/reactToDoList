@@ -7,20 +7,15 @@ const loginUserModule = require("./cloudFunctions/loginUser");
 const updateUserModule = require("./cloudFunctions/updateUser");
 const createProjectModule = require("./cloudFunctions/createProject");
 const closeProjectModule = require("./cloudFunctions/closeProject");
+const deleteProjectModule = require("./cloudFunctions/deleteProject");
+const openProjectModule = require("./cloudFunctions/openProject");
+const updateProjectModule = require("./cloudFunctions/updateProject");
 
 exports.createUser = createUserModule.createUser;
 exports.loginUser = loginUserModule.loginUser;
 exports.updateUser = updateUserModule.updateUser;
 exports.createProject = createProjectModule.createProject;
 exports.closeProject = closeProjectModule.closeProject;
-
-/*
-  console.log("closeProject data", {
-    data: _data,
-    context,
-    params: context.rawRequest.params,
-    body: context.rawRequest.body,
-    params: context.rawRequest.body,
-    auth: context.auth,
-    authToken: context.auth,
-  });*/
+exports.deleteProject = deleteProjectModule.deleteProject;
+exports.openProject = openProjectModule.openProject;
+exports.updateProject = updateProjectModule.updateProject;

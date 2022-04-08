@@ -30,18 +30,18 @@ const ScreenConfiguration = () => {
     getLanguageString,
     userUid,
     userDarkMode,
-    updateUserImage,
     userImage,
     getUserCredentials,
     languages,
     updateUser,
+    userCreationDate,
   } = useAppContext();
-  console.log("languages", languages);
+
   function onUserImageChange(e) {
     if (e.target.files && e.target.files[0]) {
       let reader = new FileReader();
       reader.onloadend = () => {
-        updateUserImage(reader.result);
+        updateUser("userImage", reader.result, true);
       };
       reader.readAsDataURL(e.target.files[0]);
     }
@@ -69,7 +69,12 @@ const ScreenConfiguration = () => {
   return (
     <Box className={style.container}>
       <Zoom in={true}>
-        <Card style={{ gridArea: "a1", height: "max-content" }}>
+        <Card
+          style={{
+            gridArea: "a1",
+            height: "max-content",
+          }}
+        >
           <Fade in={true}>
             <FormGroup className={style.myData}>
               <Typography
@@ -120,7 +125,7 @@ const ScreenConfiguration = () => {
                 gutterBottom
                 style={{ gridArea: "a6", opacity: "0.5" }}
               >
-                {"neww to get it from database"}
+                {new Date(userCreationDate._seconds).toUTCString()}
               </Typography>
               <Avatar
                 alt="User Image"
@@ -235,7 +240,6 @@ const ScreenConfiguration = () => {
               </Typography>
               <Stack spacing={2}>
                 {getUserCredentials().map((credentialData) => {
-                  console.log("credentialData", { credentialData });
                   return (
                     <CredentialCard
                       key={credentialData.uid}

@@ -2,7 +2,6 @@ const functions = require("firebase-functions");
 const admin = require("firebase-admin");
 
 exports.loginUser = functions.https.onCall(async (data, context) => {
-  console.log("executing loginUser()");
   try {
     if (admin.apps.length === 0) admin.initializeApp();
     userDoc = await admin.firestore().collection("users").doc(data.uid).get(); //get the user document
@@ -17,23 +16,25 @@ exports.loginUser = functions.https.onCall(async (data, context) => {
         language: data.language,
         userOpenProjects: [],
         userClosedProjects: [],
+        userCreationDate: "",
+      };
+
+      documentData = {
+        ...documentData,
+        creationDate: admin.firestore.FieldValue.serverTimestamp(),
+        lastLoginDate: admin.firestore.FieldValue.serverTimestamp(),
       };
       await admin // create the user document
         .firestore()
         .collection("users")
         .doc(data.uid)
-        .set({
-          ...documentData,
-          creationDate: admin.firestore.FieldValue.serverTimestamp(),
-          lastLoginDate: admin.firestore.FieldValue.serverTimestamp(),
-        });
+        .set(documentData);
     }
     return {
       errorCode: 0,
       userData: documentData,
     };
   } catch (e) {
-    console.log("ERROR:", { e });
     return {
       errorCode: 1,
       errorMessage: e.toString(),

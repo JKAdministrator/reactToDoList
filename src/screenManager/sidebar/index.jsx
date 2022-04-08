@@ -26,7 +26,7 @@ const Sidebar = ({
   };
   function handleClick(e) {
     onChangeStateCallback();
-    onSectionChangeCallback(e.target.parentNode.getAttribute("data-option"));
+    onSectionChangeCallback(e.target.getAttribute("data-option"));
     setStateData((_prevstateData) => {
       return {
         ..._prevstateData,
@@ -73,6 +73,7 @@ const Sidebar = ({
               button
               divider
               onClick={handleClick}
+              data-option="screenConfiguration"
               selected={
                 stateData.selectedOption === "screenConfiguration"
                   ? true
@@ -81,20 +82,21 @@ const Sidebar = ({
             >
               <ListItemText
                 primary={getString("configuration")}
-                data-option="screenConfiguration"
+                style={{ pointerEvents: "none" }}
               />
             </ListItem>
             <ListItem
               button
               divider
               onClick={handleClick}
+              data-option="screenProjects"
               selected={
                 stateData.selectedOption === "screenProjects" ? true : false
               }
             >
               <ListItemText
                 primary={getString("projects")}
-                data-option="screenProjects"
+                style={{ pointerEvents: "none" }}
               />
             </ListItem>
             <ListItem
@@ -105,7 +107,7 @@ const Sidebar = ({
               selected={stateData.selectedOption === "USERS" ? true : false}
               disabled
             >
-              <ListItemText primary="Users" />
+              <ListItemText primary="Users" style={{ pointerEvents: "none" }} />
             </ListItem>
             <ListItem
               button
@@ -115,7 +117,10 @@ const Sidebar = ({
               selected={stateData.selectedOption === "TEAMS" ? true : false}
               disabled
             >
-              <ListItemText primary={getString("users")} />
+              <ListItemText
+                primary={getString("users")}
+                style={{ pointerEvents: "none" }}
+              />
             </ListItem>
             <ListItem
               button
@@ -146,7 +151,10 @@ const Sidebar = ({
             }}
           >
             <ListItem button onClick={logoutUser}>
-              <ListItemText primary={getString("logout")} />
+              <ListItemText
+                primary={getString("logout")}
+                style={{ pointerEvents: "none" }}
+              />
             </ListItem>
           </List>
         </Paper>

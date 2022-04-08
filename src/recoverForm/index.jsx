@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import style from "./style.module.scss";
 import { useAppContext } from "../context/appContext";
 import FatalErrorComponent from "../fatalErrorComponent";
+import { validateEmail } from "../utils";
 import { Link } from "react-router-dom";
 import {
   Box,
@@ -14,7 +15,8 @@ import {
 
 const RecoverForm = (props) => {
   //variables de estado
-  const { getLanguageString, recoverUser, userDocId } = useAppContext();
+  const { getLanguageString, recoverUser, userDocId, userDarkMode } =
+    useAppContext();
 
   const [stateData, setStateData] = useState({
     email: props.email || "",
@@ -99,6 +101,10 @@ const RecoverForm = (props) => {
     let isEmailMissing = stateData.email.toString().length <= 0 ? true : false;
     let loginResponseMessage = "";
 
+    if (!validateEmail(stateData.email)) {
+      loginResponseMessage = "Invalid Email";
+      isEmailMissing = true;
+    }
     if (isEmailMissing || loginResponseMessage !== "") {
       setStateData({
         ...stateData,
@@ -197,7 +203,11 @@ const RecoverForm = (props) => {
                 justifyContent: "space-between",
               }}
             >
-              <Link to="/" name="signup">
+              <Link
+                to="/"
+                name="signup"
+                style={userDarkMode ? { color: "#ffffffbf" } : {}}
+              >
                 {getString("return")}
               </Link>
             </Box>
@@ -238,8 +248,12 @@ const RecoverForm = (props) => {
           <Link to="/" name="login">
             <Button
               variant="contained"
-              style={{ width: "100%" }}
               disableElevation
+              style={
+                userDarkMode
+                  ? { color: "#ffffffbf", width: "100%" }
+                  : { width: "100%" }
+              }
             >
               {getString("return")}
             </Button>

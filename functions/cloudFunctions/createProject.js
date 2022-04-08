@@ -2,7 +2,6 @@ const functions = require("firebase-functions");
 const admin = require("firebase-admin");
 
 exports.createProject = functions.https.onCall(async (data, context) => {
-  console.log("executing createProject()");
   try {
     if (admin.apps.length === 0) admin.initializeApp();
     // create project entity
@@ -10,7 +9,7 @@ exports.createProject = functions.https.onCall(async (data, context) => {
       .firestore()
       .collection("projects")
       .add({
-        name: data.name,
+        name: data.project.name,
         owner: data.uid,
         creationDate: admin.firestore.FieldValue.serverTimestamp(),
         isOpen: true,
@@ -24,18 +23,17 @@ exports.createProject = functions.https.onCall(async (data, context) => {
       .update({
         userOpenProjects: admin.firestore.FieldValue.arrayUnion({
           id: projectDocumentRef.id,
-          name: data.name,
+          name: data.project.name,
         }),
       });
 
     return {
       errorCode: 0,
-      projectData: {
+      project: {
         id: projectDocumentRef.id,
       },
     };
   } catch (e) {
-    console.log("ERROR:", { e });
     return {
       errorCode: 1,
       errorMessage: e.toString(),

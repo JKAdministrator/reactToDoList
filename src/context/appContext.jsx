@@ -19,7 +19,6 @@ import {
 } from "firebase/auth";
 import { createTheme } from "@mui/material";
 import { grey } from "@mui/material/colors";
-import useMediaQuery from "@mui/material/useMediaQuery";
 
 const AppContext = React.createContext();
 const initialContextData = {
@@ -39,6 +38,9 @@ const initialContextData = {
   updateUser: async () => {},
   createProject: () => {},
   closeProject: () => {},
+  deleteProject: () => {},
+  openProject: () => {},
+  updateProject: () => {},
   // user data
   userUid: "",
   userLanguage: "",
@@ -46,7 +48,8 @@ const initialContextData = {
   userImage: "",
   userOpenProjects: [],
   userClosedProjects: [],
-  userDarkMode: false,
+  userCreationDate: "",
+  userDarkMode: true,
   //customization objects (themes, languages, etc...)
   themeObject: {},
   languages: {},
@@ -64,6 +67,7 @@ function getDefautThemeString() {
 function getThemeObject(themeString) {
   return createTheme({
     palette: {
+      mode: themeString,
       background: {
         default: themeString === "dark" ? grey[900] : grey[50],
         paper: themeString === "dark" ? grey[800] : "#fff",
@@ -91,11 +95,8 @@ async function getFile(filePath) {
 }
 
 export function AppProvider(props) {
-  const prefersDarkMode = useMediaQuery("(prefers-color-scheme: dark)");
-
   const [appContextData, setAppContextData] = useState({
     ...initialContextData,
-    darkMode: prefersDarkMode,
   });
 
   useEffect(() => {
@@ -112,6 +113,7 @@ export function AppProvider(props) {
       userClosedProjects = [],
       userDarkMode = userThemeString === "dark" ? true : false,
       themeObject = getThemeObject(userThemeString),
+      userCreationDate = "",
       emulatorStarted = false;
 
     getFile("./json/languages.json")
@@ -156,6 +158,18 @@ export function AppProvider(props) {
           functions,
           "closeProject"
         );
+        httpsCallableFunctions.openProject = httpsCallable(
+          functions,
+          "openProject"
+        );
+        httpsCallableFunctions.updateProject = httpsCallable(
+          functions,
+          "updateProject"
+        );
+        httpsCallableFunctions.deleteProject = httpsCallable(
+          functions,
+          "deleteProject"
+        );
         httpsCallableFunctions.createUser = httpsCallable(
           functions,
           "createUser"
@@ -191,6 +205,15 @@ export function AppProvider(props) {
                     uid: responseSignInWithEmailAndPassword.user.uid,
                   });
 
+                  let responseUserDarkMode =
+                    responseLogin.data.userData.darkMode;
+                  let responseDefaultThemeString = responseUserDarkMode
+                    ? "dark"
+                    : "light";
+                  let responseThemeObject = getThemeObject(
+                    responseDefaultThemeString
+                  );
+
                   setAppContextData((prevProps) => {
                     return {
                       ...prevProps,
@@ -198,11 +221,14 @@ export function AppProvider(props) {
                       userDisplayName: responseLogin.data.userData.name,
                       userImage: responseLogin.data.userData.image,
                       userLanguage: responseLogin.data.userData.language,
-                      userDarkMode: responseLogin.data.userData.darkMode,
+                      userDarkMode: responseUserDarkMode,
                       userOpenProjects:
                         responseLogin.data.userData.userOpenProjects,
                       userClosedProjects:
                         responseLogin.data.userData.userClosedProjects,
+                      userCreationDate:
+                        responseLogin.data.userData.creationDate,
+                      themeObject: responseThemeObject,
                     };
                   });
                 } catch (e) {
@@ -220,7 +246,6 @@ export function AppProvider(props) {
         };
 
         let createUser = async (_data) => {
-          console.log("appContext.createUser()");
           try {
             let auth = getAuth();
             auth.languageCode = userLanguage;
@@ -246,10 +271,12 @@ export function AppProvider(props) {
         };
 
         let logoutUser = async (_data) => {
-          console.log("appContext.logoutUser()");
           try {
             let auth = getAuth();
             await signOut(auth);
+            let defaultThemeString = getDefautThemeString();
+            let themeObject = getThemeObject(defaultThemeString);
+            let userDarkMode = defaultThemeString === "dark" ? true : false;
             setAppContextData((prevProps) => {
               return {
                 ...prevProps,
@@ -259,7 +286,8 @@ export function AppProvider(props) {
                 userLanguage: getDefautLanguage(),
                 userOpenProjects: [],
                 userClosedProjects: [],
-                userDarkMode: getDefautThemeString() === "dark" ? true : false,
+                userDarkMode: userDarkMode,
+                themeObject: themeObject,
               };
             });
           } catch (error) {
@@ -268,7 +296,6 @@ export function AppProvider(props) {
         };
 
         let recoverUser = async (_data) => {
-          console.log("appContext.recoverUser()");
           let auth = getAuth();
           try {
             await sendPasswordResetEmail(auth, _data.email);
@@ -294,14 +321,50 @@ export function AppProvider(props) {
           return [];
         };
 
-        let closeProject = async (_data) => {
-          console.log("close project", { data: _data });
-          /*
+        let closeProject = async (_projectId) => {
           let response = await httpsCallableFunctions.closeProject({
-            dato1: "valor1",
-            dato2: "valor2",
+            project: { id: _projectId },
+            uid: userUid,
           });
-          return response;*/
+
+          setAppContextData((prevProps) => {
+            return {
+              ...prevProps,
+              userOpenProjects: response.data.userData.userOpenProjects,
+              userClosedProjects: response.data.userData.userClosedProjects,
+            };
+          });
+          return response;
+        };
+        let openProject = async (_projectId) => {
+          let response = await httpsCallableFunctions.openProject({
+            project: { id: _projectId },
+            uid: userUid,
+          });
+
+          setAppContextData((prevProps) => {
+            return {
+              ...prevProps,
+              userOpenProjects: response.data.userData.userOpenProjects,
+              userClosedProjects: response.data.userData.userClosedProjects,
+            };
+          });
+          return response;
+        };
+
+        let deleteProject = async (_projectId) => {
+          let response = await httpsCallableFunctions.deleteProject({
+            project: { id: _projectId },
+            uid: userUid,
+          });
+
+          setAppContextData((prevProps) => {
+            return {
+              ...prevProps,
+              userClosedProjects: response.data.userData.userClosedProjects,
+            };
+          });
+          return response;
         };
 
         let createProject = async (_data) => {
@@ -314,7 +377,7 @@ export function AppProvider(props) {
             });
 
             let newProjectObject = {
-              id: response.data.projectData.id,
+              id: response.data.project.id,
               name: _data.name,
             };
 
@@ -331,6 +394,42 @@ export function AppProvider(props) {
           } catch (error) {
             throw error.toString();
           }
+        };
+
+        // UPDATE USER DATA
+        let updateProject = async (
+          projectId,
+          newData,
+          updateOnServer = true
+        ) => {
+          if (updateOnServer) {
+            let dataToSend = {
+              project: {
+                newData: newData,
+                id: projectId,
+              },
+              uid: userUid,
+            };
+            httpsCallableFunctions.updateProject(dataToSend);
+          }
+
+          setAppContextData((prevProps) => {
+            let dataToChange = {
+              userClosedProjects: prevProps.userClosedProjects,
+              userOpenProjects: prevProps.userOpenProjects,
+            };
+
+            if (newData.name !== "") {
+              //locally we update the user open projects and closed projects for that project id
+              [
+                ...dataToChange.userClosedProjects,
+                ...dataToChange.userOpenProjects,
+              ].find((project) => {
+                return project.id === projectId;
+              }).name = newData.name;
+            }
+            return { ...prevProps, ...dataToChange };
+          });
         };
 
         // UPDATE USER DATA
@@ -363,7 +462,6 @@ export function AppProvider(props) {
         //try get the google user data from redirect and do a login with that
         let auth = getAuth();
         let redirectResult = await getRedirectResult(auth);
-        console.log("redirectResult", { redirectResult });
         if (redirectResult) {
           let loginData = {
             source: "google",
@@ -375,20 +473,28 @@ export function AppProvider(props) {
               ? redirectResult.user.photoURL
               : "",
           };
-          console.log("loginData", loginData);
           let responseLogin = await httpsCallableFunctions.loginUser(loginData);
-          console.log("responseLogin", responseLogin);
-          console.log("redirectResult", redirectResult);
+
           if (responseLogin.data.errorCode === 0) {
+            let responseUserDarkMode = responseLogin.data.userData.darkMode;
+            let responseDefaultThemeString = responseUserDarkMode
+              ? "dark"
+              : "light";
+            let responseThemeObject = getThemeObject(
+              responseDefaultThemeString
+            );
             userUid = redirectResult.user.uid;
-            userDarkMode = responseLogin.data.userData.darkMode;
+            userDarkMode = responseUserDarkMode;
             userLanguage = responseLogin.data.userData.language;
             userDisplayName = responseLogin.data.userData.name;
             userImage = responseLogin.data.userData.image;
             userOpenProjects = responseLogin.data.userData.userOpenProjects;
             userClosedProjects = responseLogin.data.userData.userClosedProjects;
+            userCreationDate = responseLogin.data.userData.creationDate;
+            themeObject = responseThemeObject;
           }
         }
+
         setAppContextData((prevProps) => {
           return {
             ...prevProps,
@@ -408,6 +514,10 @@ export function AppProvider(props) {
             updateUser: updateUser,
             createProject: createProject,
             closeProject: closeProject,
+            deleteProject: deleteProject,
+            openProject: openProject,
+            updateProject: updateProject,
+            userCreationDate: userCreationDate,
             // user data
             userUid: userUid,
             userLanguage: userLanguage,
@@ -421,7 +531,6 @@ export function AppProvider(props) {
             themeObject: themeObject,
           };
         });
-        console.log("changing state to ready");
       })
       .catch((e) => {
         setAppContextData((prevProps) => {

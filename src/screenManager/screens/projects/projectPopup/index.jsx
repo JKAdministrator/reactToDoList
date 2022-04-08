@@ -11,23 +11,25 @@ import {
 } from "@mui/material";
 import React, { useEffect, useState } from "react";
 import { useAppContext } from "../../../../context/appContext";
-export default function CreateProjectPopup(props) {
-  const { handleClose, open } = props;
+export default function ProjectPopup(props) {
+  const { handleClose, open, isEdit, projectId } = props;
   const [state, setState] = useState("READY");
   const [name, setName] = useState("");
   const [error, setError] = useState("");
-  const { createProject } = useAppContext();
+  const {
+    createProject,
+    updateProject,
+    getLanguageString,
+    userOpenProjects,
+    userClosedProjects,
+  } = useAppContext();
+  const [nameError, setNameError] = useState(false);
 
   function handleCloseLocally(event, reason) {
     event.preventDefault();
 
     switch (state) {
       case "LOADING": {
-        if (
-          reason &&
-          (reason === "backdropClick" || reason === "escapeKeyDown")
-        )
-          return;
         break;
       }
       case "READY": {
@@ -37,8 +39,12 @@ export default function CreateProjectPopup(props) {
           event.target.dataset.action === "CANCEL"
         ) {
           handleClose();
-        } else if (event.target.dataset.action === "CREATE") {
-          setState("LOADING");
+          setName("");
+          setNameError(false);
+        } else if (event.target.dataset.action === "SAVE") {
+          name && name.toString().length > 0
+            ? setState("LOADING")
+            : setNameError(true);
         }
         break;
       }
@@ -46,23 +52,38 @@ export default function CreateProjectPopup(props) {
         handleClose();
         break;
       }
-      default:
+      default: {
         break;
+      }
     }
+  }
+
+  function getString(string) {
+    return getLanguageString("projectPopup", string);
   }
 
   useEffect(() => {
     switch (state) {
       case "LOADING": {
-        console.log(`creating Project [${name}]`);
-        createProject({ name: name })
-          .then((result) => {
-            handleClose();
-          })
-          .catch((e) => {
-            setError(e);
-            setState("ERROR");
-          });
+        setNameError(false);
+        if (isEdit) {
+          let newName = name;
+          handleClose();
+          setName("");
+          setNameError(false);
+          updateProject(projectId, { name: newName });
+        } else {
+          createProject({ name: name })
+            .then((result) => {
+              handleClose();
+              setName("");
+              setNameError(false);
+            })
+            .catch((e) => {
+              setError(e);
+              setState("ERROR");
+            });
+        }
         break;
       }
       default:
@@ -71,17 +92,33 @@ export default function CreateProjectPopup(props) {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [state]);
 
+  useEffect(() => {
+    if (open) {
+      if (projectId != "") {
+        let project = [...userOpenProjects, ...userClosedProjects].find(
+          (project) => {
+            return project.id === projectId;
+          }
+        );
+        setName(project.name);
+      }
+      setState("READY");
+    }
+  }, [open]);
+
   return (
     <Dialog open={open} onClose={handleCloseLocally}>
       {state === "READY" ? (
         <>
-          <DialogTitle>New Project</DialogTitle>
+          <DialogTitle>
+            {getString(isEdit ? "titleEdit" : "titleCreate")}
+          </DialogTitle>
           <DialogContent>
             <TextField
               autoFocus
               margin="dense"
               id="name"
-              label="Name"
+              label={getString("name")}
               type="text"
               fullWidth
               variant="standard"
@@ -90,14 +127,23 @@ export default function CreateProjectPopup(props) {
               onChange={(e) => {
                 setName(e.target.value);
               }}
+              error={nameError}
             />
           </DialogContent>
-          <DialogActions>
+          <DialogActions
+            style={{
+              justifyContent: "space-between",
+            }}
+          >
             <Button onClick={handleCloseLocally} data-action="CANCEL">
-              Cancel
+              {getString("buttonCancel")}
             </Button>
-            <Button onClick={handleCloseLocally} data-action="CREATE">
-              Create
+            <Button
+              onClick={handleCloseLocally}
+              data-action="SAVE"
+              variant="contained"
+            >
+              {getString(isEdit ? "buttonSaveEdit" : "buttonSaveCreate")}
             </Button>
           </DialogActions>
         </>
@@ -117,12 +163,12 @@ export default function CreateProjectPopup(props) {
       {state === "ERROR" ? (
         <>
           <DialogContent>
-            <DialogTitle>Error</DialogTitle>
+            <DialogTitle>{getString("errorTitle")}</DialogTitle>
             <Typography> {error}</Typography>;
           </DialogContent>
           <DialogActions>
             <Button onClick={handleCloseLocally} data-action="CANCEL">
-              CLOSE
+              {getString("errorClose")}
             </Button>
           </DialogActions>
         </>

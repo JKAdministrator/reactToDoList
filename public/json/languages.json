@@ -97,9 +97,22 @@
           "id": "projectsPanelItem",
           "strings": {
             "delete": "Eliminar",
-            "rename": "Renombrar",
+            "rename": "Editar",
             "close": "Cerrar",
-            "reopen": "Reabrir"
+            "reopen": "Abrir"
+          }
+        },
+        {
+          "id": "projectPopup",
+          "strings": {
+            "titleCreate": "Nuevo Proyecto",
+            "titleEdit": "Editar Proyecto",
+            "buttonCancel": "CANCELAR",
+            "buttonSaveCreate": "CREAR",
+            "buttonSaveEdit": "GUARDAR",
+            "errorTitle": "ERROR",
+            "errorClose": "CERRAR",
+            "name": "Nombre"
           }
         }
       ]
@@ -203,9 +216,22 @@
           "id": "projectsPanelItem",
           "strings": {
             "delete": "Delete",
-            "rename": "Rename",
+            "rename": "Edit",
             "close": "Close",
-            "reopen": "Reopen"
+            "reopen": "Open"
+          }
+        },
+        {
+          "id": "projectPopup",
+          "strings": {
+            "titleCreate": "New Project",
+            "titleEdit": "Edit Project",
+            "buttonCancel": "CANCEL",
+            "buttonSaveCreate": "CREATE",
+            "buttonSaveEdit": "SAVE",
+            "errorTitle": "ERROR",
+            "errorClose": "CLOSE",
+            "name": "Name"
           }
         }
       ]

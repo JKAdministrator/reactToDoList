@@ -1,12 +1,12 @@
 const functions = require("firebase-functions");
 const admin = require("firebase-admin");
-exports.closeProject = functions.https.onCall(async (data, context) => {
+exports.openProject = functions.https.onCall(async (data, context) => {
   try {
     if (admin.apps.length === 0) admin.initializeApp();
     //update the project state
     await admin.firestore().collection("projects").doc(data.project.id).set(
       {
-        isOpen: false,
+        isOpen: true,
       },
       { merge: true }
     );
@@ -17,21 +17,23 @@ exports.closeProject = functions.https.onCall(async (data, context) => {
       .doc(data.uid)
       .get();
 
-    //get the project to close
+    //get the project to open
     let projectElement = userDocumentRef
       .data()
-      .userOpenProjects.find((project) => {
+      .userClosedProjects.find((project) => {
         return project.id === data.project.id;
       });
-    // create a new array of open project with all projects except the one to close
-    let userOpenProjects = userDocumentRef
+
+    // create a new array of closed projects with all projects except the one to open
+    let userClosedProjects = userDocumentRef
       .data()
-      .userOpenProjects.filter((project) => {
+      .userClosedProjects.filter((project) => {
         return project.id !== data.project.id;
       });
-    // add the project to close to the closed projects array
-    let userClosedProjects = [
-      ...userDocumentRef.data().userClosedProjects,
+
+    // add the project to open to the open projects array
+    let userOpenProjects = [
+      ...userDocumentRef.data().userOpenProjects,
       projectElement,
     ];
 

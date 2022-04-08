@@ -14,6 +14,7 @@ export default function ProjectTabPanel(props) {
     allowReopen,
     allowClose,
     allowRename,
+    editCallback,
   } = props;
   //const { userDarkMode } = useAppContext();
 
@@ -31,18 +32,21 @@ export default function ProjectTabPanel(props) {
             display: "flex",
             flexFlow: "row",
             gap: "2rem",
+            maxWidth: "100%",
+            flexWrap: "wrap",
           }}
         >
           {Array.from(projects).map((project) => {
-            console.log("project", { project });
             return (
               <ProjectTabItem
                 key={project.id}
                 name={project.name}
+                id={project.id}
                 allowDelete={allowDelete}
                 allowReopen={allowReopen}
                 allowClose={allowClose}
                 allowRename={allowRename}
+                editCallback={editCallback}
               />
             );
           })}

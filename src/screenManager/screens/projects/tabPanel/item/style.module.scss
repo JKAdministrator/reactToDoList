@@ -1,10 +1,11 @@
 .projectCard {
-  width: 10rem;
+  width: calc(20% - 1.65rem);
+  min-width: 10rem;
   height: 8rem;
   display: flex;
   flex-flow: column;
   align-items: center;
-  justify-content: center;
+  justify-content: flex-start;
   position: relative;
   > button {
     width: 100%;
@@ -12,6 +13,27 @@
   }
 }
 
+@media (max-width: 1300px) {
+  .projectCard {
+    width: calc(25% - 1.5rem);
+  }
+}
+
+@media (max-width: 1000px) {
+  .projectCard {
+    width: calc(33.33% - 1.5rem);
+  }
+}
+@media (max-width: 850px) {
+  .projectCard {
+    width: calc(50% - 1.5rem);
+  }
+}
+@media (max-width: 600px) {
+  .projectCard {
+    width: calc(100% - 1rem);
+  }
+}
 .controlsContainer {
   position: absolute;
   top: 0px;

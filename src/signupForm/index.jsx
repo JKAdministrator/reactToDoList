@@ -13,15 +13,17 @@ import {
   TextField,
   Typography,
 } from "@mui/material";
+import { validateEmail } from "../utils";
 const SignupForm = (props) => {
   //variables de estado
-  const { getLanguageString, userDocId, createUser } = useAppContext();
+  const { getLanguageString, userDocId, createUser, userDarkMode } =
+    useAppContext();
 
   const [stateData, setStateData] = useState({
-    username: props.username || "Julio Kania",
-    email: props.email || "julio.kania@gmail.com",
-    password: props.password || "password1",
-    confirmPassword: props.confirmPassword || "password1",
+    username: props.username || "",
+    email: props.email || "",
+    password: props.password || "",
+    confirmPassword: props.confirmPassword || "",
     state: "READY",
     stateErrorMessage: "",
     isUsernameMissing: false,
@@ -110,6 +112,10 @@ const SignupForm = (props) => {
     let isConfirmPasswordMissing =
       stateData.confirmPassword.toString().length <= 0 ? true : false;
     let loginResponseMessage = "";
+    if (!validateEmail(stateData.email)) {
+      isEmailMissing = true;
+      loginResponseMessage = "Invalid Email";
+    }
     if (
       !isUsernameMissing &&
       !isPasswordMissing &&
@@ -311,7 +317,11 @@ const SignupForm = (props) => {
                 alignItems: "flex-start",
               }}
             >
-              <Link to="/" name="signup">
+              <Link
+                to="/"
+                name="signup"
+                style={userDarkMode ? { color: "#ffffffbf" } : {}}
+              >
                 {getString("return")}
               </Link>
             </Box>
@@ -350,7 +360,11 @@ const SignupForm = (props) => {
             <Link to="/" name="login">
               <Button
                 variant="contained"
-                style={{ width: "100%" }}
+                style={
+                  userDarkMode
+                    ? { color: "#ffffffbf", width: "100%" }
+                    : { width: "100%" }
+                }
                 disableElevation
               >
                 {getString("login")}
