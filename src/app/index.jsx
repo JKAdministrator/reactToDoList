@@ -2,7 +2,7 @@ import style from "./style.module.scss";
 import React, { useEffect, useState } from "react";
 import { AppProvider, useAppContext } from "../context/appContext";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
-import { Box, CircularProgress, Paper } from "@mui/material";
+import { CircularProgress, Paper } from "@mui/material";
 import { ThemeProvider } from "@emotion/react";
 import NotFound from "../notFound";
 

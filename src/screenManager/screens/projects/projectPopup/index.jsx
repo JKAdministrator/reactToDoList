@@ -94,7 +94,7 @@ export default function ProjectPopup(props) {
 
   useEffect(() => {
     if (open) {
-      if (projectId != "") {
+      if (projectId !== "") {
         let project = [...userOpenProjects, ...userClosedProjects].find(
           (project) => {
             return project.id === projectId;
@@ -104,6 +104,7 @@ export default function ProjectPopup(props) {
       }
       setState("READY");
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [open]);
 
   return (

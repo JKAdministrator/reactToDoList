@@ -1,4 +1,4 @@
-import { Button, Card, Typography } from "@mui/material";
+import { Button, Typography } from "@mui/material";
 import { Box } from "@mui/system";
 import React, { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
@@ -55,7 +55,6 @@ function NotFound() {
         style={{
           padding: "1rem",
           width: "max-content",
-          padding: "1rem",
           display: "flex",
           flexFlow: "column",
           gap: "0.5rem",
