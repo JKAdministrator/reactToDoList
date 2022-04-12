@@ -114,6 +114,12 @@
             "errorClose": "CERRAR",
             "name": "Nombre"
           }
+        },
+        {
+          "id": "404",
+          "strings": {
+            "goHome": "IR AL INICIO"
+          }
         }
       ]
     },
@@ -232,6 +238,12 @@
             "errorTitle": "ERROR",
             "errorClose": "CLOSE",
             "name": "Name"
+          }
+        },
+        {
+          "id": "404",
+          "strings": {
+            "goHome": "GO HOME"
           }
         }
       ]

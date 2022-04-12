@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import style from "./style.module.scss";
 import { useAppContext } from "../context/appContext";
 import FatalErrorComponent from "../fatalErrorComponent";
-import { validateEmail } from "../utils";
+import GoogleLoginButton from "./googleLoginButton";
 import { Link } from "react-router-dom";
 import {
   Box,
@@ -12,59 +12,73 @@ import {
   TextField,
   Typography,
 } from "@mui/material";
+import { validateEmail } from "../utils";
 
-const RecoverForm = (props) => {
+interface IProps {
+  email: string;
+  password: string;
+}
+
+enum EnumComponentState {
+  READY,
+  AWAIT_LOGIN_RESPONSE,
+  INITIAL_LOADING,
+  ERROR,
+}
+
+interface IStateObject {
+  email: string;
+  password: string;
+  state: EnumComponentState;
+  stateErrorMessage: string;
+  isEmailMissing: boolean;
+  isPasswordMissing: boolean;
+  loginResponseMessage: string;
+}
+
+const SigninForm: React.FC<IProps> = (props: IProps) => {
   //variables de estado
-  const { getLanguageString, recoverUser, userDocId, userDarkMode } =
-    useAppContext();
+  const { getLanguageString, loginUser, userDarkMode } = useAppContext();
 
-  const [stateData, setStateData] = useState({
+  const [stateData, setStateData] = useState<IStateObject>({
     email: props.email || "",
-    state: "READY",
+    password: props.password || "",
+    state: EnumComponentState.READY,
     stateErrorMessage: "",
     isEmailMissing: false,
+    isPasswordMissing: false,
     loginResponseMessage: "",
   });
 
   //ejecucion inicial
   useEffect(() => {
     switch (stateData.state) {
-      case "AWAIT_RECOVER_RESPONSE": {
-        async function recoverUserCallbak() {
+      case EnumComponentState.AWAIT_LOGIN_RESPONSE: {
+        let callLoginUser = async () => {
           try {
-            await recoverUser({
+            await loginUser({
+              source: "usernameAndPassword",
               email: stateData.email,
+              password: stateData.password,
             });
           } catch (e) {
-            throw e.toString();
+            setStateData((_prevData) => {
+              return {
+                ..._prevData,
+                state: EnumComponentState.READY,
+                loginResponseMessage: e.toString(),
+              };
+            });
           }
-        }
-
-        try {
-          recoverUserCallbak();
-          setStateData((_prevData) => {
-            return {
-              ..._prevData,
-              state: "RECOVER_READY",
-              loginResponseMessage: "",
-            };
-          });
-        } catch (e) {
-          setStateData((_prevData) => {
-            return {
-              ..._prevData,
-              state: "READY",
-              loginResponseMessage: e.toString(),
-            };
-          });
-        }
+        };
+        callLoginUser();
         break;
       }
-      case "INITIAL_LOADING": {
+      case EnumComponentState.INITIAL_LOADING: {
         setStateData((_prevData) => {
           return {
             ..._prevData,
-            state: "READY",
+            state: EnumComponentState.READY,
             stateErrorMessage: "",
           };
         });
@@ -77,13 +91,10 @@ const RecoverForm = (props) => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [stateData.state]);
 
-  useEffect(() => {}, [userDocId]);
-
   // graba el nuevo estado del componente cuando se detecta un cambio en algun input
-  const changeHandler = (e) => {
-    let name = e.target.name;
-    let value = "";
-    switch (name) {
+  const changeHandler = (e: React.ChangeEvent<HTMLInputElement>) => {
+    let value: string = "";
+    switch (e.target.name) {
       default: {
         value = e.target.value;
         break;
@@ -91,52 +102,45 @@ const RecoverForm = (props) => {
     }
     setStateData({
       ...stateData,
-      [name]: value,
+      [e.target.name]: value,
     });
   };
 
   //verifica si se puede o no hacer el submit de los datos
-  const handleSubmit = (e) => {
+  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    let isEmailMissing = stateData.email.toString().length <= 0 ? true : false;
-    let loginResponseMessage = "";
+    let isEmailMissing: boolean = stateData.email.length <= 0 ? true : false;
+    let isPasswordMissing: boolean =
+      stateData.password.length <= 0 ? true : false;
 
-    if (!validateEmail(stateData.email)) {
-      loginResponseMessage = "Invalid Email";
-      isEmailMissing = true;
-    }
-    if (isEmailMissing || loginResponseMessage !== "") {
-      setStateData({
-        ...stateData,
-        isEmailMissing,
-        loginResponseMessage,
-        state: "READY",
-      });
+    if (!validateEmail(stateData.email)) isEmailMissing = true;
+    if (isEmailMissing || isPasswordMissing) {
+      setStateData({ ...stateData, isPasswordMissing, isEmailMissing });
       return;
     } else {
       setStateData({
         ...stateData,
+        isPasswordMissing,
         isEmailMissing,
-        loginResponseMessage,
-        state: "AWAIT_RECOVER_RESPONSE",
+        state: EnumComponentState.AWAIT_LOGIN_RESPONSE,
       });
       return;
     }
   };
 
-  const getString = (string) => {
-    return getLanguageString("recoverForm", string);
+  const getString = (string: string) => {
+    return getLanguageString("signinForm", string);
   };
 
   //html retornado
   return (
     <>
       <img
-        src="./logos/recoverLogo.png"
+        src="./logos/signinLogo.png"
         alt="company logo"
         className={style.floatBackground}
       />
-      {stateData.state === "READY" ? (
+      {stateData.state === EnumComponentState.READY ? (
         <Paper
           style={{
             marginTop: "3rem",
@@ -144,6 +148,7 @@ const RecoverForm = (props) => {
             display: "flex",
             flexFlow: "column",
             alignItems: "center",
+            zIndex: "1",
           }}
           className={style.container}
         >
@@ -180,21 +185,31 @@ const RecoverForm = (props) => {
               variant="outlined"
               value={stateData.email}
               onChange={changeHandler}
-              required
               autoFocus
+              required
               style={{ width: "100%" }}
               error={stateData.isEmailMissing}
               label={getString("email")}
             />
-            <span name="loginResponse">{stateData.loginResponseMessage}</span>
+            <TextField
+              type="password"
+              name="password"
+              id="password"
+              value={stateData.password}
+              onChange={changeHandler}
+              required
+              error={stateData.isPasswordMissing}
+              style={{ width: "100%" }}
+              label={getString("password")}
+            />
+            <span>{stateData.loginResponseMessage}</span>
             <Button
               variant="contained"
-              onClick={handleSubmit}
-              name="signupButton"
               style={{ width: "100%" }}
               disableElevation
+              type="submit"
             >
-              {getString("recoverButton")}
+              {getString("login")}
             </Button>
             <Box
               style={{
@@ -204,12 +219,32 @@ const RecoverForm = (props) => {
               }}
             >
               <Link
-                to="/"
-                name="signup"
+                to="/recover"
                 style={userDarkMode ? { color: "#ffffffbf" } : {}}
               >
-                {getString("return")}
+                {getString("forgot")}
               </Link>
+              <Link
+                to="/signup"
+                style={userDarkMode ? { color: "#ffffffbf" } : {}}
+              >
+                {getString("signup")}
+              </Link>
+            </Box>
+
+            <div>
+              <span className={style.line}></span>
+              <span className={style.text}>{getString("or")}</span>
+              <span className={style.line}></span>
+            </div>
+            <Box
+              style={{
+                width: "100%",
+                display: "flex",
+                justifyContent: "space-between",
+              }}
+            >
+              <GoogleLoginButton></GoogleLoginButton>
             </Box>
           </form>
         </Paper>
@@ -217,8 +252,8 @@ const RecoverForm = (props) => {
         <></>
       )}
 
-      {stateData.state === "INITIAL_LOADING" ||
-      stateData.state === "AWAIT_RECOVER_RESPONSE" ? (
+      {stateData.state === EnumComponentState.INITIAL_LOADING ||
+      stateData.state === EnumComponentState.AWAIT_LOGIN_RESPONSE ? (
         <CircularProgress
           disableShrink
           variant="indeterminate"
@@ -233,36 +268,14 @@ const RecoverForm = (props) => {
       ) : (
         <></>
       )}
-
-      {stateData.state === "ERROR" ? (
+      {stateData.state === EnumComponentState.ERROR ? (
         <FatalErrorComponent
           mensaje={stateData.stateErrorMessage}
         ></FatalErrorComponent>
       ) : (
         <></>
       )}
-
-      {stateData.state === "RECOVER_READY" ? (
-        <Paper className={style.successMessageContainer}>
-          <span>{getString("success")}</span>
-          <Link to="/" name="login">
-            <Button
-              variant="contained"
-              disableElevation
-              style={
-                userDarkMode
-                  ? { color: "#ffffffbf", width: "100%" }
-                  : { width: "100%" }
-              }
-            >
-              {getString("return")}
-            </Button>
-          </Link>
-        </Paper>
-      ) : (
-        <></>
-      )}
     </>
   );
 };
-export default RecoverForm;
+export default SigninForm;

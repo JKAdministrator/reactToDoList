@@ -1,7 +1,8 @@
 import { Button, Typography } from "@mui/material";
 import { Box } from "@mui/system";
-import React, { useEffect, useState } from "react";
+import React, { useCallback, useEffect, useMemo, useState } from "react";
 import { Link } from "react-router-dom";
+import { useAppContext } from "../context/appContext";
 
 async function getQuote() {
   try {
@@ -18,13 +19,32 @@ async function getQuote() {
   }
 }
 
-function NotFound() {
-  const [quote, setQuote] = useState({});
+interface IQuote {
+  author: string;
+  en: string;
+}
+
+const NotFound: React.FC = () => {
+  const [quote, setQuote] = useState<IQuote>({
+    author: "",
+    en: "",
+  });
+
+  //variables de estado
+  const { getLanguageString, userLanguage } = useAppContext();
+
   useEffect(() => {
     getQuote().then((quote) => {
       setQuote(quote);
     });
   }, []);
+
+  const getString = useCallback(
+    (string: string): string => {
+      return getLanguageString("signupForm", string);
+    },
+    [userLanguage]
+  );
 
   return (
     <Box
@@ -83,11 +103,11 @@ function NotFound() {
       </Box>
       <Button variant="contained">
         <Link to="/" style={{ color: "white", textDecoration: "none" }}>
-          Go Home
+          {getString("goHome")}
         </Link>
       </Button>
     </Box>
   );
-}
+};
 
 export default NotFound;

@@ -7,15 +7,19 @@ import {
   Avatar,
 } from "@mui/material";
 import MenuIcon from "@mui/icons-material/Menu";
-
 import { useAppContext } from "../../context/appContext";
 import style from "./style.module.scss";
 import React from "react";
 
-const Headerbar = ({ toggleSidebarCallback, currentSection }) => {
+interface IProps {
+  toggleSidebarCallback: any;
+  currentSection: string;
+}
+
+const Headerbar: React.FC<IProps> = (props: IProps) => {
   const { getLanguageString, userDarkMode, userImage } = useAppContext();
 
-  const getString = (section, string) => {
+  const getString = (section: string, string: string): string => {
     return getLanguageString(section, string);
   };
 
@@ -31,12 +35,14 @@ const Headerbar = ({ toggleSidebarCallback, currentSection }) => {
             color="inherit"
             aria-label="menu"
             sx={{ mr: 2 }}
-            onClick={toggleSidebarCallback}
+            onClick={props.toggleSidebarCallback}
           >
             <MenuIcon />
           </IconButton>
           <Typography variant="h6" component="div" sx={{ flexGrow: 1 }}>
-            {currentSection ? getString(currentSection, "title") : ""}
+            {props.currentSection
+              ? getString(props.currentSection, "title")
+              : ""}
           </Typography>
           <Avatar
             alt="User image"

@@ -21,9 +21,8 @@ import {
   Avatar,
 } from "@mui/material";
 import CredentialCard from "./credentialCard";
-export const AppContext = React.createContext();
 
-const ScreenConfiguration = () => {
+const ScreenConfiguration: React.FC = (props) => {
   const {
     userLanguage,
     userDisplayName,
@@ -37,33 +36,36 @@ const ScreenConfiguration = () => {
     userCreationDate,
   } = useAppContext();
 
-  function onUserImageChange(e) {
+  function onUserImageChange(e: React.ChangeEvent<HTMLInputElement>) {
     if (e.target.files && e.target.files[0]) {
       let reader = new FileReader();
       reader.onloadend = () => {
-        updateUser("userImage", reader.result, true);
+        if (reader.result) {
+          updateUser("userImage", reader.result.toString(), true);
+        }
       };
       reader.readAsDataURL(e.target.files[0]);
     }
   }
-  function onChangeThemeHandler(e) {
-    let newDarkMode = !userDarkMode;
+
+  function onChangeThemeHandler(e: React.ChangeEvent<HTMLInputElement>) {
+    let newDarkMode: boolean = !userDarkMode;
     updateUser("userDarkMode", newDarkMode, true);
   }
 
-  function onChangeLanguageHandler(e) {
-    updateUser("userLanguage", e.target.value, true);
+  function onChangeLanguageHandler(e: React.ChangeEvent<HTMLInputElement>) {
+    updateUser("userLanguage", e.target.value.toString(), true);
   }
 
-  const getString = (string) => {
+  const getString = (string: string): string => {
     return getLanguageString("screenConfiguration", string);
   };
 
-  function handleChangeName(e) {
-    updateUser("userDisplayName", e.target.value, false);
+  function handleChangeName(e: React.ChangeEvent<HTMLInputElement>) {
+    updateUser("userDisplayName", e.target.value.toString(), false);
   }
-  function handleBlurName(e) {
-    updateUser("userDisplayName", e.target.value, true);
+  function handleBlurName(e: React.FocusEvent<HTMLInputElement>) {
+    updateUser("userDisplayName", e.target.value.toString(), true);
   }
 
   return (
@@ -206,7 +208,7 @@ const ScreenConfiguration = () => {
                   onChange={onChangeLanguageHandler}
                   variant="filled"
                 >
-                  {Array.from(languages).map((language) => {
+                  {Array.from(languages).map((language: any) => {
                     return (
                       <MenuItem value={language.id} key={language.id}>
                         {language.label}
@@ -239,7 +241,7 @@ const ScreenConfiguration = () => {
                 {getString("accesAccounts")}
               </Typography>
               <Stack spacing={2}>
-                {getUserCredentials().map((credentialData) => {
+                {getUserCredentials().map((credentialData: any) => {
                   return (
                     <CredentialCard
                       key={credentialData.uid}

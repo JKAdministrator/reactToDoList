@@ -2,12 +2,13 @@ import React from "react";
 import style from "./style.module.scss";
 import { useAppContext } from "../../context/appContext";
 import { Button } from "@mui/material";
-const GoogleLoginButton = () => {
+
+const GoogleLoginButton: React.FC = () => {
   const { loginUser } = useAppContext();
 
-  function handleLoginClick(e) {
+  const handleLoginClick = (e: React.MouseEvent<HTMLElement>) => {
     loginUser({ source: "google" });
-  }
+  };
 
   return (
     <>

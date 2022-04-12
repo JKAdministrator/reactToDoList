@@ -2,11 +2,19 @@ import React from "react";
 import style from "./style.module.scss";
 import { Avatar, Card, FormGroup, Typography } from "@mui/material";
 
-const CredentialCard = (props) => {
+interface IProps {
+  image: string;
+  provider: string;
+  uid: string;
+  name: string;
+  email: string;
+}
+
+const CredentialCard: React.FC<IProps> = (props: IProps) => {
   return (
     <Card variant="outlined" sx={{}}>
       <FormGroup className={style.credentialCard}>
-        <Typography variant="h7" component="h3" style={{ gridArea: "a1" }}>
+        <Typography variant="h6" component="h3" style={{ gridArea: "a1" }}>
           {props.provider}
         </Typography>
         <Avatar

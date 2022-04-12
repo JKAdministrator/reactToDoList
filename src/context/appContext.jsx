@@ -8,7 +8,6 @@ import {
 import {
   getAuth,
   signOut,
-  getRedirectResult,
   GoogleAuthProvider,
   signInWithRedirect,
   signInWithEmailAndPassword,
@@ -53,6 +52,8 @@ const initialContextData = {
   //customization objects (themes, languages, etc...)
   themeObject: {},
   languages: {},
+  //userLoginState
+  userLoginState: "LOADING",
 };
 
 function getDefautThemeString() {
@@ -114,11 +115,11 @@ export function AppProvider(props) {
       userDarkMode = userThemeString === "dark" ? true : false,
       themeObject = getThemeObject(userThemeString),
       userCreationDate = "",
+      userLoginState = "LOADING",
       emulatorStarted = false;
 
     getFile("./json/languages.json")
       .then(async (languagesFile) => {
-        console.log("firebaseConfig", { env: process.env });
         let firebaseConfig = {
           apiKey: process.env.REACT_APP_FIREBASE_API_KEY,
           authDomain: process.env.REACT_APP_FIREBASE_AUTH_DOMAIN,
@@ -462,76 +463,80 @@ export function AppProvider(props) {
 
         //try get the google user data from redirect and do a login with that
         let auth = getAuth();
-        let redirectResult = await getRedirectResult(auth);
-        console.log("redirectResult", { redirectResult });
-        if (redirectResult) {
-          let loginData = {
-            source: "google",
-            uid: redirectResult.user.uid,
-            darkMode: userDarkMode,
-            language: userLanguage,
-            name: redirectResult.user.displayName,
-            image: redirectResult.user.photoURL
-              ? redirectResult.user.photoURL
-              : "",
-          };
-          let responseLogin = await httpsCallableFunctions.loginUser(loginData);
-          console.log("responseLogin", { responseLogin });
-          if (responseLogin.data.errorCode === 0) {
-            let responseUserDarkMode = responseLogin.data.userData.darkMode;
-            let responseDefaultThemeString = responseUserDarkMode
-              ? "dark"
-              : "light";
-            let responseThemeObject = getThemeObject(
-              responseDefaultThemeString
+        auth.onAuthStateChanged(async (user) => {
+          if (user) {
+            let loginData = {
+              source: "google",
+              uid: user.uid,
+              darkMode: userDarkMode,
+              language: userLanguage,
+              name: user.displayName,
+              image: user.photoURL ? user.photoURL : "",
+            };
+            let responseLogin = await httpsCallableFunctions.loginUser(
+              loginData
             );
-            userUid = redirectResult.user.uid;
-            userDarkMode = responseUserDarkMode;
-            userLanguage = responseLogin.data.userData.language;
-            userDisplayName = responseLogin.data.userData.name;
-            userImage = responseLogin.data.userData.image;
-            userOpenProjects = responseLogin.data.userData.userOpenProjects;
-            userClosedProjects = responseLogin.data.userData.userClosedProjects;
-            userCreationDate = responseLogin.data.userData.creationDate;
-            themeObject = responseThemeObject;
+            if (responseLogin.data.errorCode === 0) {
+              let responseUserDarkMode = responseLogin.data.userData.darkMode;
+              let responseDefaultThemeString = responseUserDarkMode
+                ? "dark"
+                : "light";
+              let responseThemeObject = getThemeObject(
+                responseDefaultThemeString
+              );
+              userUid = user.uid;
+              userDarkMode = responseUserDarkMode;
+              userLanguage = responseLogin.data.userData.language;
+              userDisplayName = responseLogin.data.userData.name;
+              userImage = responseLogin.data.userData.image;
+              userOpenProjects = responseLogin.data.userData.userOpenProjects;
+              userClosedProjects =
+                responseLogin.data.userData.userClosedProjects;
+              userCreationDate = responseLogin.data.userData.creationDate;
+              themeObject = responseThemeObject;
+              userLoginState = "LOGUED_IN";
+            }
+          } else {
+            userLoginState = "LOGUED_OUT";
           }
-        }
-
-        setAppContextData((prevProps) => {
-          return {
-            ...prevProps,
-            //firebase connection data
-            firebaseConnectionState: errorMessage ? "ERROR" : "READY",
-            firebaseConnectionStateError: errorMessage,
-            firebaseApp: app,
-            firebaseFunctions: functions,
-            firebaseHttpsCallableFunctions: httpsCallableFunctions,
-            emulatorStarted: emulatorStarted,
-            //global server functions
-            createUser: createUser,
-            loginUser: loginUser,
-            logoutUser: logoutUser,
-            recoverUser: recoverUser,
-            getUserCredentials: getUserCredentials,
-            updateUser: updateUser,
-            createProject: createProject,
-            closeProject: closeProject,
-            deleteProject: deleteProject,
-            openProject: openProject,
-            updateProject: updateProject,
-            userCreationDate: userCreationDate,
-            // user data
-            userUid: userUid,
-            userLanguage: userLanguage,
-            userDisplayName: userDisplayName,
-            userImage: userImage,
-            userOpenProjects: userOpenProjects,
-            userClosedProjects: userClosedProjects,
-            userDarkMode: userDarkMode,
-            //customization objects (themes, languages, etc...)
-            languages: languagesFile.languages,
-            themeObject: themeObject,
-          };
+          setAppContextData((prevProps) => {
+            return {
+              ...prevProps,
+              //firebase connection data
+              firebaseConnectionState: errorMessage ? "ERROR" : "READY",
+              firebaseConnectionStateError: errorMessage,
+              firebaseApp: app,
+              firebaseFunctions: functions,
+              firebaseHttpsCallableFunctions: httpsCallableFunctions,
+              emulatorStarted: emulatorStarted,
+              //global server functions
+              createUser: createUser,
+              loginUser: loginUser,
+              logoutUser: logoutUser,
+              recoverUser: recoverUser,
+              getUserCredentials: getUserCredentials,
+              updateUser: updateUser,
+              createProject: createProject,
+              closeProject: closeProject,
+              deleteProject: deleteProject,
+              openProject: openProject,
+              updateProject: updateProject,
+              userCreationDate: userCreationDate,
+              // user data
+              userUid: userUid,
+              userLanguage: userLanguage,
+              userDisplayName: userDisplayName,
+              userImage: userImage,
+              userOpenProjects: userOpenProjects,
+              userClosedProjects: userClosedProjects,
+              userDarkMode: userDarkMode,
+              //customization objects (themes, languages, etc...)
+              languages: languagesFile.languages,
+              themeObject: themeObject,
+              //userLoginState
+              userLoginState: userLoginState,
+            };
+          });
         });
       })
       .catch((e) => {

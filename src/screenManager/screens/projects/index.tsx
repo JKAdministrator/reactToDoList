@@ -8,18 +8,24 @@ import ProjectTabPanel from "./tabPanel";
 import { Fab, Tooltip } from "@mui/material";
 import AddIcon from "@mui/icons-material/Add";
 import ProjectPopup from "./projectPopup";
-export const AppContext = React.createContext();
 
-function a11yProps(index) {
+interface IStateObject {
+  value: number;
+  isOpen: boolean;
+  isEdit: boolean;
+  projectId: string;
+}
+
+function a11yProps(index: string): object {
   return {
     id: `simple-tab-${index}`,
     "aria-controls": `simple-tabpanel-${index}`,
   };
 }
 
-export default function ScreenProjects() {
-  const [value, setValue] = useState(0);
-  const [projectPopupState, setProjectPopupState] = useState({
+const ScreenProjects = () => {
+  const [stateObject, setStateObject] = useState<IStateObject>({
+    value: 0,
     isOpen: false,
     isEdit: false,
     projectId: "",
@@ -28,21 +34,30 @@ export default function ScreenProjects() {
   const { getLanguageString, userOpenProjects, userClosedProjects } =
     useAppContext();
 
-  const handleChange = (event, newValue) => {
-    setValue(newValue);
+  const handleChange = (
+    event: React.ChangeEvent<HTMLInputElement>,
+    newValue: number
+  ) => {
+    setStateObject((_prevValue) => {
+      return {
+        ..._prevValue,
+        state: newValue,
+      };
+    });
   };
-  const getString = (string) => {
+
+  const getString = (string: string): string => {
     return getLanguageString("screenProjects", string);
   };
 
-  const newProjectClickCallback = useCallback((e) => {
-    setProjectPopupState((prevState) => {
+  const newProjectClickCallback = useCallback(() => {
+    setStateObject((prevState) => {
       return { ...prevState, isOpen: true, isEdit: false };
     });
   }, []);
 
   const editCallback = useCallback((_projectId) => {
-    setProjectPopupState((prevState) => {
+    setStateObject((prevState) => {
       return {
         ...prevState,
         isOpen: true,
@@ -55,7 +70,7 @@ export default function ScreenProjects() {
   const openProjectClickCallback = useCallback((e) => {}, []);
 
   function handleCloseProjectPopup() {
-    setProjectPopupState((prevState) => {
+    setStateObject((prevState) => {
       return { ...prevState, isOpen: false };
     });
   }
@@ -64,40 +79,46 @@ export default function ScreenProjects() {
     <>
       <Box className={style.container}>
         <Box sx={{ borderBottom: 1, borderColor: "divider" }}>
-          <Tabs value={value} onChange={handleChange} aria-label="Project tabs">
+          <Tabs
+            value={stateObject.value}
+            onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
+              handleChange(event, stateObject.value);
+            }}
+            aria-label="Project tabs"
+          >
             <Tab
               label={getString("open") + " (" + userOpenProjects.length + ")"}
-              {...a11yProps(0)}
+              {...a11yProps("0")}
             />
             <Tab
               label={
                 getString("closed") + " (" + userClosedProjects.length + ")"
               }
-              {...a11yProps(1)}
+              {...a11yProps("1")}
             />
           </Tabs>
         </Box>
         <ProjectTabPanel
-          value={value}
+          value={stateObject.value}
           index={0}
           projects={userOpenProjects}
-          openProjectClickCallback={openProjectClickCallback}
           allowClose={true}
           allowDelete={false}
           allowReopen={false}
           allowRename={true}
           editCallback={editCallback}
+          openCallback={openProjectClickCallback}
         ></ProjectTabPanel>
         <ProjectTabPanel
-          value={value}
+          value={stateObject.value}
           index={1}
           projects={userClosedProjects}
-          openProjectClickCallback={openProjectClickCallback}
           allowClose={false}
           allowDelete={true}
           allowReopen={true}
           allowRename={false}
           editCallback={editCallback}
+          openCallback={openProjectClickCallback}
         ></ProjectTabPanel>
       </Box>
       <Tooltip title={getString("btnNewTooltip")}>
@@ -112,10 +133,11 @@ export default function ScreenProjects() {
       </Tooltip>
       <ProjectPopup
         handleClose={handleCloseProjectPopup}
-        open={projectPopupState.isOpen}
-        isEdit={projectPopupState.isEdit}
-        projectId={projectPopupState.projectId}
+        open={stateObject.isOpen}
+        isEdit={stateObject.isEdit}
+        projectId={stateObject.projectId}
       ></ProjectPopup>
     </>
   );
-}
+};
+export default ScreenProjects;

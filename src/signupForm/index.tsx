@@ -14,31 +14,63 @@ import {
   Typography,
 } from "@mui/material";
 import { validateEmail } from "../utils";
-const SignupForm = (props) => {
+
+interface IProps {
+  username: string;
+  email: string;
+  password: string;
+  confirmPassword: string;
+  userImage: string;
+}
+
+enum EnumComponentState {
+  READY,
+  AWAIT_REGISTER_RESPONSE,
+  LOGIN_READY,
+  INITIAL_LOADING,
+  ERROR,
+}
+
+interface IStateObject {
+  username: string;
+  email: string;
+  password: string;
+  confirmPassword: string;
+  state: EnumComponentState;
+  stateErrorMessage: string;
+  isUsernameMissing: boolean;
+  isEmailMissing: boolean;
+  isPasswordMissing: boolean;
+  isConfirmPasswordMissing: boolean;
+  loginResponseMessage: string;
+  userImage: string;
+}
+
+const SignupForm: React.FC<IProps> = (props: IProps) => {
   //variables de estado
   const { getLanguageString, userDocId, createUser, userDarkMode } =
     useAppContext();
 
-  const [stateData, setStateData] = useState({
+  const [stateData, setStateData] = useState<IStateObject>({
     username: props.username || "",
     email: props.email || "",
     password: props.password || "",
     confirmPassword: props.confirmPassword || "",
-    state: "READY",
+    state: EnumComponentState.READY,
     stateErrorMessage: "",
     isUsernameMissing: false,
     isEmailMissing: false,
     isPasswordMissing: false,
     isConfirmPasswordMissing: false,
     loginResponseMessage: "",
-    userImage: "",
+    userImage: props.userImage || "",
   });
 
   //ejecucion inicial
   useEffect(() => {
     switch (stateData.state) {
-      case "AWAIT_REGISTER_RESPONSE": {
-        async function callCreateUser() {
+      case EnumComponentState.AWAIT_REGISTER_RESPONSE: {
+        const callCreateUser = async () => {
           try {
             await createUser({
               email: stateData.email,
@@ -49,7 +81,7 @@ const SignupForm = (props) => {
             setStateData((_prevData) => {
               return {
                 ..._prevData,
-                state: "LOGIN_READY",
+                state: EnumComponentState.LOGIN_READY,
                 loginResponseMessage: "",
               };
             });
@@ -57,20 +89,20 @@ const SignupForm = (props) => {
             setStateData((_prevData) => {
               return {
                 ..._prevData,
-                state: "READY",
+                state: EnumComponentState.READY,
                 loginResponseMessage: e.toString(),
               };
             });
           }
-        }
+        };
         callCreateUser();
         break;
       }
-      case "INITIAL_LOADING": {
+      case EnumComponentState.INITIAL_LOADING: {
         setStateData((_prevData) => {
           return {
             ..._prevData,
-            state: "READY",
+            state: EnumComponentState.READY,
             stateErrorMessage: "",
           };
         });
@@ -86,7 +118,7 @@ const SignupForm = (props) => {
   useEffect(() => {}, [userDocId]);
 
   // graba el nuevo estado del componente cuando se detecta un cambio en algun input
-  const changeHandler = (e) => {
+  const changeHandler = (e: React.ChangeEvent<HTMLInputElement>) => {
     let name = e.target.name;
     let value = "";
     switch (name) {
@@ -102,15 +134,13 @@ const SignupForm = (props) => {
   };
 
   //verifica si se puede o no hacer el submit de los datos
-  const handleSubmit = (e) => {
+  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    let isUsernameMissing =
-      stateData.username.toString().length <= 0 ? true : false;
-    let isEmailMissing = stateData.email.toString().length <= 0 ? true : false;
-    let isPasswordMissing =
-      stateData.password.toString().length <= 0 ? true : false;
+    let isUsernameMissing = stateData.username.length <= 0 ? true : false;
+    let isEmailMissing = stateData.email.length <= 0 ? true : false;
+    let isPasswordMissing = stateData.password.length <= 0 ? true : false;
     let isConfirmPasswordMissing =
-      stateData.confirmPassword.toString().length <= 0 ? true : false;
+      stateData.confirmPassword.length <= 0 ? true : false;
     let loginResponseMessage = "";
     if (!validateEmail(stateData.email)) {
       isEmailMissing = true;
@@ -121,7 +151,7 @@ const SignupForm = (props) => {
       !isPasswordMissing &&
       !isConfirmPasswordMissing &&
       !isEmailMissing &&
-      stateData.password.toString() !== stateData.confirmPassword.toString()
+      stateData.password !== stateData.confirmPassword
     ) {
       loginResponseMessage = getString("passwordMissmatch");
       isPasswordMissing = true;
@@ -144,7 +174,7 @@ const SignupForm = (props) => {
         isEmailMissing,
         isConfirmPasswordMissing,
         loginResponseMessage,
-        state: "READY",
+        state: EnumComponentState.READY,
       });
       return;
     } else {
@@ -155,33 +185,35 @@ const SignupForm = (props) => {
         isEmailMissing,
         isConfirmPasswordMissing,
         loginResponseMessage,
-        state: "AWAIT_REGISTER_RESPONSE",
+        state: EnumComponentState.AWAIT_REGISTER_RESPONSE,
       });
       return;
     }
   };
 
-  function onUserImageChange(e) {
+  function onUserImageChange(e: React.ChangeEvent<HTMLInputElement>) {
     if (e.target.files && e.target.files[0]) {
       let reader = new FileReader();
       reader.onloadend = () => {
-        setStateData({
-          ...stateData,
-          userImage: reader.result,
-        });
+        if (reader.result) {
+          setStateData({
+            ...stateData,
+            userImage: reader.result.toString(),
+          });
+        }
       };
       reader.readAsDataURL(e.target.files[0]);
     }
   }
 
-  const getString = (string) => {
+  const getString = (string: string) => {
     return getLanguageString("signupForm", string);
   };
 
   //html retornado
   return (
     <>
-      {stateData.state === "READY" ? (
+      {stateData.state === EnumComponentState.READY ? (
         <Paper
           style={{
             marginTop: "3rem",
@@ -297,13 +329,12 @@ const SignupForm = (props) => {
                 </Button>
               </label>
             </Box>
-            <span name="loginResponse">{stateData.loginResponseMessage}</span>
+            <span>{stateData.loginResponseMessage}</span>
             <Button
               variant="contained"
-              onClick={handleSubmit}
-              name="signupButton"
               style={{ width: "100%" }}
               disableElevation
+              type="submit"
             >
               {getString("signupButton")}
             </Button>
@@ -317,11 +348,7 @@ const SignupForm = (props) => {
                 alignItems: "flex-start",
               }}
             >
-              <Link
-                to="/"
-                name="signup"
-                style={userDarkMode ? { color: "#ffffffbf" } : {}}
-              >
+              <Link to="/" style={userDarkMode ? { color: "#ffffffbf" } : {}}>
                 {getString("return")}
               </Link>
             </Box>
@@ -330,8 +357,8 @@ const SignupForm = (props) => {
       ) : (
         <></>
       )}
-      {stateData.state === "INITIAL_LOADING" ||
-      stateData.state === "AWAIT_REGISTER_RESPONSE" ? (
+      {stateData.state === EnumComponentState.INITIAL_LOADING ||
+      stateData.state === EnumComponentState.AWAIT_REGISTER_RESPONSE ? (
         <CircularProgress
           disableShrink
           variant="indeterminate"
@@ -346,18 +373,18 @@ const SignupForm = (props) => {
       ) : (
         <></>
       )}
-      {stateData.state === "ERROR" ? (
+      {stateData.state === EnumComponentState.ERROR ? (
         <FatalErrorComponent
           mensaje={stateData.stateErrorMessage}
         ></FatalErrorComponent>
       ) : (
         <></>
       )}
-      {stateData.state === "LOGIN_READY" ? (
+      {stateData.state === EnumComponentState.LOGIN_READY ? (
         <>
           <Paper className={style.successMessageContainer}>
             <span>{getString("success")}</span>
-            <Link to="/" name="login">
+            <Link to="/">
               <Button
                 variant="contained"
                 style={

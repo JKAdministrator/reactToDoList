@@ -13,7 +13,7 @@ import NotFound from "../notFound";
 
 // el React context es un objeto
 // tiene 2 partes "provider" y "consumer"
-export const AppContext = React.createContext();
+export const AppContext = React.createContext(null);
 
 // <React.Suspense fallback={<CircularProgress />}></React.Suspense>;
 //envolvemos la app dentro del proveedor
@@ -43,21 +43,13 @@ const ScreenManager = React.lazy(() => {
 });
 
 function App() {
-  const [state, setState] = useState("LOADING");
-  const {
-    firebaseConnectionState,
-    firebaseConnectionStateError,
-    userUid,
-    themeObject,
-    userDarkMode,
-  } = useAppContext();
+  const { themeObject, userDarkMode, userLoginState } = useAppContext();
+
+  const [state, setState] = useState(userLoginState);
 
   useEffect(() => {
-    if (firebaseConnectionState === "LOADING") setState("LOADING");
-    else if (firebaseConnectionState === "ERROR") setState("ERROR");
-    else if (userUid !== "") setState("LOGUED_IN");
-    else if (userUid === "") setState("LOGUED_OUT");
-  }, [userUid, firebaseConnectionState]);
+    setState(userLoginState);
+  }, [userLoginState]);
 
   //la salida debe especificar el valor inicial del proveedor (objeto vacio)
   return (
@@ -109,7 +101,7 @@ function App() {
                     {state === "ERROR" ? (
                       <>
                         <span>error:</span>
-                        <span>{firebaseConnectionStateError}</span>
+                        <span>Error connecting with Firebase database</span>
                       </>
                     ) : (
                       <></>
