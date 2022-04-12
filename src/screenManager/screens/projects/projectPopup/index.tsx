@@ -53,22 +53,53 @@ const ProjectPopup: React.FC<IProps> = (props: IProps) => {
     userClosedProjects,
   } = useAppContext();
 
+  const hanldeButtonClick = (action: EnumButtonAction) => {
+    switch (action) {
+      case EnumButtonAction.CANCEL: {
+        props.handleClose();
+        setStateObject((_prevState) => {
+          return {
+            ..._prevState,
+            name: "",
+            nameError: false,
+          };
+        });
+        break;
+      }
+      case EnumButtonAction.SAVE: {
+        stateObject.name.length > 0
+          ? setStateObject((_prevState) => {
+              return {
+                ..._prevState,
+                state: EnumComponentState.LOADING,
+              };
+            })
+          : setStateObject((_prevState) => {
+              return {
+                ..._prevState,
+                nameError: true,
+              };
+            });
+        break;
+      }
+      default:
+        break;
+    }
+  };
+
   const handleCloseLocally = (
     event: React.MouseEvent<HTMLElement>,
     reason: string
   ): void => {
     event.preventDefault();
-
     switch (stateObject.state) {
       case EnumComponentState.LOADING: {
         break;
       }
       case EnumComponentState.READY: {
         if (
-          (reason &&
-            (reason === "backdropClick" || reason === "escapeKeyDown")) ||
-          event.currentTarget.dataset.action ===
-            EnumButtonAction.CANCEL.toString()
+          reason &&
+          (reason === "backdropClick" || reason === "escapeKeyDown")
         ) {
           props.handleClose();
           setStateObject((_prevState) => {
@@ -78,23 +109,6 @@ const ProjectPopup: React.FC<IProps> = (props: IProps) => {
               nameError: false,
             };
           });
-        } else if (
-          event.currentTarget.dataset.action ===
-          EnumButtonAction.SAVE.toString()
-        ) {
-          stateObject.name.length > 0
-            ? setStateObject((_prevState) => {
-                return {
-                  ..._prevState,
-                  state: EnumComponentState.LOADING,
-                };
-              })
-            : setStateObject((_prevState) => {
-                return {
-                  ..._prevState,
-                  nameError: true,
-                };
-              });
         }
         break;
       }
@@ -124,7 +138,7 @@ const ProjectPopup: React.FC<IProps> = (props: IProps) => {
               nameError: false,
             };
           });
-          updateProject(props.projectId, { name: "" });
+          updateProject(props.projectId, { name: stateObject.name });
         } else {
           createProject({ name: stateObject.name })
             .then((result: any) => {
@@ -213,13 +227,17 @@ const ProjectPopup: React.FC<IProps> = (props: IProps) => {
               justifyContent: "space-between",
             }}
           >
-            <Button data-action={EnumButtonAction.CANCEL.toString()}>
+            <Button
+              data-action={EnumButtonAction.CANCEL}
+              onClick={() => hanldeButtonClick(EnumButtonAction.CANCEL)}
+            >
               {getString("buttonCancel")}
             </Button>
 
             <Button
-              data-action={EnumButtonAction.SAVE.toString()}
+              data-action={EnumButtonAction.SAVE}
               variant="contained"
+              onClick={() => hanldeButtonClick(EnumButtonAction.SAVE)}
             >
               {getString(props.isEdit ? "buttonSaveEdit" : "buttonSaveCreate")}
             </Button>

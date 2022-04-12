@@ -16,7 +16,7 @@ interface IStateObject {
   projectId: string;
 }
 
-function a11yProps(index: string): object {
+function a11yProps(index: number) {
   return {
     id: `simple-tab-${index}`,
     "aria-controls": `simple-tabpanel-${index}`,
@@ -34,14 +34,12 @@ const ScreenProjects = () => {
   const { getLanguageString, userOpenProjects, userClosedProjects } =
     useAppContext();
 
-  const handleChange = (
-    event: React.ChangeEvent<HTMLInputElement>,
-    newValue: number
-  ) => {
+  const handleChange = (event: React.SyntheticEvent, newValue: number) => {
     setStateObject((_prevValue) => {
+      console.log("handleChange ", { _prevValue, newValue });
       return {
         ..._prevValue,
-        state: newValue,
+        value: newValue,
       };
     });
   };
@@ -81,20 +79,18 @@ const ScreenProjects = () => {
         <Box sx={{ borderBottom: 1, borderColor: "divider" }}>
           <Tabs
             value={stateObject.value}
-            onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
-              handleChange(event, stateObject.value);
-            }}
+            onChange={handleChange}
             aria-label="Project tabs"
           >
             <Tab
               label={getString("open") + " (" + userOpenProjects.length + ")"}
-              {...a11yProps("0")}
+              {...a11yProps(0)}
             />
             <Tab
               label={
                 getString("closed") + " (" + userClosedProjects.length + ")"
               }
-              {...a11yProps("1")}
+              {...a11yProps(1)}
             />
           </Tabs>
         </Box>
@@ -109,6 +105,7 @@ const ScreenProjects = () => {
           editCallback={editCallback}
           openCallback={openProjectClickCallback}
         ></ProjectTabPanel>
+
         <ProjectTabPanel
           value={stateObject.value}
           index={1}
