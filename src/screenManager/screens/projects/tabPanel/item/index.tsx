@@ -116,11 +116,22 @@ const ProjectTabItem: React.FC<IProps> = (props: IProps) => {
     open: Boolean(null),
   });
 
-  const handleClick = (event: React.MouseEvent<HTMLElement>) => {
+  const handleClick = (event: React.MouseEvent<HTMLButtonElement>) => {
     setStateObject((_prevState) => {
       return {
         ..._prevState,
         anchorEl: event.currentTarget,
+        open: Boolean(event.currentTarget),
+      };
+    });
+  };
+
+  const handleClose = () => {
+    setStateObject((_prevState) => {
+      return {
+        ..._prevState,
+        anchorEl: null,
+        open: Boolean(null),
       };
     });
   };
@@ -136,6 +147,7 @@ const ProjectTabItem: React.FC<IProps> = (props: IProps) => {
             ..._prevState,
             state: EnumComponentState.CHANGING,
             anchorEl: null,
+            open: Boolean(null),
           };
         });
         closeProject(props.id);
@@ -147,6 +159,7 @@ const ProjectTabItem: React.FC<IProps> = (props: IProps) => {
             ..._prevState,
             state: EnumComponentState.CHANGING,
             anchorEl: null,
+            open: Boolean(null),
           };
         });
         openProject(props.id);
@@ -158,6 +171,7 @@ const ProjectTabItem: React.FC<IProps> = (props: IProps) => {
             ..._prevState,
             state: EnumComponentState.CHANGING,
             anchorEl: null,
+            open: Boolean(null),
           };
         });
         deleteProject(props.id);
@@ -168,6 +182,7 @@ const ProjectTabItem: React.FC<IProps> = (props: IProps) => {
           return {
             ..._prevState,
             anchorEl: null,
+            open: Boolean(null),
           };
         });
         props.editCallback(props.id);
@@ -178,6 +193,7 @@ const ProjectTabItem: React.FC<IProps> = (props: IProps) => {
           return {
             ..._prevState,
             anchorEl: null,
+            open: Boolean(null),
           };
         });
         break;
@@ -225,6 +241,7 @@ const ProjectTabItem: React.FC<IProps> = (props: IProps) => {
                 id="basic-menu"
                 anchorEl={stateObject.anchorEl}
                 open={stateObject.open}
+                onClose={handleClose}
                 MenuListProps={{
                   "aria-labelledby": "basic-button",
                 }}
@@ -232,10 +249,10 @@ const ProjectTabItem: React.FC<IProps> = (props: IProps) => {
                 {options
                   .filter((option: IOption) => {
                     return (
-                      option.allowReopen === props.allowReopen ||
-                      option.allowClose === props.allowClose ||
-                      option.allowDelete === props.allowDelete ||
-                      option.allowRename === props.allowRename
+                      (option.allowReopen && props.allowReopen) ||
+                      (option.allowClose && props.allowClose) ||
+                      (option.allowDelete && props.allowDelete) ||
+                      (option.allowRename && props.allowRename)
                     );
                   })
                   .map((option: IOption) => {

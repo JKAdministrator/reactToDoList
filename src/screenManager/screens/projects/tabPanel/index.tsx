@@ -3,6 +3,7 @@ import PropTypes from "prop-types";
 import Box from "@mui/material/Box";
 //import { useAppContext } from "../../../../context/appContext";
 import ProjectTabItem from "./item";
+
 //export const AppContext = React.createContext();
 interface IProject {
   id: string;
@@ -10,6 +11,7 @@ interface IProject {
 }
 
 interface IProps {
+  children?: React.ReactNode;
   value: number;
   index: number;
   projects: IProject[];
