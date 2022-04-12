@@ -45,13 +45,8 @@ const ProjectPopup: React.FC<IProps> = (props: IProps) => {
     nameError: false,
   });
 
-  const {
-    createProject,
-    updateProject,
-    getLanguageString,
-    userOpenProjects,
-    userClosedProjects,
-  } = useAppContext();
+  const { createProject, updateProject, getLanguageString, userProjects } =
+    useAppContext();
 
   const hanldeButtonClick = (action: EnumButtonAction) => {
     switch (action) {
@@ -174,11 +169,9 @@ const ProjectPopup: React.FC<IProps> = (props: IProps) => {
     if (props.open) {
       let name: string = "";
       if (props.projectId !== "") {
-        let project = [...userOpenProjects, ...userClosedProjects].find(
-          (project) => {
-            return project.id === props.projectId;
-          }
-        );
+        let project = userProjects.find((project: any) => {
+          return project.id === props.projectId;
+        });
         name = project.name;
       }
 

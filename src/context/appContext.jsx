@@ -45,8 +45,7 @@ const initialContextData = {
   userLanguage: "",
   userDisplayName: "",
   userImage: "",
-  userOpenProjects: [],
-  userClosedProjects: [],
+  userProjects: [],
   userCreationDate: "",
   userDarkMode: true,
   //customization objects (themes, languages, etc...)
@@ -110,8 +109,7 @@ export function AppProvider(props) {
       userLanguage = getDefautLanguage(),
       errorMessage,
       userImage,
-      userOpenProjects = [],
-      userClosedProjects = [],
+      userProjects = [],
       userDarkMode = userThemeString === "dark" ? true : false,
       themeObject = getThemeObject(userThemeString),
       userCreationDate = "",
@@ -137,7 +135,7 @@ export function AppProvider(props) {
 
         // connect to the emulator if developement
         let useEmulator = process.env.REACT_APP_USE_FIREBASE_EMULATOR;
-
+        console.log("use emulator is", useEmulator);
         if (useEmulator === "1") {
           emulatorStarted = true;
           let autho = getAuth();
@@ -224,10 +222,7 @@ export function AppProvider(props) {
                       userImage: responseLogin.data.userData.image,
                       userLanguage: responseLogin.data.userData.language,
                       userDarkMode: responseUserDarkMode,
-                      userOpenProjects:
-                        responseLogin.data.userData.userOpenProjects,
-                      userClosedProjects:
-                        responseLogin.data.userData.userClosedProjects,
+                      userProjects: responseLogin.data.userData.userProjects,
                       userCreationDate:
                         responseLogin.data.userData.creationDate,
                       themeObject: responseThemeObject,
@@ -286,8 +281,7 @@ export function AppProvider(props) {
                 userDisplayName: "",
                 userImage: "",
                 userLanguage: getDefautLanguage(),
-                userOpenProjects: [],
-                userClosedProjects: [],
+                userProjects: [],
                 userDarkMode: userDarkMode,
                 themeObject: themeObject,
               };
@@ -324,52 +318,74 @@ export function AppProvider(props) {
         };
 
         let closeProject = async (_projectId) => {
-          let response = await httpsCallableFunctions.closeProject({
-            project: { id: _projectId },
-            uid: userUid,
-          });
-
+          //dont wait for the server respone to change the project status
+          let response;
+          try {
+            response = httpsCallableFunctions.closeProject({
+              project: { id: _projectId },
+              uid: userUid,
+            });
+          } catch (e) {
+            //do nothing on error
+          }
           setAppContextData((prevProps) => {
+            prevProps.userProjects.find((p) => {
+              return p.id === _projectId;
+            }).isOpen = false;
             return {
               ...prevProps,
-              userOpenProjects: response.data.userData.userOpenProjects,
-              userClosedProjects: response.data.userData.userClosedProjects,
             };
           });
           return response;
         };
+
         let openProject = async (_projectId) => {
-          let response = await httpsCallableFunctions.openProject({
-            project: { id: _projectId },
-            uid: userUid,
-          });
+          //dont wait for the server respone to change the project status
+          let response;
+          try {
+            httpsCallableFunctions.openProject({
+              project: { id: _projectId },
+              uid: userUid,
+            });
+          } catch (e) {
+            //do nothing on error
+          }
 
           setAppContextData((prevProps) => {
+            prevProps.userProjects.find((p) => {
+              return p.id === _projectId;
+            }).isOpen = true;
             return {
               ...prevProps,
-              userOpenProjects: response.data.userData.userOpenProjects,
-              userClosedProjects: response.data.userData.userClosedProjects,
             };
           });
           return response;
         };
 
         let deleteProject = async (_projectId) => {
-          let response = await httpsCallableFunctions.deleteProject({
-            project: { id: _projectId },
-            uid: userUid,
-          });
-
+          //dont wait for the server respone to delete the project
+          let response;
+          try {
+            response = httpsCallableFunctions.deleteProject({
+              project: { id: _projectId },
+              uid: userUid,
+            });
+          } catch (e) {
+            //do nothing on error
+          }
           setAppContextData((prevProps) => {
             return {
               ...prevProps,
-              userClosedProjects: response.data.userData.userClosedProjects,
+              userProjects: prevProps.userProjects.filter((p) => {
+                return p.id !== _projectId;
+              }),
             };
           });
           return response;
         };
 
         let createProject = async (_data) => {
+          //here we wait for the server to create the project
           try {
             let response = await httpsCallableFunctions.createProject({
               project: {
@@ -381,16 +397,13 @@ export function AppProvider(props) {
             let newProjectObject = {
               id: response.data.project.id,
               name: _data.name,
+              isOpen: true,
             };
 
             setAppContextData((prevProps) => {
-              let newUserOpenProjects = [
-                ...prevProps.userOpenProjects,
-                newProjectObject,
-              ];
               return {
                 ...prevProps,
-                userOpenProjects: newUserOpenProjects,
+                userProjects: [...prevProps.userProjects, newProjectObject],
               };
             });
           } catch (error) {
@@ -417,16 +430,12 @@ export function AppProvider(props) {
 
           setAppContextData((prevProps) => {
             let dataToChange = {
-              userClosedProjects: prevProps.userClosedProjects,
-              userOpenProjects: prevProps.userOpenProjects,
+              userProjects: prevProps.userProjects,
             };
 
             if (newData.name !== "") {
               //locally we update the user open projects and closed projects for that project id
-              [
-                ...dataToChange.userClosedProjects,
-                ...dataToChange.userOpenProjects,
-              ].find((project) => {
+              [...dataToChange.userProjects].find((project) => {
                 return project.id === projectId;
               }).name = newData.name;
             }
@@ -489,9 +498,7 @@ export function AppProvider(props) {
               userLanguage = responseLogin.data.userData.language;
               userDisplayName = responseLogin.data.userData.name;
               userImage = responseLogin.data.userData.image;
-              userOpenProjects = responseLogin.data.userData.userOpenProjects;
-              userClosedProjects =
-                responseLogin.data.userData.userClosedProjects;
+              userProjects = responseLogin.data.userData.userProjects;
               userCreationDate = responseLogin.data.userData.creationDate;
               themeObject = responseThemeObject;
               userLoginState = "LOGUED_IN";
@@ -527,8 +534,7 @@ export function AppProvider(props) {
               userLanguage: userLanguage,
               userDisplayName: userDisplayName,
               userImage: userImage,
-              userOpenProjects: userOpenProjects,
-              userClosedProjects: userClosedProjects,
+              userProjects: userProjects,
               userDarkMode: userDarkMode,
               //customization objects (themes, languages, etc...)
               languages: languagesFile.languages,

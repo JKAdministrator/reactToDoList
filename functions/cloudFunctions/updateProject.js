@@ -16,23 +16,16 @@ exports.updateProject = functions.https.onCall(async (data, context) => {
       .doc(data.uid)
       .get();
 
-    let userDocumentData = userDocument.data();
-    let project;
-    project = userDocumentData.userOpenProjects.find((project) => {
+    let userProjects = userDocument.data().userProjects;
+    let project = userProjects.find((project) => {
       return data.project.id === project.id;
     });
-    if (project) project.name = data.project.newData.name;
-    else {
-      project = userDocumentData.userClosedProjects.find((project) => {
-        return data.project.id === project.id;
-      });
-      project.name = data.project.newData.name;
-    }
+
+    project.name = data.project.newData.name;
 
     await admin.firestore().collection("users").doc(data.uid).update(
       {
-        userOpenProjects: userDocumentData.userOpenProjects,
-        userClosedProjects: userDocumentData.userClosedProjects,
+        userProjects,
       },
       { merge: true }
     );

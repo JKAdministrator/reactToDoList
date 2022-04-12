@@ -13,8 +13,7 @@ exports.loginUser = functions.https.onCall(async (data, context) => {
         image: data.image,
         darkMode: data.darkMode,
         language: data.language,
-        userOpenProjects: [],
-        userClosedProjects: [],
+        userProjects: [],
         userCreationDate: "",
       };
 

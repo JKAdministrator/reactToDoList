@@ -11,8 +11,7 @@ exports.createUser = functions.https.onCall(async (data, context) => {
       creationDate: admin.firestore.FieldValue.serverTimestamp(),
       darkMode: data.darkMode,
       language: data.language,
-      userOpenProjects: [],
-      userClosedProjects: [],
+      userProjects: [],
     });
 
     return {

@@ -17,38 +17,25 @@ exports.closeProject = functions.https.onCall(async (data, context) => {
       .doc(data.uid)
       .get();
 
+    //get the projects
+    let userProjects = userDocumentRef.data().userProjects;
+    console.log("userProjects", { userProjects });
     //get the project to close
-    let projectElement = userDocumentRef
-      .data()
-      .userOpenProjects.find((project) => {
-        return project.id === data.project.id;
-      });
-    // create a new array of open project with all projects except the one to close
-    let userOpenProjects = userDocumentRef
-      .data()
-      .userOpenProjects.filter((project) => {
-        return project.id !== data.project.id;
-      });
-    // add the project to close to the closed projects array
-    let userClosedProjects = [
-      ...userDocumentRef.data().userClosedProjects,
-      projectElement,
-    ];
-
-    //update the user document
-    let newUserData = {
-      userOpenProjects: userOpenProjects,
-      userClosedProjects: userClosedProjects,
-    };
+    let projectElement = userProjects.find((project) => {
+      return project.id === data.project.id;
+    });
+    console.log("projectElement", { projectElement });
+    //close the projext
+    projectElement.isOpen = false;
     await admin
       .firestore()
       .collection("users")
       .doc(data.uid)
-      .set(newUserData, { merge: true });
+      .set({ userProjects }, { merge: true });
 
     return {
       errorCode: 0,
-      userData: newUserData,
+      userData: { userProjects },
     };
   } catch (e) {
     return {

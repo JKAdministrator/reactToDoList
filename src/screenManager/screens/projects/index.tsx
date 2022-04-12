@@ -31,8 +31,14 @@ const ScreenProjects = () => {
     projectId: "",
   });
 
-  const { getLanguageString, userOpenProjects, userClosedProjects } =
-    useAppContext();
+  const { getLanguageString, userProjects } = useAppContext();
+
+  const openProjects = userProjects.filter((p: any) => {
+    return p.isOpen;
+  });
+  const closedProjects = userProjects.filter((p: any) => {
+    return !p.isOpen;
+  });
 
   const handleChange = (event: React.SyntheticEvent, newValue: number) => {
     setStateObject((_prevValue) => {
@@ -83,13 +89,11 @@ const ScreenProjects = () => {
             aria-label="Project tabs"
           >
             <Tab
-              label={getString("open") + " (" + userOpenProjects.length + ")"}
+              label={getString("open") + " (" + openProjects.length + ")"}
               {...a11yProps(0)}
             />
             <Tab
-              label={
-                getString("closed") + " (" + userClosedProjects.length + ")"
-              }
+              label={getString("closed") + " (" + closedProjects.length + ")"}
               {...a11yProps(1)}
             />
           </Tabs>
@@ -97,7 +101,7 @@ const ScreenProjects = () => {
         <ProjectTabPanel
           value={stateObject.value}
           index={0}
-          projects={userOpenProjects}
+          projects={openProjects}
           allowClose={true}
           allowDelete={false}
           allowReopen={false}
@@ -109,7 +113,7 @@ const ScreenProjects = () => {
         <ProjectTabPanel
           value={stateObject.value}
           index={1}
-          projects={userClosedProjects}
+          projects={closedProjects}
           allowClose={false}
           allowDelete={true}
           allowReopen={true}
