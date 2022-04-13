@@ -34,7 +34,6 @@ exports.deleteProject = functions.https.onCall(async (data, context) => {
 
     return {
       errorCode: 0,
-      userData: { userProjects },
     };
   } catch (e) {
     return {

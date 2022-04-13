@@ -1,8 +1,8 @@
 import { Button, Typography } from "@mui/material";
 import { Box } from "@mui/system";
-import React, { useCallback, useEffect, useMemo, useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
-import { useAppContext } from "../context/appContext";
+import { useTranslation } from "react-i18next";
 
 async function getQuote() {
   try {
@@ -29,22 +29,13 @@ const NotFound: React.FC = () => {
     author: "",
     en: "",
   });
-
-  //variables de estado
-  const { getLanguageString, userLanguage } = useAppContext();
+  const { t } = useTranslation();
 
   useEffect(() => {
-    getQuote().then((quote) => {
-      setQuote(quote);
+    getQuote().then((_quote) => {
+      setQuote(_quote);
     });
   }, []);
-
-  const getString = useCallback(
-    (string: string): string => {
-      return getLanguageString("signupForm", string);
-    },
-    [userLanguage]
-  );
 
   return (
     <Box
@@ -80,6 +71,7 @@ const NotFound: React.FC = () => {
           gap: "0.5rem",
           alignItems: "flex-end",
           maxWidth: "calc(100% - 2rem)",
+          flexGrow: "1",
         }}
       >
         <Typography
@@ -101,9 +93,9 @@ const NotFound: React.FC = () => {
           {quote && quote.author ? quote.author : ""}
         </Typography>
       </Box>
-      <Button variant="contained">
+      <Button variant="contained" style={{ marginBottom: "4rem" }}>
         <Link to="/" style={{ color: "white", textDecoration: "none" }}>
-          {getString("goHome")}
+          {t("404-goHome")}
         </Link>
       </Button>
     </Box>
