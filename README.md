@@ -24,7 +24,6 @@ Tasky.com is developed by [Julio Kania](linkedin.com/in/juliokania) as a practic
 - Code Splitting with [React Suspense](https://17.reactjs.org/docs/concurrent-mode-suspense.html)
 - Styled commponents with [Material Design](https://v4.mui.com/)
 - CRUD against backend API
-- Language Customization (using a local json)
 - Backend [Firebase](https://firebase.google.com/):
   - Hosting 
   - Authentication 
