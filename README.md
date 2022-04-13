@@ -16,6 +16,7 @@ Tasky.com is developed by [Julio Kania](linkedin.com/in/juliokania) as a practic
 
 > Technical features:
 - React v18 using (functional components & hooks)
+- i18n multiplanguage support
 - Typescript
 - Dark Theme mode
 - Global state management with [React Context](https://es.reactjs.org/docs/context.html)
@@ -29,6 +30,7 @@ Tasky.com is developed by [Julio Kania](linkedin.com/in/juliokania) as a practic
   - Authentication 
   - NoSQL Database (Firestore)
   - Cloud functions (Node.js) 
+  - Storage (Google Cloud bucket for user image)
 
 
 > Pending technical features
