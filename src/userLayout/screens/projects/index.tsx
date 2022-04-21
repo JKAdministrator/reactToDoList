@@ -1,4 +1,4 @@
-import React, { useState, useCallback } from "react";
+import React, { useState, useCallback, useEffect } from "react";
 import Tabs from "@mui/material/Tabs";
 import Tab from "@mui/material/Tab";
 import Box from "@mui/material/Box";
@@ -7,10 +7,15 @@ import ProjectTabPanel from "./tabPanel";
 import { Fab, Tooltip } from "@mui/material";
 import AddIcon from "@mui/icons-material/Add";
 import ProjectPopup from "./projectPopup";
-import { IAppContextData, IProject } from "../../../appContext/index.d";
+import {
+  IAppContextData,
+  IProject,
+  ISection,
+} from "../../../appContext/index.d";
 import { AppContext } from "../../../appContext";
 import { useTranslation } from "react-i18next";
-
+import { useNavigate } from "react-router-dom";
+import FolderIcon from "@mui/icons-material/Folder";
 interface IStateObject {
   value: number;
   isOpen: boolean;
@@ -26,6 +31,7 @@ function a11yProps(index: number) {
 }
 
 const ScreenProjects = () => {
+  let navigate = useNavigate();
   const [stateObject, setStateObject] = useState<IStateObject>({
     value: 0,
     isOpen: false,
@@ -34,7 +40,9 @@ const ScreenProjects = () => {
   });
 
   const { t } = useTranslation();
-  const { userObject } = React.useContext(AppContext) as IAppContextData;
+  const { userObject, setHeaderLinks } = React.useContext(
+    AppContext
+  ) as IAppContextData;
 
   const openProjects = userObject
     ? userObject.userProjects.filter((p: IProject) => {
@@ -73,13 +81,37 @@ const ScreenProjects = () => {
     });
   }, []);
 
-  const openProjectClickCallback = useCallback((e) => {}, []);
+  const openProjectClickCallback = useCallback((e: any) => {
+    let selectedProjectId: string = e.target.getAttribute("data-id");
+    if (userObject) {
+      let selectedProjectData: IProject | undefined =
+        userObject.userProjects.find((p: IProject) => {
+          return p.id == selectedProjectId;
+        });
+      if (selectedProjectData) {
+        navigate(`../projects/${selectedProjectData?.id}/board`);
+      }
+    }
+  }, []);
 
-  function handleCloseProjectPopup() {
+  const handleCloseProjectPopup = () => {
     setStateObject((prevState) => {
       return { ...prevState, isOpen: false };
     });
-  }
+  };
+
+  useEffect(() => {
+    setHeaderLinks((_prevHeadersLinks: ISection[]) => {
+      return [
+        {
+          id: "projects",
+          label: "main-section-projects",
+          link: "/projects",
+          icon: <FolderIcon fontSize="small" />,
+        } as ISection,
+      ];
+    });
+  }, []);
 
   return (
     <>

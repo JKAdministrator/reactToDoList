@@ -12,7 +12,10 @@ import {
   Routes,
   useLocation,
   useNavigate,
+  useParams,
 } from "react-router-dom";
+import { IPropsScreenProject } from "./screens/project/index.d";
+
 export enum EnumSections {
   CONFIGURATION = "/configuration",
   PROJECTS = "/projects",
@@ -33,6 +36,9 @@ interface IStateObject {
   isSidebarOpen: boolean;
 }
 
+const ScreenProject: React.LazyExoticComponent<React.FC> = React.lazy(() => {
+  return import("./screens/project");
+});
 const ScreenProjects: React.LazyExoticComponent<React.FC> = React.lazy(() => {
   return import("./screens/projects");
 });
@@ -44,32 +50,22 @@ const ScreenConfiguration: React.LazyExoticComponent<React.FC> = React.lazy(
 const NotFound: React.LazyExoticComponent<React.FC> = React.lazy(() => {
   return import("../notFound");
 });
+
 interface IProps {
   section: EnumSections;
 }
 const UserLayout: React.FC<IProps> = (props: IProps) => {
-  let location = useLocation();
-  let navigate = useNavigate();
+  const location = useLocation();
+  const navigate = useNavigate();
+  const params = useParams();
+  const projectId: string | undefined = params.projectId;
+  console.log("userLayout url param projectId", { projectId });
+
   const [isSidebarOpen, setIsSidebarOpen] = useState<boolean>(false);
   const [currentSection, setCurrentSection] = useState<EnumSections | null>(
     location.pathname as EnumSections
   );
 
-  useEffect(() => {
-    if (location.pathname === currentSection && currentSection === "/") {
-      setCurrentSection(EnumSections.PROJECTS);
-      navigate(EnumSections.PROJECTS);
-    }
-  }, []);
-
-  useEffect(() => {
-    let validCurrentSection = Object.values(EnumSections).includes(
-      currentSection as EnumSections
-    );
-    validCurrentSection
-      ? navigate(currentSection ? currentSection.toString() : "")
-      : setCurrentSection(EnumSections.PROJECTS);
-  }, [currentSection]);
   function onSectionChange(e: EnumSections) {
     setCurrentSection(e);
   }
@@ -110,10 +106,14 @@ const UserLayout: React.FC<IProps> = (props: IProps) => {
         >
           <Routes>
             <Route
-              path="configuration"
+              path="/configuration"
               element={<ScreenConfiguration />}
             ></Route>
-            <Route path="projects" element={<ScreenProjects />}></Route>
+            <Route path="/projects" element={<ScreenProjects />}></Route>
+            <Route
+              path="/projects/:projectId/*"
+              element={<ScreenProject />}
+            ></Route>
             <Route path="*" element={<NotFound />}></Route>
           </Routes>
         </React.Suspense>

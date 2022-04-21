@@ -7,6 +7,7 @@ import {
   EnumUserLoginState,
   IUser,
   IProject,
+  ISection,
 } from "./index.d";
 import i18n from "i18next";
 import Firebase from "./firebase";
@@ -60,6 +61,8 @@ const AppContextProvider: React.FC<React.ReactNode> = ({ children }) => {
   );
   const [userObject, setUserObject] = useState<IUser | null>(null);
   const [userImage, setUserImage] = useState<string>("./noUserImage.png");
+
+  const [headerLinks, setHeaderLinks] = useState<ISection[]>();
 
   useEffect(() => {
     // if user logout => reset the themeObject
@@ -407,6 +410,8 @@ const AppContextProvider: React.FC<React.ReactNode> = ({ children }) => {
     createProject,
     updateProject,
     deleteProject,
+    headerLinks,
+    setHeaderLinks,
   };
 
   return (

@@ -1,5 +1,6 @@
 import * as React from "react";
 import * as ReactDOM from "react-dom/client";
+import { useParams } from "react-router-dom";
 import "./index.scss";
 import { RootComponent } from "./root/root";
 

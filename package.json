@@ -24,6 +24,8 @@
     "i18next-http-backend": "^1.4.0",
     "query-string": "^7.1.1",
     "react": "^18.0.0",
+    "react-dnd": "^16.0.0",
+    "react-dnd-html5-backend": "^16.0.0",
     "react-dom": "^18.0.0",
     "react-i18next": "^11.16.6",
     "react-scripts": "^5.0.0",

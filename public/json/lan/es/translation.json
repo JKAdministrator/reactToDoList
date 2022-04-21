@@ -53,5 +53,13 @@
 
   "screen-projects-open": "ABIERTOS",
   "screen-projects-closed": "CERRADOS",
-  "screen-projects-btnNewTooltip": "Nuevo proyecto"
+  "screen-projects-btnNewTooltip": "Nuevo proyecto",
+  "main-section-projects": "Proyectos",
+  "main-section-configuration": "Perfil",
+  "main-section-logout": "Salir",
+  "main-section-projects-project-board": "Tablero",
+  "main-section-projects-project-chat": "Chat",
+
+  "project-sidebar-board": "Tablero",
+  "project-sidebar-chat": "Chat"
 }

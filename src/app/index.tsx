@@ -1,6 +1,12 @@
 import style from "./style.module.scss";
-import React from "react";
-import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
+import React, { useEffect } from "react";
+import {
+  BrowserRouter,
+  Routes,
+  Route,
+  Navigate,
+  useParams,
+} from "react-router-dom";
 import { Button, CircularProgress, Paper } from "@mui/material";
 import { ThemeProvider } from "@emotion/react";
 import { EnumUserLoginState, IAppContextData } from "../appContext/index.d";
@@ -44,47 +50,46 @@ export const App = () => {
   const { themeObject, userLoginState } = React.useContext(
     AppContext
   ) as IAppContextData;
+  const params = useParams();
+
+  console.log("app url param params", { params });
+
+  const getLoader = () => {
+    return (
+      <div className={style.loader}>
+        <CircularProgress
+          style={{
+            position: "absolute",
+            top: "calc(50% - 20px)",
+          }}
+        />
+      </div>
+    );
+  };
+
+  const getError = () => {
+    return (
+      <>
+        <span>error:</span>
+        <span>Error connecting with Firebase database</span>
+      </>
+    );
+  };
+
+  const getLayout = () => {
+    if (userLoginState === EnumUserLoginState.LOGUED_IN) return <UserLayout />;
+    else if (userLoginState === EnumUserLoginState.LOGUED_OUT)
+      return <GuestLayout />;
+    else if (userLoginState === EnumUserLoginState.LOADING) return getLoader();
+    else if (userLoginState === EnumUserLoginState.ERROR) return getError();
+    else return <></>;
+  };
+
   return (
     <ThemeProvider theme={themeObject}>
       <BrowserRouter>
         <Routes>
-          <Route
-            path="*"
-            element={
-              <>
-                {userLoginState === EnumUserLoginState.LOGUED_IN ? (
-                  <UserLayout />
-                ) : (
-                  <></>
-                )}
-                {userLoginState === EnumUserLoginState.LOGUED_OUT ? (
-                  <GuestLayout />
-                ) : (
-                  <></>
-                )}
-                {userLoginState === EnumUserLoginState.LOADING ? (
-                  <div className={style.loader}>
-                    <CircularProgress
-                      style={{
-                        position: "absolute",
-                        top: "calc(50% - 20px)",
-                      }}
-                    />
-                  </div>
-                ) : (
-                  <></>
-                )}
-                {userLoginState === EnumUserLoginState.ERROR ? (
-                  <>
-                    <span>error:</span>
-                    <span>Error connecting with Firebase database</span>
-                  </>
-                ) : (
-                  <></>
-                )}
-              </>
-            }
-          ></Route>
+          <Route path="*" element={<>{getLayout()}</>}></Route>
         </Routes>
       </BrowserRouter>
     </ThemeProvider>

@@ -20,12 +20,12 @@ import {
   Avatar,
 } from "@mui/material";
 import CredentialCard from "./credentialCard";
-import { IAppContextData } from "../../../appContext/index.d";
+import { IAppContextData, ISection } from "../../../appContext/index.d";
 import { AppContext } from "../../../appContext";
 import { useTranslation } from "react-i18next";
 import i18next from "i18next";
 import { Auth, getAuth, User, UserInfo } from "firebase/auth";
-
+import PersonIcon from "@mui/icons-material/Person";
 interface ILanguage {
   id: string;
   name: string;
@@ -46,6 +46,7 @@ const ScreenConfiguration: React.FC = (props) => {
     changeUserLanguage,
     changeUserName,
     userImage,
+    setHeaderLinks,
   } = React.useContext(AppContext) as IAppContextData;
   const [credentials, setCredentials] = useState<UserInfo[]>([]);
 
@@ -53,6 +54,17 @@ const ScreenConfiguration: React.FC = (props) => {
     let auth: Auth = getAuth();
     let user: User | null = auth.currentUser;
     if (user) setCredentials(user.providerData);
+    //set the navbar to the correct link
+    setHeaderLinks((_prevHeadersLinks: ISection[]) => {
+      return [
+        {
+          id: "configuration",
+          label: "main-section-configuration",
+          link: "/configuration",
+          icon: <PersonIcon fontSize="small" />,
+        } as ISection,
+      ];
+    });
   }, []);
 
   function onUserImageChange(e: React.ChangeEvent<HTMLInputElement>) {

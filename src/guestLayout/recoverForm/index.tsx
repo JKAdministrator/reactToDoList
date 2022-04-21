@@ -234,7 +234,7 @@ const RecoverForm: React.FC<IProps> = ({ email }: IProps) => {
               }}
             >
               <Link
-                to="/"
+                to="/signin"
                 style={
                   themeObject.palette.mode === "dark"
                     ? { color: "#ffffffbf" }

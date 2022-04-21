@@ -7,11 +7,14 @@ import Box from "@mui/material/Box";
 import Paper from "@mui/material/Paper";
 import SwipeableDrawer from "@mui/material/SwipeableDrawer";
 import { AppContext } from "../../appContext";
-import { IAppContextData } from "../../appContext/index.d";
+import { IAppContextData, ISection } from "../../appContext/index.d";
 import { useTranslation } from "react-i18next";
 import { getAuth, signOut } from "firebase/auth";
-import { sections, ISection, EnumSections } from "../index";
-import { useNavigate } from "react-router-dom";
+import { sections, EnumSections } from "../index";
+import { useNavigate, useParams } from "react-router-dom";
+import { ListItemButton, ListItemIcon } from "@mui/material";
+import ViewKanbanIcon from "@mui/icons-material/ViewKanban";
+import ChatIcon from "@mui/icons-material/Chat";
 interface IProps {
   isOpen: boolean;
   onChangeStateCallback: any;
@@ -20,25 +23,16 @@ interface IProps {
 
 const Sidebar: React.FC<IProps> = (props: IProps) => {
   const { t } = useTranslation();
-  let navigate = useNavigate();
-  //let navigate = useNavigate();
-  const [selectedSection, setSelectedSection] = useState<EnumSections>();
+  const navigate = useNavigate();
 
-  function handleClick(e: React.MouseEvent<HTMLElement>) {
-    let sectionId = e.currentTarget.getAttribute(
-      "data-option"
-    ) as keyof typeof EnumSections;
-    props.onChangeStateCallback(); // close the sidebar
-    props.onSectionChangeCallback(sectionId); // update the section in the parent component
-    //navigate(sectionId);
-    setSelectedSection(EnumSections[sectionId]);
-  }
+  const { projectId } = useParams();
+  const { setHeaderLinks, headerLinks } = React.useContext(
+    AppContext
+  ) as IAppContextData;
 
-  const logoutUser = useCallback(() => {
-    const auth = getAuth();
-    signOut(auth);
-    navigate("/");
-  }, []);
+  const handleClick = (e: React.MouseEvent<HTMLElement>) => {
+    console.log("click en sidebar ", { projectId });
+  };
 
   return (
     <SwipeableDrawer
@@ -74,36 +68,22 @@ const Sidebar: React.FC<IProps> = (props: IProps) => {
               width: "100%",
             }}
           >
-            {sections.map((section) => {
-              return (
-                <ListItem
-                  button
-                  divider
-                  onClick={handleClick}
-                  key={section.id}
-                  data-option={section.id}
-                  selected={selectedSection === section.id ? true : false}
-                >
-                  <ListItemText
-                    primary={t(section.label)}
-                    style={{ pointerEvents: "none" }}
-                  />
-                </ListItem>
-              );
-            })}
-          </List>
-          <List
-            component="nav"
-            style={{
-              width: "100%",
-              marginTop: "auto",
-            }}
-          >
-            <ListItem button onClick={logoutUser}>
-              <ListItemText
-                primary={t("sidebar-logout")}
-                style={{ pointerEvents: "none" }}
-              />
+            <ListItem disablePadding onClick={handleClick}>
+              <ListItemButton>
+                <ListItemIcon>
+                  <ViewKanbanIcon type="small" />
+                </ListItemIcon>
+                <ListItemText primary={t("project-sidebar-board")} />
+              </ListItemButton>
+            </ListItem>
+
+            <ListItem disablePadding onClick={handleClick}>
+              <ListItemButton>
+                <ListItemIcon>
+                  <ChatIcon type="small" />
+                </ListItemIcon>
+                <ListItemText primary={t("project-sidebar-chat")} />
+              </ListItemButton>
             </ListItem>
           </List>
         </Paper>

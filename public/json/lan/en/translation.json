@@ -52,5 +52,12 @@
   "projectPopup-name": "Name",
   "screen-projects-open": "OPEN",
   "screen-projects-closed": "CLOSED",
-  "screen-projects-btnNewTooltip": "New project"
+  "screen-projects-btnNewTooltip": "New project",
+  "main-section-projects": "Projects",
+  "main-section-configuration": "Profile",
+  "main-section-logout": "Logout",
+  "main-section-projects-project-board": "Board",
+  "main-section-projects-project-chat": "Chat",
+  "project-sidebar-board": "Board",
+  "project-sidebar-chat": "Chat"
 }

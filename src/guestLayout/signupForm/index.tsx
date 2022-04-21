@@ -288,7 +288,7 @@ const SignupForm: React.FC<IProps> = (props: IProps) => {
               }}
             >
               <Link
-                to="/"
+                to="/signin"
                 style={
                   themeObject.palette.mode === "dark"
                     ? { color: "#ffffffbf" }

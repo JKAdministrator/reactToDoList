@@ -1,4 +1,5 @@
-import { Theme } from "@mui/material";
+import { SvgIconTypeMap, Theme } from "@mui/material";
+import { OverridableComponent } from "@mui/material/OverridableComponent";
 
 export interface ILanguageComponent {
   id: string;
@@ -69,7 +70,18 @@ export interface IAppContextData {
   updateProject: (id: string, newData: any, updateOnServer: boolean) => void;
   deleteProject: (id: string) => void;
   userImage: string;
+  headerLinks: ISection[] | undefined;
+  setHeaderLinks: React.Dispatch<React.SetStateAction<ISection[]>>;
   //  currentLanguage: string;
+}
+/**
+ * MAIN SECTIONS (PROJECTS, CONFIGURATION, ETC)
+ */
+interface ISection {
+  label: string;
+  id: string;
+  link: string;
+  icon: any;
 }
 
 export interface IUser {
@@ -84,59 +96,9 @@ export interface IUser {
   uid: string;
 }
 
-/*
-  //firebase connection data
-  firebaseConnectionState: EnumFirebaseConnectionState;
-  firebaseConnectionStateError: string;
-  firebaseApp: object;
-  firebaseFunctions: object;
-  firebaseHttpsCallableFunctions: IFirebaseHttpCallableFunctions;
-  emulatorStarted: boolean;
-  //global server functions
-  createUser?: (_data: {
-    email: string;
-    password: string;
-    name: string;
-    image: string;
-  }) => Promise<void>;
-  loginUser?: (_data: {
-    source: "google" | "usernameAndPassword";
-    email: string;
-    password: string;
-  }) => Promise<void>;
-  logoutUser?: () => Promise<void>;
-  recoverUser?: (_data: { email: string }) => Promise<void>;
-  getUserCredentials?: () => ICredential[];
-  updateUser?: (_data: {
-    field: string;
-    value: string;
-    updateOnServer: boolean;
-  }) => void;
-  createProject?: (_data: { name: string }) => Promise<void>;
-  closeProject?: (_projectId: string) => Promise<any>;
-  deleteProject?: (_projectId: String) => Promise<any>;
-  openProject?: (_projectId: string) => Promise<any>;
-  updateProject?: (_data: {
-    projectId: string;
-    newData: any;
-    updateOnServer: boolean;
-  }) => void;
-  // user data
-  userUid: string;
-  userLanguage: string;
-  userDisplayName: string;
-  userImage: string;
-  userProjects: IProject[];
-  userCreationDate: { _seconds: number; _miliseconds: number };
-  userDarkMode: boolean;
-  //customization objects (themes, languages, etc...)
-  themeObject: object;
-  languages: ILanguage[];
-  getLanguageString?: (componentName: string, stringId: string) => string;
-  //userLoginState
-  userLoginState: EnumUserLoginState;
-}*/
-
+/*************************************
+ * HTTP CALLABLE INTERFACES
+ */
 interface IhttpCallableLoginUserResponse {
   data: {
     errorCode: number;

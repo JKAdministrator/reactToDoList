@@ -209,7 +209,7 @@ const ProjectTabItem: React.FC<IProps> = (props: IProps) => {
         ></CircularProgress>
       ) : (
         <>
-          <Button onClick={props.openCallback}>
+          <Button onClick={props.openCallback} data-id={props.id}>
             <Typography
               variant="body1"
               sx={
