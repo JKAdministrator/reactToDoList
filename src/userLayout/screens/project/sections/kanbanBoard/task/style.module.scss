@@ -1,0 +1,15 @@
+.kanbanBoardTask {
+  list-style: none;
+  display: flex;
+  flex-flow: row;
+  align-items: flex-start;
+  justify-content: flex-start;
+  padding: 0.2rem;
+  margin: 0.2rem;
+  width: 10rem;
+  transition: 0.3s;
+}
+
+.kanbanBoardTask[data-is-dragging="true"] {
+  box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2);
+}

@@ -89,7 +89,7 @@ const ScreenProjects = () => {
           return p.id == selectedProjectId;
         });
       if (selectedProjectData) {
-        navigate(`../projects/${selectedProjectData?.id}/board`);
+        navigate(`../projects/${selectedProjectData?.id}`);
       }
     }
   }, []);

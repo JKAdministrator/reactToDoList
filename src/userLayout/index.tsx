@@ -4,7 +4,6 @@ import React, { useEffect, useState } from "react";
 //import ScreenProjects from "./screens/projects";
 import style from "./style.module.scss";
 import Headerbar from "./headerbar";
-import Sidebar from "./sidebar";
 import {
   BrowserRouter,
   Navigate,
@@ -33,7 +32,6 @@ export const sections: ISection[] = [
 
 interface IStateObject {
   currentSection: EnumSections | string;
-  isSidebarOpen: boolean;
 }
 
 const ScreenProject: React.LazyExoticComponent<React.FC> = React.lazy(() => {
@@ -59,9 +57,7 @@ const UserLayout: React.FC<IProps> = (props: IProps) => {
   const navigate = useNavigate();
   const params = useParams();
   const projectId: string | undefined = params.projectId;
-  console.log("userLayout url param projectId", { projectId });
 
-  const [isSidebarOpen, setIsSidebarOpen] = useState<boolean>(false);
   const [currentSection, setCurrentSection] = useState<EnumSections | null>(
     location.pathname as EnumSections
   );
@@ -70,32 +66,14 @@ const UserLayout: React.FC<IProps> = (props: IProps) => {
     setCurrentSection(e);
   }
 
-  function onToggleSidebarFromHeader(e: any) {
-    setIsSidebarOpen((_prevValue: boolean) => {
-      return !_prevValue;
-    });
-  }
-
-  function onToggleSidebarFromSidebar(e: any) {
-    setIsSidebarOpen((_prevValue: boolean) => {
-      return !_prevValue;
-    });
-  }
-
   return (
     <Paper
       sx={{ backgroundColor: "background.default" }}
       className={style.container}
     >
       <Headerbar
-        toggleSidebarCallback={onToggleSidebarFromHeader}
         currentSection={currentSection ? currentSection.toString() : ""}
       ></Headerbar>
-      <Sidebar
-        isOpen={isSidebarOpen}
-        onChangeStateCallback={onToggleSidebarFromSidebar}
-        onSectionChangeCallback={onSectionChange}
-      ></Sidebar>
       <Box className={style.sectionContainer}>
         <React.Suspense
           fallback={
@@ -114,6 +92,7 @@ const UserLayout: React.FC<IProps> = (props: IProps) => {
               path="/projects/:projectId/*"
               element={<ScreenProject />}
             ></Route>
+            <Route path="/" element={<ScreenProject />}></Route>
             <Route path="*" element={<NotFound />}></Route>
           </Routes>
         </React.Suspense>

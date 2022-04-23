@@ -10,13 +10,9 @@ import ChatIcon from "@mui/icons-material/Chat";
 const Chat = () => {
   const { projectId } = useParams();
   const { t } = useTranslation();
-  const { userObject, setHeaderLinks } = React.useContext(
-    AppContext
-  ) as IAppContextData;
-
+  const { setHeaderLinks } = React.useContext(AppContext) as IAppContextData;
   useEffect(() => {
     setHeaderLinks((_prevHeadersLinks: ISection[]) => {
-      console.log("setting header links for board");
       return [
         {
           id: "projects",
@@ -42,7 +38,7 @@ const Chat = () => {
   return (
     <>
       <Box className={style.container}>
-        This is the board of the project ::
+        This is the CHAT of the project ::
         {projectId?.toString()}
       </Box>
     </>

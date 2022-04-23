@@ -52,8 +52,6 @@ export const App = () => {
   ) as IAppContextData;
   const params = useParams();
 
-  console.log("app url param params", { params });
-
   const getLoader = () => {
     return (
       <div className={style.loader}>

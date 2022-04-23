@@ -28,7 +28,6 @@ import FolderIcon from "@mui/icons-material/Folder";
 import PersonIcon from "@mui/icons-material/Person";
 import { getAuth, signOut } from "firebase/auth";
 interface IProps {
-  toggleSidebarCallback: any;
   currentSection: string;
 }
 const links: ISection[] = [
@@ -62,21 +61,15 @@ const Headerbar: React.FC<IProps> = (props: IProps) => {
     let selectedId: string = e.currentTarget.getAttribute(
       "data-option"
     ) as string;
-    let selectedLink: ISection = headerLinks?.find((l) => {
+    let selectedLink: ISection = links.find((l) => {
       return l.id === selectedId;
     }) as ISection;
-    console.log("headerbar link click", { e, selectedId });
+
     if (selectedId === "logout") {
       const auth = getAuth();
       signOut(auth);
       navigate("/signin");
     } else {
-      console.log("headerbar link click", {
-        e,
-        selectedId,
-        selectedLink,
-        headerLinks,
-      });
       navigate(selectedLink.link);
     }
   };
@@ -101,23 +94,6 @@ const Headerbar: React.FC<IProps> = (props: IProps) => {
                 : style.appBarLight
             }
           >
-            <IconButton
-              size="large"
-              edge="start"
-              color="inherit"
-              aria-label="menu"
-              sx={{ mr: 2 }}
-              onClick={props.toggleSidebarCallback}
-              disabled={
-                headerLinks &&
-                headerLinks[0].id === "projects" &&
-                headerLinks.length > 1
-                  ? false
-                  : true
-              }
-            >
-              <MenuIcon />
-            </IconButton>
             <Breadcrumbs
               aria-label="breadcrumb"
               style={{ marginRight: "auto" }}
