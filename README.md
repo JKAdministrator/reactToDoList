@@ -1,5 +1,6 @@
 # Tasky
 *Manage tasks quickly*
+What if Trello & Slack but better
 
 ## Why should i use it?
 Tasky allows the organization to organize all its projects in a simple way by automating the priority of the requirements based on dependencies.
@@ -14,25 +15,18 @@ The application is in alpha so many of its main features are not online at the m
 ## Who is in charge of development?
 Tasky.com is developed by [Julio Kania](linkedin.com/in/juliokania) as a practical exercise to learn React.
 
-> Technical features:
-- React v18
-- i18n multiplanguage support
-- Typescript
-- Dark Theme mode
+> Technical information:
+- [React v18](https://reactjs.org/)
+- [Typescript](https://www.typescriptlang.org/) 
+- Internationalization with [i18next](https://www.i18next.com/)
 - Global state management with [React Context](https://es.reactjs.org/docs/context.html)
 - Page router with [React Router](https://v5.reactrouter.com/)
 - Code Splitting with [React Suspense](https://17.reactjs.org/docs/concurrent-mode-suspense.html)
 - Styled commponents with [Material Design](https://v4.mui.com/)
-- CRUD against backend API
-- Backend [Firebase](https://firebase.google.com/):
-  - Hosting 
-  - Authentication 
-  - NoSQL Database (Firestore)
-  - Cloud functions (Node.js) 
-  - Storage (Google Cloud bucket for user image)
-
+- Trello like boards with [react-beautiful-dnd](https://github.com/atlassian/react-beautiful-dnd)
+- Backend with [Firebase](https://firebase.google.com/):
 
 > Pending technical features
 - Unit Testing with Jest
-- Redux (just to learn) 
+- Redux (meaby just to learn it) 
 - Github actions (automatic testing & deploy from main branch)
