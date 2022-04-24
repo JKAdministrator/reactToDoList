@@ -60,6 +60,6 @@
   "main-section-projects-project-board": "Tablero",
   "main-section-projects-project-chat": "Chat",
 
-  "project-sidebar-board": "Tablero",
-  "project-sidebar-chat": "Chat"
+  "kanban-board-add-task-button-label": "Agregar Tarea",
+  "kanban-board-add-list-button-label": "Agregar Lista"
 }

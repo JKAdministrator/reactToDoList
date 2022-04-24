@@ -75,7 +75,10 @@ const ScreenProject: React.FC = () => {
 
   return (
     <>
-      <Box sx={{ borderBottom: 1, borderColor: "divider" }}>
+      <Box
+        sx={{ borderBottom: 1, borderColor: "divider", width: "100%" }}
+        className={style.tabContainer}
+      >
         <Tabs
           value={tabPanelCurrentValue}
           onChange={handleChange}
@@ -91,14 +94,18 @@ const ScreenProject: React.FC = () => {
           />
         </Tabs>
       </Box>
+      <Box
+        sx={{ borderBottom: 1, borderColor: "divider", width: "100%" }}
+        className={style.tabPanelContainer}
+      >
+        <TabPanel value={tabPanelCurrentValue} index={0}>
+          <KanbanBoard />
+        </TabPanel>
 
-      <TabPanel value={tabPanelCurrentValue} index={0}>
-        <KanbanBoard />
-      </TabPanel>
-
-      <TabPanel value={tabPanelCurrentValue} index={1}>
-        <Chat />
-      </TabPanel>
+        <TabPanel value={tabPanelCurrentValue} index={1}>
+          <Chat />
+        </TabPanel>
+      </Box>
     </>
   );
 };

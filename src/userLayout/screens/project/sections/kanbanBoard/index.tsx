@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import style from "./style.module.scss";
 import { IAppContextData, ISection } from "../../../../../appContext/index.d";
 import { AppContext } from "../../../../../appContext";
@@ -12,56 +12,68 @@ import {
   ResponderProvided,
 } from "react-beautiful-dnd";
 import { IColumn, ITask } from "./index.d";
-import KanbanBoardColumn from "./column";
+import KanbanBoardColumn from "./list";
+import KanbanBoardAddButton, { EType } from "./addButton";
+import KanbanBoardList from "./list";
 
 const dataColumns: IColumn[] = [
   {
     id: "c1",
-    label: "Col1 (c1)",
+    label: "To Do (c1)",
     tasks: [
       {
         id: "t1",
-        label: "Gary Goodspeed (t1)",
+        label: "Fix the login screen view on mobile (t1)",
       } as ITask,
       {
         id: "t2",
-        label: "Little Cato (t2)",
+        label: "Add color selector to kanban lists (t2)",
       } as ITask,
     ],
   } as IColumn,
   {
     id: "c2",
-    label: "Col2 (c2)",
+    label: "Working (c2)",
     tasks: [
       {
         id: "t3",
-        label: "KVN (t3)",
+        label: "Add color selector to kanban cards (t3)",
       } as ITask,
       {
         id: "t4",
-        label: "Mooncake (t4)",
+        label: "Make chat user images bigger (t4)",
       } as ITask,
       {
         id: "t5",
-        label: "Quinn Ergon (t5)",
+        label: "Automatic logout on session timeout (t5)",
       } as ITask,
     ],
   } as IColumn,
   {
     id: "c3",
-    label: "Col3 (c3)",
+    label: "Testing (c3)",
     tasks: [
       {
         id: "t6",
-        label: "KVN (t6)",
+        label: "Profile: Dark mode not working on IOS (t6)",
       } as ITask,
       {
         id: "t7",
-        label: "Mooncake (t7)",
+        label: "Team CRUD operations (t7)",
       } as ITask,
       {
         id: "t8",
-        label: "Quinn Ergon (t8)",
+        label: "Allow Edit username (t8)",
+      } as ITask,
+    ],
+  } as IColumn,
+  {
+    id: "c4",
+    label: "Done (c4)",
+    tasks: [
+      {
+        id: "t9",
+        label: "Hide alert from Database when testing (t9)",
       } as ITask,
     ],
   } as IColumn,
@@ -77,20 +89,10 @@ const KanbanBoard = () => {
     if (!result.destination) return;
 
     const {
-      destination,
       destination: { droppableId: desDroppableId, index: desIndex },
-      source,
       source: { droppableId: srcDroppableId, index: srcIndex },
-      draggableId,
       type,
     } = result;
-    console.table({
-      srcDroppableId,
-      srcIndex,
-      desDroppableId,
-      desIndex,
-      draggableId,
-    });
 
     const newColumns = Array.from(columns);
     if (srcDroppableId === desDroppableId && desDroppableId === projectId) {
@@ -111,13 +113,6 @@ const KanbanBoard = () => {
       desColumn.tasks.splice(desIndex, 0, reorderedTask);
     }
     updateColumns(newColumns);
-    /*
-    const items = Array.from(characters);
-    const [reorderedItem] = items.splice(result.source.index, 1);
-    items.splice(result.destination.index, 0, reorderedItem);
-
-    updateCharacters(items);
-*/
   };
 
   useEffect(() => {
@@ -145,35 +140,114 @@ const KanbanBoard = () => {
     });
   }, []);
 
+  const handleDeleteTask = (taskId: string, listId: string) => {
+    console.log("deleting task ", taskId, " from list ", listId);
+    const newColumns = Array.from(columns);
+    const column: IColumn = newColumns.find((c: IColumn) => {
+      return c.id === listId;
+    }) as IColumn;
+    const taskToDeleteIndex = column.tasks.findIndex((t: ITask) => {
+      return t.id === taskId;
+    }) as number;
+    column.tasks.splice(taskToDeleteIndex, 1);
+    updateColumns(newColumns);
+  };
+  const handleDeleteList = (listId: string) => {
+    console.log("deleting list ", listId);
+    const newColumns = Array.from(columns);
+    const columnToDeleteIndex = newColumns.findIndex((c: IColumn) => {
+      return c.id === listId;
+    }) as number;
+    newColumns.splice(columnToDeleteIndex, 1);
+    updateColumns(newColumns);
+  };
+  const handleEditTask = (taskId: string, listId: string) => {
+    console.log("editing task ", taskId, " from list ", listId);
+  };
+  const handleEditList = (listId: string) => {
+    console.log("editing list ", listId);
+  };
+
+  const addTaskCallback: (name: string, columnId: string) => void = (
+    name,
+    columnId
+  ) => {
+    updateColumns((_prevColumns: IColumn[]) => {
+      //get a copy of the columns
+      const newColumnsData: IColumn[] = Array.from(_prevColumns);
+      //get the column
+      const columSelected = newColumnsData.find((c: IColumn) => {
+        return c.id === columnId;
+      }) as IColumn;
+      //get a new task id (to-do : the idd must be getted from the server)
+      const newTaskId: string =
+        columSelected.tasks.length > 0
+          ? columSelected.tasks[columSelected.tasks.length - 1].id
+          : "c";
+      // add the task to column
+      columSelected.tasks.push({
+        id: newTaskId + "-c",
+        label: name,
+      } as ITask);
+      return newColumnsData;
+    });
+  };
+
+  const addColumnCallback: (name: string) => void = (name) => {
+    //to-do the id must be getted from the server
+    updateColumns((_prevColumns) => {
+      const lastColumn = _prevColumns[_prevColumns.length - 1].id;
+      return [
+        ..._prevColumns,
+        {
+          id: lastColumn + "-c",
+          label: name,
+          tasks: [],
+        } as IColumn,
+      ];
+    });
+  };
+
   return (
-    <DragDropContext onDragEnd={handleOnDragEnd}>
-      <Droppable
-        droppableId={projectId as string}
-        type="list"
-        direction="horizontal"
-      >
-        {(provided) => (
-          <div
-            className={style.board}
-            ref={provided.innerRef}
-            {...provided.droppableProps}
-          >
-            {columns.map((c: IColumn, index: number) => {
-              return (
-                <KanbanBoardColumn
-                  key={c.id}
-                  id={c.id}
-                  label={c.label}
-                  tasks={c.tasks}
-                  index={index}
-                ></KanbanBoardColumn>
-              );
-            })}
-            {provided.placeholder}
-          </div>
-        )}
-      </Droppable>
-    </DragDropContext>
+    <>
+      <DragDropContext onDragEnd={handleOnDragEnd}>
+        <Droppable
+          droppableId={projectId as string}
+          type="list"
+          direction="horizontal"
+        >
+          {(provided) => (
+            <div
+              className={style.board}
+              ref={provided.innerRef}
+              {...provided.droppableProps}
+            >
+              {columns.map((c: IColumn, index: number) => {
+                return (
+                  <KanbanBoardList
+                    key={c.id}
+                    id={c.id}
+                    label={c.label}
+                    tasks={c.tasks}
+                    index={index}
+                    addTaskCallback={addTaskCallback}
+                    handleDeleteList={handleDeleteList}
+                    handleDeleteTask={handleDeleteTask}
+                    handleEditList={handleEditList}
+                    handleEditTask={handleEditTask}
+                  />
+                );
+              })}
+              {provided.placeholder}
+              <KanbanBoardAddButton
+                type={EType.COLUMN}
+                addElementCallback={addColumnCallback}
+              />
+            </div>
+          )}
+        </Droppable>
+      </DragDropContext>
+    </>
   );
 };
 export default KanbanBoard;

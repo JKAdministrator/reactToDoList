@@ -4,13 +4,24 @@ import { AppContext } from "../../../../../../appContext";
 import { useTranslation } from "react-i18next";
 import { useParams } from "react-router-dom";
 import { Draggable } from "react-beautiful-dnd";
-import { Card, CardContent, Paper, Typography } from "@mui/material";
-
+import style from "./style.module.scss";
+import {
+  Box,
+  Card,
+  CardContent,
+  IconButton,
+  Paper,
+  Typography,
+} from "@mui/material";
+import MoreVertIcon from "@mui/icons-material/MoreVert";
+import Header from "../header";
 interface IKanbanBoardTaskProps {
   id: string;
   label: string;
   index: number;
   isDraggingOver: boolean;
+  handleEdit: (elementId: string) => void;
+  handleDelete: (elementId: string) => void;
 }
 /*
 const LiContainer = styled.li`
@@ -18,12 +29,6 @@ const LiContainer = styled.li`
 `;*/
 
 const KanbanBoardTask = (props: IKanbanBoardTaskProps) => {
-  const { projectId } = useParams();
-  const { t } = useTranslation();
-  const { userObject, setHeaderLinks } = React.useContext(
-    AppContext
-  ) as IAppContextData;
-
   return (
     <Draggable draggableId={props.id} index={props.index}>
       {(provided, snapshot) => (
@@ -34,7 +39,12 @@ const KanbanBoardTask = (props: IKanbanBoardTaskProps) => {
           data-is-dragging={snapshot.isDragging}
         >
           <Paper elevation={1} style={{ padding: "0.5rem" }}>
-            <h3 style={{ fontSize: 14 }}>{props.label}</h3>
+            <Header
+              label={props.label}
+              elementId={props.id}
+              handleEdit={props.handleEdit}
+              handleDelete={props.handleDelete}
+            />
           </Paper>
         </div>
       )}

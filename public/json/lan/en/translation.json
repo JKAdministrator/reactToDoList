@@ -58,6 +58,6 @@
   "main-section-logout": "Logout",
   "main-section-projects-project-board": "Board",
   "main-section-projects-project-chat": "Chat",
-  "project-sidebar-board": "Board",
-  "project-sidebar-chat": "Chat"
+  "kanban-board-add-task-button-label": "Add Task",
+  "kanban-board-add-list-button-label": "Add List"
 }
