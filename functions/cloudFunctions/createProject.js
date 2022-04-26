@@ -3,8 +3,7 @@ const admin = require("firebase-admin");
 if (admin.apps.length === 0) admin.initializeApp();
 exports.createProject = functions.https.onCall(async (data, context) => {
   try {
-    //if (admin.apps.length === 0) admin.initializeApp();
-    // create project entity
+    //create the project
     let projectDocumentRef = await admin
       .firestore()
       .collection("projects")
@@ -13,6 +12,8 @@ exports.createProject = functions.https.onCall(async (data, context) => {
         owner: data.uid,
         creationDate: admin.firestore.FieldValue.serverTimestamp(),
         isOpen: true,
+        lists: [],
+        tasks: [],
       });
 
     //update user projects
@@ -21,9 +22,10 @@ exports.createProject = functions.https.onCall(async (data, context) => {
       .collection("users")
       .doc(data.uid)
       .update({
-        userOpenProjects: admin.firestore.FieldValue.arrayUnion({
+        userProjects: admin.firestore.FieldValue.arrayUnion({
           id: projectDocumentRef.id,
           name: data.project.name,
+          isOpen: true,
         }),
       });
 

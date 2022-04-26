@@ -3,7 +3,6 @@ const admin = require("firebase-admin");
 if (admin.apps.length === 0) admin.initializeApp();
 exports.updateProject = functions.https.onCall(async (data, context) => {
   try {
-    //if (admin.apps.length === 0) admin.initializeApp();
     await admin
       .firestore()
       .collection("projects")
@@ -16,23 +15,17 @@ exports.updateProject = functions.https.onCall(async (data, context) => {
       .doc(data.uid)
       .get();
 
-    let userDocumentData = userDocument.data();
-    let project;
-    project = userDocumentData.userOpenProjects.find((project) => {
+    let userProjects = userDocument.data().userProjects;
+    let project = userProjects.find((project) => {
       return data.project.id === project.id;
     });
-    if (project) project.name = data.project.newData.name;
-    else {
-      project = userDocumentData.userClosedProjects.find((project) => {
-        return data.project.id === project.id;
-      });
-      project.name = data.project.newData.name;
-    }
+
+    for (const [key, val] of Object.entries(data.project.newData))
+      project[key] = val;
 
     await admin.firestore().collection("users").doc(data.uid).update(
       {
-        userOpenProjects: userDocumentData.userOpenProjects,
-        userClosedProjects: userDocumentData.userClosedProjects,
+        userProjects,
       },
       { merge: true }
     );

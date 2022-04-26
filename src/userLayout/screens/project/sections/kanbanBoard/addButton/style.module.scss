@@ -1,0 +1,10 @@
+.headerContainerBox {
+  width: 100%;
+  margin: 0 !important;
+  > * {
+    margin-top: 0.5rem !important;
+  }
+}
+.headerContainerBox:hover > button {
+  opacity: 0.8 !important;
+}

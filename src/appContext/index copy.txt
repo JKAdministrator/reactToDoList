@@ -1,0 +1,1209 @@
+import React, {
+  useState,
+  useCallback,
+} from "react";
+import { createTheme, PaletteMode, Theme } from "@mui/material";
+import { grey } from "@mui/material/colors";
+import {
+  EnumThemeString,
+  IAppContextData,
+} from ".";
+import i18n from "i18next";
+
+function getDefautThemeString(): PaletteMode {
+  let themeMode: EnumThemeString =
+    window.matchMedia &&
+    window.matchMedia("(prefers-color-scheme: dark)").matches
+      ? EnumThemeString.DARK
+      : EnumThemeString.LIGHT;
+  return themeMode;
+}
+
+function getThemeObject(themeString: PaletteMode): Theme {
+  return createTheme({
+    palette: {
+      mode: themeString,
+      background: {
+        default: themeString === "dark" ? grey[900] : grey[50],
+        paper: themeString === "dark" ? grey[800] : "#fff",
+      },
+      text: {
+        primary: themeString === "dark" ? "#fff" : grey[800],
+        secondary: themeString === "dark" ? grey[500] : grey[900],
+      },
+    },
+  });
+}
+
+
+export const AppContext = React.createContext<IAppContextData | null>(null);
+let defaultUserThemeString: PaletteMode = getDefautThemeString();
+
+const AppContextProvider: React.FC<React.ReactNode> = ({ children }) => {
+  const [currentLanguage, setCurrentLanguage] = useState("es");
+  const [themeObject, setThemeObject] = useState(
+    getThemeObject(defaultUserThemeString)
+  );
+
+  const changeLanguage: (lanCode: string) => void = useCallback(
+    (lanCode: string) => {
+      i18n.changeLanguage(lanCode);
+      setCurrentLanguage(lanCode);
+    },
+    []
+  );
+
+  const appContextData: IAppContextData = {
+    changeLanguage,
+    themeObject,
+  };
+
+  /*const [appContextData, setAppContextData] =
+    useState<IAppContextData>(initialContextData);*/
+
+  /*
+
+  
+  const userUid: string = "";
+
+  // connect to firebase and get cloud functions
+  const { app, functions } = connectToFirebase();
+
+  const https_loginUser: HttpsCallable<unknown, unknown> = httpsCallable(
+    functions,
+    "login"
+  );
+  const https_createUser: HttpsCallable<unknown, unknown> = httpsCallable(
+    functions,
+    "createUser"
+  );
+  const https_closeProject: HttpsCallable<unknown, unknown> = httpsCallable(
+    functions,
+    "closeProject"
+  );
+  const https_openProject: HttpsCallable<unknown, unknown> = httpsCallable(
+    functions,
+    "openProject"
+  );
+  const https_deleteProject: HttpsCallable<unknown, unknown> = httpsCallable(
+    functions,
+    "deleteProject"
+  );
+  const https_createProject: HttpsCallable<unknown, unknown> = httpsCallable(
+    functions,
+    "createProject"
+  );
+  const https_updateProject: HttpsCallable<unknown, unknown> = httpsCallable(
+    functions,
+    "updateProject"
+  );
+  const https_updateUser: HttpsCallable<unknown, unknown> = httpsCallable(
+    functions,
+    "updateUpser"
+  );
+
+  // define loginUser function
+  const loginUser: (_data: {
+    source: "google" | "usernameAndPassword";
+    email: string;
+    password: string;
+  }) => Promise<void> = async (_data: {
+    source: "google" | "usernameAndPassword";
+    email: string;
+    password: string;
+  }) => {
+    try {
+      let auth: Auth = getAuth();
+      switch (_data.source) {
+        case "google": {
+          let provider: GoogleAuthProvider = new GoogleAuthProvider();
+          signInWithRedirect(auth, provider);
+          break;
+        }
+        case "usernameAndPassword": {
+          try {
+            let responseSignInWithEmailAndPassword: {
+              user: { uid: string };
+            } = await signInWithEmailAndPassword(
+              auth,
+              _data.email.toString(),
+              _data.password.toString()
+            );
+
+            let responseLogin: IhttpCallableLoginUserResponse =
+              (await https_loginUser({
+                source: "usernameAndPassword",
+                uid: responseSignInWithEmailAndPassword.user.uid,
+              })) as IhttpCallableLoginUserResponse;
+            let responseUserDarkMode: boolean =
+              responseLogin.data.userData.darkMode;
+            let responseDefaultThemeString: EnumThemeString =
+              responseUserDarkMode
+                ? EnumThemeString.DARK
+                : EnumThemeString.LIGHT;
+            setAppContextData((_prevProps: IAppContextData) => {
+              return {
+                ..._prevProps,
+                userUid: responseSignInWithEmailAndPassword.user.uid,
+                userDisplayName: responseLogin.data.userData.name,
+                userImage: responseLogin.data.userData.image,
+                userLanguage: responseLogin.data.userData.language,
+                userDarkMode: responseUserDarkMode,
+                userProjects: responseLogin.data.userData.userProjects,
+                userCreationDate: responseLogin.data.userData.creationDate,
+                themeObject: getThemeObject(responseDefaultThemeString),
+              };
+            });
+          } catch (e: any) {
+            throw e.toString();
+          }
+          break;
+        }
+        default: {
+          throw new Error("Must specify a login source");
+        }
+      }
+    } catch (e: any) {
+      throw e.toString();
+    }
+  };
+
+  // define loginUser function
+  const createUser: (_data: {
+    email: string;
+    password: string;
+    name: string;
+    image: string;
+  }) => Promise<void> = async (_data: {
+    email: string;
+    password: string;
+    name: string;
+    image: string;
+  }) => {
+    try {
+      let userLanguage: string = getDefautLanguage();
+      let auth: Auth = getAuth();
+      auth.languageCode = userLanguage;
+      let response: UserCredential = await createUserWithEmailAndPassword(
+        auth,
+        _data.email,
+        _data.password
+      );
+      if (auth.currentUser) {
+        let userThemeString: PaletteMode = getDefautThemeString();
+        let userDarkMode: boolean =
+          userThemeString === EnumThemeString.DARK ? true : false;
+        await sendEmailVerification(auth.currentUser);
+
+        await https_createUser({
+          source: "usernameAndPassword",
+          uid: response.user.uid,
+          email: _data.email,
+          password: _data.password,
+          name: _data.name,
+          darkMode: userDarkMode,
+          language: userLanguage,
+          image: _data.image,
+        });
+      }
+    } catch (error: any) {
+      throw error.toString();
+    }
+  };
+
+  const logoutUser: () => Promise<void> = async () => {
+    try {
+      let auth: Auth = getAuth();
+      await signOut(auth);
+      let defaultThemeString: PaletteMode = getDefautThemeString();
+      let themeObject: Theme = getThemeObject(defaultThemeString);
+      let userDarkMode: boolean =
+        defaultThemeString === EnumThemeString.DARK ? true : false;
+      setAppContextData((prevProps: IAppContextData) => {
+        return {
+          ...prevProps,
+          userUid: "",
+          userDisplayName: "",
+          userImage: "",
+          userLanguage: getDefautLanguage(),
+          userProjects: [],
+          userDarkMode: userDarkMode,
+          themeObject: themeObject,
+        };
+      });
+    } catch (error: any) {
+      throw error.toString();
+    }
+  };
+
+  let recoverUser: (_data: { email: string }) => Promise<void> = async (_data: {
+    email: string;
+  }) => {
+    let auth: Auth = getAuth();
+    try {
+      await sendPasswordResetEmail(auth, _data.email);
+    } catch (error: any) {
+      throw error.toString();
+    }
+  };
+
+  let closeProject: (_projectId: string) => Promise<any> = async (
+    _projectId: string
+  ) => {
+    //dont wait for the server respone to change the project status
+    let response: any;
+    try {
+      response = https_closeProject({
+        project: { id: _projectId },
+        uid: userUid,
+      });
+    } catch (e) {
+      //do nothing on error
+    }
+    setAppContextData((prevProps: IAppContextData) => {
+      let userProjects: IProject[] = prevProps.userProjects;
+      let project: IProject | undefined = prevProps.userProjects.find(
+        (p: IProject) => {
+          return p.id === _projectId;
+        }
+      );
+      if (project) project.isOpen = false;
+      return {
+        ...prevProps,
+        userProjects,
+      };
+    });
+    return response;
+  };
+
+  const openProject: (_projectId: string) => Promise<any> = async (
+    _projectId: string
+  ) => {
+    //dont wait for the server respone to change the project status
+    let response: any;
+    try {
+      if (appContextData.firebaseHttpsCallableFunctions)
+        https_openProject({
+          project: { id: _projectId },
+          uid: userUid,
+        });
+    } catch (e) {
+      //do nothing on error
+    }
+    setAppContextData((prevProps: IAppContextData) => {
+      let userProjects: IProject[] = prevProps.userProjects;
+      let project: IProject | undefined = userProjects.find((p: IProject) => {
+        return p.id === _projectId;
+      });
+      if (project) project.isOpen = true;
+      return {
+        ...prevProps,
+        userProjects,
+      };
+    });
+    return response;
+  };
+
+  let deleteProject: (
+    _projectId: String
+  ) => Promise<IhttpCallableDeleteProjectResponse | undefined> = async (
+    _projectId: String
+  ) => {
+    //dont wait for the server respone to delete the project
+    try {
+      let response: IhttpCallableDeleteProjectResponse =
+        (await https_deleteProject({
+          project: { id: _projectId },
+          uid: userUid,
+        })) as IhttpCallableDeleteProjectResponse;
+      setAppContextData((prevProps: IAppContextData) => {
+        return {
+          ...prevProps,
+          userProjects: prevProps.userProjects.filter((p: IProject) => {
+            return p.id !== _projectId;
+          }),
+        };
+      });
+      return response;
+    } catch (e: any) {
+      throw e.toString();
+      //do nothing on error
+    }
+  };
+
+  let createProject: (_data: {
+    name: string;
+  }) => Promise<void> = async (_data: { name: string }) => {
+    //here we wait for the server to create the project
+    try {
+      let response: IhttpCallableCreateProjectResponse =
+        (await https_createProject({
+          project: {
+            name: _data.name,
+          },
+          uid: userUid,
+        })) as IhttpCallableCreateProjectResponse;
+
+      let newProjectObject: IProject = {
+        id: response.data.project.id,
+        name: _data.name,
+        isOpen: true,
+      };
+
+      setAppContextData((prevProps) => {
+        return {
+          ...prevProps,
+          userProjects: [...prevProps.userProjects, newProjectObject],
+        };
+      });
+    } catch (error: any) {
+      throw error.toString();
+    }
+  };
+
+  // UPDATE USER DATA
+  const updateProject: (_data: {
+    projectId: string;
+    newData: any;
+    updateOnServer: boolean;
+  }) => void = (_data: {
+    projectId: string;
+    newData: any;
+    updateOnServer: boolean;
+  }) => {
+    if (_data.updateOnServer) {
+      https_updateProject({
+        project: {
+          newData: _data.newData,
+          id: _data.projectId,
+        },
+        uid: userUid,
+      });
+    }
+
+    setAppContextData((prevProps: IAppContextData) => {
+      if (_data.newData.name !== "") {
+        //locally we update the user open projects and closed projects for that project id
+        let userProjects: IProject[] = prevProps.userProjects;
+        let project = userProjects.find((project: IProject) => {
+          return project.id === _data.projectId;
+        });
+        if (project) project.name = _data.newData.name;
+      }
+      return prevProps;
+    });
+  };
+
+  // UPDATE USER DATA
+  const updateUser: (_data: {
+    field: string;
+    value: string;
+    updateOnServer: boolean;
+  }) => void = (_data: {
+    field: string;
+    value: string;
+    updateOnServer: boolean;
+  }) => {
+    let auth: Auth = getAuth();
+    let userUid: string | null =
+      auth.currentUser !== null ? auth.currentUser.uid : null;
+    if (_data.updateOnServer) {
+      let databaseField: string = "";
+      switch (_data.field) {
+        case "userImage": {
+          databaseField = "image";
+          break;
+        }
+        case "userDisplayName": {
+          databaseField = "name";
+          break;
+        }
+        case "userLanguage": {
+          databaseField = "language";
+          break;
+        }
+        case "userDarkMode": {
+          databaseField = "darkMode";
+          break;
+        }
+        default: {
+          break;
+        }
+      }
+      https_updateUser({
+        newData: { field: databaseField, value: _data.value },
+        uid: userUid,
+      });
+    }
+    let dataToChange: any = { [_data.field]: _data.value };
+    setAppContextData((prevProps: IAppContextData) => {
+      if (_data.field === "userDarkMode")
+        dataToChange = {
+          themeObject: getThemeObject(
+            _data.value ? EnumThemeString.DARK : EnumThemeString.LIGHT
+          ),
+        };
+      return { ...prevProps, ...dataToChange };
+    });
+  };
+
+  const getUserCredentials: () => ICredential[] = useCallback(() => {
+    let auth: Auth = getAuth();
+    let user: User | null = auth.currentUser;
+    if (user !== null) {
+      return Array.from(user.providerData).map((profile: UserInfo) => {
+        return {
+          provider: profile.providerId ? profile.providerId : "",
+          uid: profile.uid ? profile.uid : "",
+          name: profile.displayName ? profile.displayName : "",
+          email: profile.email ? profile.email : "",
+          image: profile.photoURL ? profile.photoURL : "",
+        };
+      });
+    }
+    return [];
+  }, []);
+
+  let auth: Auth = getAuth();
+  auth.onAuthStateChanged(async (user: User) => {
+    let userThemeString: PaletteMode = getDefautThemeString();
+    let userDarkMode: boolean =
+      userThemeString === EnumThemeString.DARK ? true : false;
+    let userUid: string = "";
+    let userDisplayName: string = "";
+    let userImage: string = "";
+    let userProjects: IProject[];
+    let userCreationDate: {
+      _seconds: number;
+      _miliseconds: number;
+    };
+    let themeObject: Theme = getThemeObject(userThemeString);
+    let userLoginState: EnumUserLoginState;
+    let userLanguage: string = getDefautLanguage();
+
+    if (user) {
+      let loginData: {
+        source: string;
+        uid: string;
+        darkMode: boolean;
+        language: string;
+        name: string;
+        image: string;
+      } = {
+        source: "google",
+        uid: user.uid,
+        darkMode: userDarkMode,
+        language: userLanguage,
+        name: user.displayName ? user.displayName : "",
+        image: user.photoURL ? user.photoURL : "",
+      };
+
+      let responseLogin: IhttpCallableLoginUserResponse =
+        (await https_loginUser(loginData)) as IhttpCallableLoginUserResponse;
+
+      if (responseLogin.data.errorCode === 0) {
+        let responseUserDarkMode: boolean =
+          responseLogin.data.userData.darkMode;
+        let responseThemeObject: Theme = getThemeObject(
+          responseUserDarkMode ? EnumThemeString.DARK : EnumThemeString.LIGHT
+        );
+        userUid = user.uid;
+        userDarkMode = responseUserDarkMode;
+        userLanguage = responseLogin.data.userData.language;
+        userDisplayName = responseLogin.data.userData.name;
+        userImage = responseLogin.data.userData.image;
+        userProjects = responseLogin.data.userData.userProjects;
+        userCreationDate = responseLogin.data.userData.creationDate;
+        themeObject = responseThemeObject;
+        userLoginState = EnumUserLoginState.LOGUED_IN;
+      }
+    } else {
+      userLoginState = EnumUserLoginState.LOGUED_OUT;
+    }
+    setAppContextData((prevProps: IAppContextData) => {
+      await languagesFile.languages;
+      return {
+        ...prevProps,
+        userCreationDate: userCreationDate,
+        // user data
+        userUid: userUid,
+        userLanguage: userLanguage,
+        userDisplayName: userDisplayName,
+        userImage: userImage,
+        userProjects: userProjects,
+        userDarkMode: userDarkMode,
+        //customization objects (themes, languages, etc...)
+        languages: await languagesFile.languages,
+        themeObject: themeObject,
+        //userLoginState
+        userLoginState: userLoginState,
+        //global server functions
+        createUser: createUser,
+        loginUser: loginUser,
+        logoutUser: logoutUser,
+        recoverUser: recoverUser,
+        getUserCredentials: getUserCredentials,
+        updateUser: updateUser,
+        createProject: createProject,
+        closeProject: closeProject,
+        deleteProject: deleteProject,
+        openProject: openProject,
+        updateProject: updateProject,
+        //firebase connection data
+        firebaseConnectionState: app
+          ? EnumFirebaseConnectionState.ERROR
+          : EnumFirebaseConnectionState.READY,
+        firebaseConnectionStateError: "",
+        firebaseApp: app,
+        firebaseFunctions: functions,
+        firebaseHttpsCallableFunctions: {
+          ...prevProps.firebaseHttpsCallableFunctions,
+          https_loginUser: https_loginUser,
+          https_createUser: https_createUser,
+          https_closeProject: https_closeProject,
+          https_openProject: https_openProject,
+          https_deleteProject: https_deleteProject,
+          https_createProject: https_createProject,
+          https_updateProject: https_updateProject,
+          https_updateUser: https_updateUser,
+        },
+      };
+    });
+  });
+
+  //try get the google user data from redirect and do a login with that
+*/
+  return (
+    <AppContext.Provider value={appContextData}>{children}</AppContext.Provider>
+  );
+};
+
+export default AppContextProvider;
+/*
+
+export function AppProvider(props: IAppContextData | null): JSX.Element {
+  const [appContextData, setAppContextData] = useState({
+    ...initialContextData,
+  });
+
+  useEffect(() => {
+    let userThemeString: PaletteMode = getDefautThemeString();
+    let app: FirebaseApp,
+      functions: Functions,
+      httpsCallableFunctions: IFirebaseHttpCallableFunctions = {
+        createUser: null,
+        loginUser: null,
+        logoutUser: null,
+        recoverUser: null,
+        getUserCredentials: null,
+        updateUser: null,
+        createProject: null,
+        closeProject: null,
+        deleteProject: null,
+        openProject: null,
+        updateProject: null,
+        login: null,
+      },
+      userUid: string = "",
+      userDisplayName: string = "",
+      userLanguage: string = getDefautLanguage(),
+      errorMessage: string,
+      userImage: string,
+      userProjects: IProject[] = [],
+      userDarkMode: boolean = userThemeString === "dark" ? true : false,
+      themeObject: Theme = getThemeObject(userThemeString),
+      userCreationDate: string = "",
+      userLoginState: EnumUserLoginState = EnumUserLoginState.LOADING,
+      emulatorStarted: boolean = false,
+      useEmulator: string | undefined =
+        process.env.REACT_APP_USE_FIREBASE_EMULATOR,
+      firebaseConfig: IFirebaseConfig = {
+        apiKey: process.env.REACT_APP_FIREBASE_API_KEY,
+        authDomain: process.env.REACT_APP_FIREBASE_AUTH_DOMAIN,
+        projectId: process.env.REACT_APP_FIREBASE_PROJECT_ID,
+        storageBucket: process.env.REACT_APP_FIREBASE_STORAGE_BUCKET,
+        messagingSenderId: process.env.REACT_APP_FIREBASE_MESSAGING_SENDER_ID,
+        appId: process.env.REACT_APP_FIREBASE_APP_ID,
+        measurementId: process.env.REACT_APP_FIREBASE_MEASUREMENT_ID,
+      };
+
+    getFile("./json/languages.json")
+      .then(async (languagesFile: any) => {
+        // initialize firebase app,  get cloud functions reference & check if has to use emulator
+        app = initializeApp(firebaseConfig);
+        functions = getFunctions(app);
+        if (useEmulator === "1") {
+          emulatorStarted = true;
+          let autho: Auth = getAuth();
+          connectFunctionsEmulator(functions, "localhost", 5001);
+          connectAuthEmulator(autho, "http://localhost:9099");
+        }
+
+        httpsCallableFunctions.login = httpsCallable(functions, "login");
+        httpsCallableFunctions.createProject = httpsCallable( 
+          functions,
+          "createProject"
+        );
+        httpsCallableFunctions.closeProject = httpsCallable(
+          functions,
+          "closeProject"
+        );
+        httpsCallableFunctions.openProject = httpsCallable(
+          functions,
+          "openProject"
+        );
+        httpsCallableFunctions.updateProject = httpsCallable(
+          functions,
+          "updateProject"
+        );
+        httpsCallableFunctions.deleteProject = httpsCallable(
+          functions,
+          "deleteProject"
+        );
+        httpsCallableFunctions.createUser = httpsCallable(
+          functions,
+          "createUser"
+        );
+        httpsCallableFunctions.loginUser = httpsCallable(
+          functions,
+          "loginUser"
+        );
+        httpsCallableFunctions.updateUser = httpsCallable(
+          functions,
+          "updateUser"
+        );
+
+        let loginUser: (_data: {
+          source: "google" | "usernameAndPassword";
+          email: string;
+          password: string;
+        }) => Promise<void> = async (_data: {
+          source: "google" | "usernameAndPassword";
+          email: string;
+          password: string;
+        }) => {
+          try {
+            let auth: Auth = getAuth();
+            switch (_data.source) {
+              case "google": {
+                let provider: GoogleAuthProvider = new GoogleAuthProvider();
+                signInWithRedirect(auth, provider);
+                break;
+              }
+              case "usernameAndPassword": {
+                try {
+                  let responseSignInWithEmailAndPassword: {
+                    user: { uid: string };
+                  } = await signInWithEmailAndPassword(
+                    auth,
+                    _data.email.toString(),
+                    _data.password.toString()
+                  );
+                  let responseLogin: {
+                    data: {
+                      userData: {
+                        darkMode: boolean;
+                        name: string;
+                        image: string;
+                        language: string;
+                        userProjects: IProject[];
+                        creationDate: string;
+                      };
+                    };
+                  } = await httpsCallableFunctions.loginUser({
+                    source: "usernameAndPassword",
+                    uid: responseSignInWithEmailAndPassword.user.uid,
+                  });
+
+                  let responseUserDarkMode: boolean =
+                    responseLogin.data.userData.darkMode;
+                  let responseDefaultThemeString: EnumThemeString =
+                    responseUserDarkMode
+                      ? EnumThemeString.DARK
+                      : EnumThemeString.LIGHT;
+                  setAppContextData((prevProps: IAppContextData) => {
+                    return {
+                      ...prevProps,
+                      userUid: responseSignInWithEmailAndPassword.user.uid,
+                      userDisplayName: responseLogin.data.userData.name,
+                      userImage: responseLogin.data.userData.image,
+                      userLanguage: responseLogin.data.userData.language,
+                      userDarkMode: responseUserDarkMode,
+                      userProjects: responseLogin.data.userData.userProjects,
+                      userCreationDate:
+                        responseLogin.data.userData.creationDate,
+                      themeObject: getThemeObject(responseDefaultThemeString),
+                    };
+                  });
+                } catch (e: any) {
+                  throw e.toString();
+                }
+                break;
+              }
+              default: {
+                throw new Error("Must specify a login source");
+              }
+            }
+          } catch (e: any) {
+            throw e.toString();
+          }
+        };
+
+        let createUser: (_data: {
+          email: string;
+          password: string;
+          name: string;
+          image: string;
+        }) => Promise<void> = async (_data: {
+          email: string;
+          password: string;
+          name: string;
+          image: string;
+        }) => {
+          try {
+            let auth: Auth = getAuth();
+            auth.languageCode = userLanguage;
+            let response: UserCredential = await createUserWithEmailAndPassword(
+              auth,
+              _data.email,
+              _data.password
+            );
+            if (auth.currentUser) {
+              await sendEmailVerification(auth.currentUser);
+              await httpsCallableFunctions.createUser({
+                source: "password",
+                uid: response.user.uid,
+                email: _data.email,
+                password: _data.password,
+                name: _data.name,
+                darkMode: userDarkMode,
+                language: userLanguage,
+                image: _data.image,
+              });
+            } else {
+              throw "Error creating user";
+            }
+          } catch (error: any) {
+            throw error.toString();
+          }
+        };
+
+        let logoutUser: () => Promise<void> = async () => {
+          try {
+            let auth: Auth = getAuth();
+            await signOut(auth);
+            let defaultThemeString: PaletteMode = getDefautThemeString();
+            let themeObject: Theme = getThemeObject(defaultThemeString);
+            let userDarkMode: boolean =
+              defaultThemeString === EnumThemeString.DARK ? true : false;
+            setAppContextData((prevProps: IAppContextData) => {
+              return {
+                ...prevProps,
+                userUid: "",
+                userDisplayName: "",
+                userImage: "",
+                userLanguage: getDefautLanguage(),
+                userProjects: [],
+                userDarkMode: userDarkMode,
+                themeObject: themeObject,
+              };
+            });
+          } catch (error: any) {
+            throw error.toString();
+          }
+        };
+
+        let recoverUser: (_data: {
+          email: string;
+        }) => Promise<void> = async (_data: { email: string }) => {
+          let auth: Auth = getAuth();
+          try {
+            await sendPasswordResetEmail(auth, _data.email);
+          } catch (error: any) {
+            throw error.toString();
+          }
+        };
+
+        let getUserCredentials: () => ICredential[] = () => {
+          let auth: Auth = getAuth();
+          let user: User | null = auth.currentUser;
+          if (user !== null) {
+            return Array.from(user.providerData).map((profile: UserInfo) => {
+              return {
+                provider: profile.providerId ? profile.providerId : "",
+                uid: profile.uid ? profile.uid : "",
+                name: profile.displayName ? profile.displayName : "",
+                email: profile.email ? profile.email : "",
+                image: profile.photoURL ? profile.photoURL : "",
+              };
+            });
+          }
+          return [];
+        };
+
+        let closeProject: (_projectId: string) => Promise<any> = async (
+          _projectId: string
+        ) => {
+          //dont wait for the server respone to change the project status
+          let response: any;
+          try {
+            response = httpsCallableFunctions.closeProject({
+              project: { id: _projectId },
+              uid: userUid,
+            });
+          } catch (e) {
+            //do nothing on error
+          }
+          setAppContextData((prevProps: IAppContextData) => {
+            let userProjects: IProject[] = prevProps.userProjects;
+            let project: IProject | undefined = prevProps.userProjects.find(
+              (p: IProject) => {
+                return p.id === _projectId;
+              }
+            );
+            if (project) project.isOpen = false;
+            return {
+              ...prevProps,
+              userProjects,
+            };
+          });
+          return response;
+        };
+
+        let openProject: (_projectId: string) => Promise<any> = async (
+          _projectId: string
+        ) => {
+          //dont wait for the server respone to change the project status
+          let response: any;
+          try {
+            httpsCallableFunctions.openProject({
+              project: { id: _projectId },
+              uid: userUid,
+            });
+          } catch (e) {
+            //do nothing on error
+          }
+
+          setAppContextData((prevProps: IAppContextData) => {
+            let userProjects: IProject[] = prevProps.userProjects;
+            let project: IProject | undefined = userProjects.find(
+              (p: IProject) => {
+                return p.id === _projectId;
+              }
+            );
+            if (project) project.isOpen = true;
+            return {
+              ...prevProps,
+              userProjects,
+            };
+          });
+          return response;
+        };
+
+        let deleteProject: (_projectId: String) => Promise<any> = async (
+          _projectId: String
+        ) => {
+          //dont wait for the server respone to delete the project
+          let response;
+          try {
+            response = httpsCallableFunctions.deleteProject({
+              project: { id: _projectId },
+              uid: userUid,
+            });
+          } catch (e) {
+            //do nothing on error
+          }
+          setAppContextData((prevProps: IAppContextData) => {
+            return {
+              ...prevProps,
+              userProjects: prevProps.userProjects.filter((p: IProject) => {
+                return p.id !== _projectId;
+              }),
+            };
+          });
+          return response;
+        };
+
+        let createProject: (_data: {
+          name: string;
+        }) => Promise<void> = async (_data: { name: string }) => {
+          //here we wait for the server to create the project
+          try {
+            let response: {
+              data: {
+                project: {
+                  id: string;
+                };
+              };
+            } = await httpsCallableFunctions.createProject({
+              project: {
+                name: _data.name,
+              },
+              uid: userUid,
+            });
+
+            let newProjectObject: IProject = {
+              id: response.data.project.id,
+              name: _data.name,
+              isOpen: true,
+            };
+
+            setAppContextData((prevProps) => {
+              return {
+                ...prevProps,
+                userProjects: [...prevProps.userProjects, newProjectObject],
+              };
+            });
+          } catch (error: any) {
+            throw error.toString();
+          }
+        };
+
+        // UPDATE USER DATA
+        let updateProject: (_data: {
+          projectId: string;
+          newData: any;
+          updateOnServer: boolean;
+        }) => Promise<void> = async (_data: {
+          projectId: string;
+          newData: any;
+          updateOnServer: boolean;
+        }) => {
+          if (_data.updateOnServer) {
+            httpsCallableFunctions.updateProject({
+              project: {
+                newData: _data.newData,
+                id: _data.projectId,
+              },
+              uid: userUid,
+            });
+          }
+
+          setAppContextData((prevProps: IAppContextData) => {
+            if (_data.newData.name !== "") {
+              //locally we update the user open projects and closed projects for that project id
+              let userProjects: IProject[] = prevProps.userProjects;
+              let project = userProjects.find((project: IProject) => {
+                return project.id === _data.projectId;
+              });
+              if (project) project.name = _data.newData.name;
+            }
+            return prevProps;
+          });
+        };
+
+        // UPDATE USER DATA
+        let updateUser: (_data: {
+          field: string;
+          value: string;
+          updateOnServer: boolean;
+        }) => Promise<void> = async (_data: {
+          field: string;
+          value: string;
+          updateOnServer: boolean;
+        }) => {
+          let auth: Auth = getAuth();
+          let userUid: string | null =
+            auth.currentUser !== null ? auth.currentUser.uid : null;
+          if (_data.updateOnServer) {
+            let databaseField: string = "";
+            switch (_data.field) {
+              case "userImage": {
+                databaseField = "image";
+                break;
+              }
+              case "userDisplayName": {
+                databaseField = "name";
+                break;
+              }
+              case "userLanguage": {
+                databaseField = "language";
+                break;
+              }
+              case "userDarkMode": {
+                databaseField = "darkMode";
+                break;
+              }
+              default: {
+                break;
+              }
+            }
+            httpsCallableFunctions.updateUser({
+              newData: { field: databaseField, value: _data.value },
+              uid: userUid,
+            });
+          }
+          let dataToChange: any = { [_data.field]: value };
+          setAppContextData((prevProps: IAppContextData) => {
+            if (_data.field === "userDarkMode")
+              dataToChange = {
+                themeObject: getThemeObject(
+                  value ? EnumThemeString.DARK : EnumThemeString.LIGHT
+                ),
+              };
+            return { ...prevProps, ...dataToChange };
+          });
+        };
+
+        //try get the google user data from redirect and do a login with that
+        let auth: Auth = getAuth();
+        auth.onAuthStateChanged(async (user: User) => {
+          if (user) {
+            let loginData: {
+              source: string;
+              uid: string;
+              darkMode: boolean;
+              language: string;
+              name: string;
+              image: string;
+            } = {
+              source: "google",
+              uid: user.uid,
+              darkMode: userDarkMode,
+              language: userLanguage,
+              name: user.displayName ? user.displayName : "",
+              image: user.photoURL ? user.photoURL : "",
+            };
+            let responseLogin: {
+              data: {
+                errorCode: number;
+                userData: {
+                  darkMode: boolean;
+                  language: string;
+                  name: string;
+                  image: string;
+                  userProjects: IProject[];
+                  creationDate: string;
+                };
+              };
+            } = await httpsCallableFunctions.loginUser(loginData);
+
+            if (responseLogin.data.errorCode === 0) {
+              let responseUserDarkMode: boolean =
+                responseLogin.data.userData.darkMode;
+              let responseThemeObject: Theme = getThemeObject(
+                responseUserDarkMode
+                  ? EnumThemeString.DARK
+                  : EnumThemeString.LIGHT
+              );
+              userUid = user.uid;
+              userDarkMode = responseUserDarkMode;
+              userLanguage = responseLogin.data.userData.language;
+              userDisplayName = responseLogin.data.userData.name;
+              userImage = responseLogin.data.userData.image;
+              userProjects = responseLogin.data.userData.userProjects;
+              userCreationDate = responseLogin.data.userData.creationDate;
+              themeObject = responseThemeObject;
+              userLoginState = EnumUserLoginState.LOGUED_IN;
+            }
+          } else {
+            userLoginState = EnumUserLoginState.LOGUED_OUT;
+          }
+          setAppContextData((prevProps: IAppContextData) => {
+            return {
+              ...prevProps,
+              //firebase connection data
+              firebaseConnectionState: errorMessage
+                ? EnumFirebaseConnectionState.ERROR
+                : EnumFirebaseConnectionState.READY,
+              firebaseConnectionStateError: errorMessage,
+              firebaseApp: app,
+              firebaseFunctions: functions,
+              firebaseHttpsCallableFunctions: httpsCallableFunctions,
+              emulatorStarted: emulatorStarted,
+              //global server functions
+              createUser: createUser,
+              loginUser: loginUser,
+              logoutUser: logoutUser,
+              recoverUser: recoverUser,
+              getUserCredentials: getUserCredentials,
+              updateUser: updateUser,
+              createProject: createProject,
+              closeProject: closeProject,
+              deleteProject: deleteProject,
+              openProject: openProject,
+              updateProject: updateProject,
+              userCreationDate: userCreationDate,
+              // user data
+              userUid: userUid,
+              userLanguage: userLanguage,
+              userDisplayName: userDisplayName,
+              userImage: userImage,
+              userProjects: userProjects,
+              userDarkMode: userDarkMode,
+              //customization objects (themes, languages, etc...)
+              languages: languagesFile.languages,
+              themeObject: themeObject,
+              //userLoginState
+              userLoginState: userLoginState,
+            };
+          });
+        });
+      })
+      .catch((e: any) => {
+        setAppContextData((prevProps: IAppContextData) => {
+          return {
+            ...prevProps,
+            firebaseConnectionState: EnumFirebaseConnectionState.ERROR,
+            firebaseConnectionStateError: e.toString(),
+          };
+        });
+      });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  // el provider siempre tiene una variable value
+  // este es el valor retornado por el provider al componente interesado en escuchar al proveedor
+  // use memo permite que React guarde el objeto retornado salvo que las propiedades en [] cambien
+  const value: any = useMemo(() => {
+    let getLanguageString: (
+      componentName: string,
+      stringId: string
+    ) => string = (componentName: string, stringId: string): string => {
+      let userLanguage: string = appContextData.userLanguage;
+      if (appContextData.languages.length > 0) {
+        let language: ILanguage | undefined = appContextData.languages.find(
+          (element: { id: string }) => {
+            return userLanguage === element.id;
+          }
+        );
+        let str: string = "-NaL-";
+        if (language) {
+          let component: ILanguageComponent | undefined =
+            language.components.find((component: ILanguageComponent) => {
+              return componentName === component.id;
+            });
+          if (component) {
+            let string: { id: string; value: string } | undefined =
+              component.strings.find(
+                (_string: { id: string; value: string }) => {
+                  return _string.id === stringId;
+                }
+              );
+            str = string ? string.value : "-NaS-";
+          } else str = "-NaC-";
+        }
+        return str;
+      } else {
+        return "-NfA-";
+      }
+    };
+
+    return {
+      ...appContextData,
+      getLanguageString: getLanguageString,
+    };
+  }, [appContextData]);
+
+  return <AppContext.Provider value={value} {...props}></AppContext.Provider>;
+}
+
+//se exporta un hook que sirve para que quien lo use pueda consumir el valor enviado por el Provider
+export function useAppContext() {
+  const context = React.useContext(AppContext); // esta variable context es el value pasado al AppContext.Provider
+  if (!context) {
+    throw new Error("useFirebase debe estar dentro del proveedor AppContext");
+  }
+  return context;
+}
+*/

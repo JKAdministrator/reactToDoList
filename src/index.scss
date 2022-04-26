@@ -1,14 +1,14 @@
 @font-face {
   font-family: LobsterRegular;
-  src: url(fonts/Lobster-Regular.ttf);
+  src: url(common/fonts/Lobster-Regular.ttf);
 }
 @font-face {
   font-family: LobsterRegular;
-  src: url(fonts/PermanentMarker-Regular.ttf);
+  src: url(common/fonts/PermanentMarker-Regular.ttf);
 }
 @font-face {
   font-family: RobotoRegular;
-  src: url(fonts/roboto/Roboto-Regular.ttf);
+  src: url(common/fonts/roboto/Roboto-Regular.ttf);
 }
 
 html {
@@ -78,4 +78,11 @@ button {
 /* Handle on hover */
 ::-webkit-scrollbar-thumb:hover {
   background: #555;
+}
+body > p.firebase-emulator-warning {
+  display: none;
+  visibility: hidden;
+  pointer-events: none;
+  width: 0;
+  height: 0;
 }

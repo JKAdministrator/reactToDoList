@@ -10,16 +10,9 @@ exports.loginUser = functions.https.onCall(async (data, context) => {
       documentData = {
         // define the initial document data
         name: data.name,
-        image: data.image,
         darkMode: data.darkMode,
         language: data.language,
-        userOpenProjects: [],
-        userClosedProjects: [],
-        userCreationDate: "",
-      };
-
-      documentData = {
-        ...documentData,
+        userProjects: [],
         creationDate: admin.firestore.FieldValue.serverTimestamp(),
         lastLoginDate: admin.firestore.FieldValue.serverTimestamp(),
       };
@@ -28,6 +21,13 @@ exports.loginUser = functions.https.onCall(async (data, context) => {
         .collection("users")
         .doc(data.uid)
         .set(documentData);
+    } else {
+      await admin.firestore().collection("users").doc(data.uid).set(
+        {
+          lastLoginDate: admin.firestore.FieldValue.serverTimestamp(),
+        },
+        { merge: true }
+      );
     }
     return {
       errorCode: 0,

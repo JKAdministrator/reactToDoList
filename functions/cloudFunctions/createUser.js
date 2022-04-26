@@ -7,12 +7,10 @@ exports.createUser = functions.https.onCall(async (data, context) => {
     //if (admin.apps.length === 0) admin.initializeApp();
     await admin.firestore().collection("users").doc(data.uid).set({
       name: data.name,
-      image: data.image,
       creationDate: admin.firestore.FieldValue.serverTimestamp(),
       darkMode: data.darkMode,
       language: data.language,
-      userOpenProjects: [],
-      userClosedProjects: [],
+      userProjects: [],
     });
 
     return {

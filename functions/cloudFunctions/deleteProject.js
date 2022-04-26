@@ -19,25 +19,21 @@ exports.deleteProject = functions.https.onCall(async (data, context) => {
       .get();
 
     // create a new array of closed project with all projects except the one deleted
-    let userClosedProjects = userDocumentRef
-      .data()
-      .userClosedProjects.filter((project) => {
-        return project.id !== data.project.id;
-      });
+    // get the projects
+    let projects = userDocumentRef.data().userProjects;
+    // remove the project to delete
+    let userProjects = projects.filter((project) => {
+      return project.id !== data.project.id;
+    });
 
-    //update the user document
-    let newUserData = {
-      userClosedProjects: userClosedProjects,
-    };
     await admin
       .firestore()
       .collection("users")
       .doc(data.uid)
-      .set(newUserData, { merge: true });
+      .set({ userProjects }, { merge: true });
 
     return {
       errorCode: 0,
-      userData: newUserData,
     };
   } catch (e) {
     return {

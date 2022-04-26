@@ -1,27 +1,11 @@
-/*import React from "react";
-import ReactDOM from "react-dom";
-import "./index.scss";
-import App from "./app";
-
-ReactDOM.render(
-  <React.StrictMode>
-    <App />
-  </React.StrictMode>,
-  document.getElementById("root")
-);
-*/
-
-// After
 import * as React from "react";
 import * as ReactDOM from "react-dom/client";
+import { useParams } from "react-router-dom";
 import "./index.scss";
-import App from "./app";
+import { RootComponent } from "./root/root";
 
 const rootElement = document.getElementById("root");
 if (!rootElement) throw new Error("Failed to find the root element");
 const root = ReactDOM.createRoot(rootElement);
-root.render(
-  <React.StrictMode>
-    <App />
-  </React.StrictMode>
-);
+// <React.Strict> Not used since it re-renders all the components twice, so its calling useEffect(()=>{},[]) twice in each component and breaking the login logic
+root.render(<RootComponent />);
