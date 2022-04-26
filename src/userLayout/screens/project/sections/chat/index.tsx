@@ -38,8 +38,7 @@ const Chat = () => {
   return (
     <>
       <Box className={style.container}>
-        This is the CHAT of the project ::
-        {projectId?.toString()}
+        pending... project [{projectId?.toString()}]
       </Box>
     </>
   );

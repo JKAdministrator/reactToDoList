@@ -48,7 +48,11 @@ const ScreenConfiguration: React.LazyExoticComponent<React.FC> = React.lazy(
 const NotFound: React.LazyExoticComponent<React.FC> = React.lazy(() => {
   return import("../notFound");
 });
-
+const RedirectToUserLayout: React.LazyExoticComponent<React.FC> = React.lazy(
+  () => {
+    return import("./redirectToUserLayout");
+  }
+);
 interface IProps {
   section: EnumSections;
 }
@@ -92,6 +96,10 @@ const UserLayout: React.FC<IProps> = (props: IProps) => {
               path="/projects/:projectId/*"
               element={<ScreenProject />}
             ></Route>
+            <Route path="/signup" element={<RedirectToUserLayout />}></Route>
+            <Route path="/recover" element={<RedirectToUserLayout />}></Route>
+            <Route path="/signin" element={<RedirectToUserLayout />}></Route>
+            <Route path="/login" element={<RedirectToUserLayout />}></Route>
             <Route path="/" element={<ScreenProject />}></Route>
             <Route path="*" element={<NotFound />}></Route>
           </Routes>

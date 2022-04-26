@@ -83,15 +83,7 @@ const ScreenProjects = () => {
 
   const openProjectClickCallback = useCallback((e: any) => {
     let selectedProjectId: string = e.target.getAttribute("data-id");
-    if (userObject) {
-      let selectedProjectData: IProject | undefined =
-        userObject.userProjects.find((p: IProject) => {
-          return p.id == selectedProjectId;
-        });
-      if (selectedProjectData) {
-        navigate(`../projects/${selectedProjectData?.id}`);
-      }
-    }
+    navigate(`../projects/${selectedProjectId}`);
   }, []);
 
   const handleCloseProjectPopup = () => {

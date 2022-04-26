@@ -23,7 +23,11 @@ const SigninForm: React.LazyExoticComponent<React.FC> = React.lazy(() => {
 const RecoverForm: React.LazyExoticComponent<React.FC> = React.lazy(() => {
   return import("./recoverForm");
 });
-
+const RedirectToGuestLayout: React.LazyExoticComponent<React.FC> = React.lazy(
+  () => {
+    return import("./redirectToGuestLayout");
+  }
+);
 const GuestLayout: React.FC = () => {
   const { themeObject } = React.useContext(AppContext) as IAppContextData;
   return (
@@ -39,7 +43,9 @@ const GuestLayout: React.FC = () => {
         <Route path="/recover" element={<RecoverForm />}></Route>
         <Route path="/signin" element={<SigninForm />}></Route>
         <Route path="/login" element={<SigninForm />}></Route>
-        <Route path="/" element={<SigninForm />}></Route>
+        <Route path="/projects" element={<RedirectToGuestLayout />}></Route>
+        <Route path="/projects/*" element={<RedirectToGuestLayout />}></Route>
+        <Route path="/" element={<RedirectToGuestLayout />}></Route>
         <Route path="/*" element={<NotFound />}></Route>
       </Routes>
     </React.Suspense>

@@ -37,7 +37,10 @@ const KanbanBoardAddButton = (props: IPropsAddButton) => {
       {state === EState.BUTTON ? (
         <Button
           variant="text"
-          style={{ justifyContent: "flex-start", width: "max-content" }}
+          style={{
+            justifyContent: "flex-start",
+            width: "max-content",
+          }}
           onClick={() => {
             setState(EState.INPUT);
           }}
@@ -50,7 +53,8 @@ const KanbanBoardAddButton = (props: IPropsAddButton) => {
         <Box
           className={style.headerContainerBox}
           sx={{
-            maxWidth: "100%",
+            width: "100%",
+            maxWidth: "18rem",
           }}
         >
           <TextField
@@ -61,7 +65,13 @@ const KanbanBoardAddButton = (props: IPropsAddButton) => {
             inputRef={nameInputRef}
             error={nameInputError}
           />
-          <Button variant="contained" onClick={onAddelementClick}>
+          <Button
+            variant="contained"
+            onClick={onAddelementClick}
+            style={{
+              whiteSpace: "nowrap",
+            }}
+          >
             {props.type === EType.TASK
               ? t("kanban-board-add-task-button-label")
               : t("kanban-board-add-list-button-label")}

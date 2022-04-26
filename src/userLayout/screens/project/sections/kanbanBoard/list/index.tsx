@@ -38,7 +38,10 @@ const KanbanBoardList = (props: IKanbanBoardListProps) => {
           {...provided.dragHandleProps}
         >
           <Box style={{ width: "18rem" }}>
-            <Paper elevation={0} style={{ padding: "0.5rem" }}>
+            <Paper
+              elevation={0}
+              style={{ padding: "0.5rem", border: "1px solid #8080802b" }}
+            >
               <Header
                 label={props.label}
                 elementId={props.id}

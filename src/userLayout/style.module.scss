@@ -8,8 +8,10 @@
   height: max-content;
 }
 .sectionContainer {
-  width: 100%;
+  min-width: 100%;
+  width: max-content;
   height: 100%;
+  min-height: max-content;
   display: flex;
   flex-flow: column;
   align-items: center;

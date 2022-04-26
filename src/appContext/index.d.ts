@@ -69,6 +69,14 @@ export interface IAppContextData {
   createProject: (name: string) => Promise<any>;
   updateProject: (id: string, newData: any, updateOnServer: boolean) => void;
   deleteProject: (id: string) => void;
+  createKanbanList: (name: string, projectId: string) => Promise<any>;
+  createKanbanTask: (
+    name: string,
+    projectId: string,
+    listId: string
+  ) => Promise<any>;
+  deleteKanbanTask: (projectId: string, listId: string, taskId: string) => void;
+  deleteKanbanList: (projectId: string, listId: string) => void;
   userImage: string;
   headerLinks: ISection[] | undefined;
   setHeaderLinks: React.Dispatch<React.SetStateAction<ISection[]>>;

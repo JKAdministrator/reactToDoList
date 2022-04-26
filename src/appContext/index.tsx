@@ -21,6 +21,7 @@ import {
 } from "firebase/storage";
 import i18next from "i18next";
 import { loadExternalImage } from "../utils";
+import { useNavigate } from "react-router-dom";
 function getDefautThemeString(): PaletteMode {
   let themeMode: EnumThemeString =
     window.matchMedia &&
@@ -74,6 +75,7 @@ const AppContextProvider: React.FC<React.ReactNode> = ({ children }) => {
       auth,
       (_user: User) => {
         if (_user) {
+          console.log("auth user change!");
           if (
             userLoginState === EnumUserLoginState.LOGUED_OUT ||
             userLoginState === EnumUserLoginState.LOADING
@@ -279,15 +281,128 @@ const AppContextProvider: React.FC<React.ReactNode> = ({ children }) => {
       [userLoginState]
     );
 
+  const createKanbanList: (name: string, projectId: string) => Promise<any> =
+    useCallback(
+      (name: string, projectId: string) => {
+        return new Promise((resolve, reject) => {
+          let functions: Functions = getFunctions(firebaseApp) as Functions;
+          const createKanbanListFunction = httpsCallable(
+            functions,
+            "createKanbanList"
+          );
+          createKanbanListFunction({
+            uid: userObject?.uid,
+            project: {
+              id: projectId,
+              list: {
+                name: name,
+              },
+            },
+          })
+            .then((response: any) => {
+              response.data.errorCode === 0
+                ? resolve(response.data)
+                : reject(response);
+            })
+            .catch((e) => {
+              reject(e);
+            });
+        });
+      },
+      [userLoginState]
+    );
+
+  const createKanbanTask: (
+    name: string,
+    projectId: string,
+    listId: string
+  ) => Promise<any> = useCallback(
+    (name: string, projectId: string, listId: string) => {
+      return new Promise((resolve, reject) => {
+        let functions: Functions = getFunctions(firebaseApp) as Functions;
+        const createKanbanTaskFunction = httpsCallable(
+          functions,
+          "createKanbanTask"
+        );
+        createKanbanTaskFunction({
+          uid: userObject?.uid,
+          project: {
+            id: projectId,
+            list: {
+              id: listId,
+              task: {
+                name: name,
+              },
+            },
+          },
+        })
+          .then((response: any) => {
+            response.data.errorCode === 0
+              ? resolve(response.data)
+              : reject(response);
+          })
+          .catch((e) => {
+            reject(e);
+          });
+      });
+    },
+    [userLoginState]
+  );
+
+  const deleteKanbanTask: (
+    projectId: string,
+    listId: string,
+    taskId: string
+  ) => void = useCallback(
+    (projectId: string, listId: string, taskId: string) => {
+      let functions: Functions = getFunctions(firebaseApp) as Functions;
+      const deleteKanbanTaskFunction = httpsCallable(
+        functions,
+        "deleteKanbanTask"
+      );
+
+      deleteKanbanTaskFunction({
+        uid: userObject?.uid,
+        project: {
+          id: projectId,
+          list: {
+            id: listId,
+            task: {
+              id: taskId,
+            },
+          },
+        },
+      });
+    },
+    [userLoginState]
+  );
+
+  const deleteKanbanList: (projectId: string, listId: string) => void =
+    useCallback(
+      (projectId: string, listId: string) => {
+        httpsCallable(
+          getFunctions(firebaseApp),
+          "deleteKanbanList"
+        )({
+          uid: userObject?.uid,
+          project: {
+            id: projectId,
+            list: {
+              id: listId,
+            },
+          },
+        });
+      },
+      [userLoginState]
+    );
+
   const createProject: (name: string) => Promise<any> = useCallback(
     (name: string) => {
       return new Promise((resolve, reject) => {
-        let functions: Functions = getFunctions(firebaseApp);
-        const createCreateProjectFunction = httpsCallable(
-          functions,
+        httpsCallable(
+          getFunctions(firebaseApp),
           "createProject"
-        );
-        createCreateProjectFunction({
+        )({
           uid: userObject?.uid,
           project: {
             name,
@@ -296,17 +411,16 @@ const AppContextProvider: React.FC<React.ReactNode> = ({ children }) => {
           .then((response: any) => {
             if (response.data.errorCode === 0) {
               setUserObject((_prevData: IUser) => {
-                let project: IProject = {
-                  id: response.data.project.id,
-                  name: name,
-                  isOpen: true,
-                };
-                let oldProjects = _prevData?.userProjects
-                  ? _prevData.userProjects
-                  : [];
                 return {
                   ..._prevData,
-                  userProjects: [...oldProjects, project],
+                  userProjects: [
+                    ...Array.from(_prevData?.userProjects),
+                    {
+                      id: response.data.project.id,
+                      name: name,
+                      isOpen: true,
+                    },
+                  ],
                 };
               });
               resolve(null);
@@ -410,6 +524,10 @@ const AppContextProvider: React.FC<React.ReactNode> = ({ children }) => {
     createProject,
     updateProject,
     deleteProject,
+    createKanbanList,
+    createKanbanTask,
+    deleteKanbanTask,
+    deleteKanbanList,
     headerLinks,
     setHeaderLinks,
   };

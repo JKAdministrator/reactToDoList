@@ -16,72 +16,17 @@ import KanbanBoardColumn from "./list";
 import KanbanBoardAddButton, { EType } from "./addButton";
 import KanbanBoardList from "./list";
 
-const dataColumns: IColumn[] = [
-  {
-    id: "c1",
-    label: "To Do (c1)",
-    tasks: [
-      {
-        id: "t1",
-        label: "Fix the login screen view on mobile (t1)",
-      } as ITask,
-      {
-        id: "t2",
-        label: "Add color selector to kanban lists (t2)",
-      } as ITask,
-    ],
-  } as IColumn,
-  {
-    id: "c2",
-    label: "Working (c2)",
-    tasks: [
-      {
-        id: "t3",
-        label: "Add color selector to kanban cards (t3)",
-      } as ITask,
-      {
-        id: "t4",
-        label: "Make chat user images bigger (t4)",
-      } as ITask,
-      {
-        id: "t5",
-        label: "Automatic logout on session timeout (t5)",
-      } as ITask,
-    ],
-  } as IColumn,
-  {
-    id: "c3",
-    label: "Testing (c3)",
-    tasks: [
-      {
-        id: "t6",
-        label: "Profile: Dark mode not working on IOS (t6)",
-      } as ITask,
-      {
-        id: "t7",
-        label: "Team CRUD operations (t7)",
-      } as ITask,
-      {
-        id: "t8",
-        label: "Allow Edit username (t8)",
-      } as ITask,
-    ],
-  } as IColumn,
-  {
-    id: "c4",
-    label: "Done (c4)",
-    tasks: [
-      {
-        id: "t9",
-        label: "Hide alert from Database when testing (t9)",
-      } as ITask,
-    ],
-  } as IColumn,
-];
+const dataColumns: IColumn[] = [];
 
 const KanbanBoard = () => {
   const { projectId } = useParams();
-  const { setHeaderLinks } = React.useContext(AppContext) as IAppContextData;
+  const {
+    setHeaderLinks,
+    createKanbanList,
+    createKanbanTask,
+    deleteKanbanTask,
+    deleteKanbanList,
+  } = React.useContext(AppContext) as IAppContextData;
 
   const [columns, updateColumns] = useState(dataColumns);
 
@@ -141,7 +86,7 @@ const KanbanBoard = () => {
   }, []);
 
   const handleDeleteTask = (taskId: string, listId: string) => {
-    console.log("deleting task ", taskId, " from list ", listId);
+    deleteKanbanTask(projectId as string, listId, taskId);
     const newColumns = Array.from(columns);
     const column: IColumn = newColumns.find((c: IColumn) => {
       return c.id === listId;
@@ -153,7 +98,7 @@ const KanbanBoard = () => {
     updateColumns(newColumns);
   };
   const handleDeleteList = (listId: string) => {
-    console.log("deleting list ", listId);
+    deleteKanbanList(projectId as string, listId);
     const newColumns = Array.from(columns);
     const columnToDeleteIndex = newColumns.findIndex((c: IColumn) => {
       return c.id === listId;
@@ -172,39 +117,46 @@ const KanbanBoard = () => {
     name,
     columnId
   ) => {
-    updateColumns((_prevColumns: IColumn[]) => {
-      //get a copy of the columns
-      const newColumnsData: IColumn[] = Array.from(_prevColumns);
-      //get the column
-      const columSelected = newColumnsData.find((c: IColumn) => {
-        return c.id === columnId;
-      }) as IColumn;
-      //get a new task id (to-do : the idd must be getted from the server)
-      const newTaskId: string =
-        columSelected.tasks.length > 0
-          ? columSelected.tasks[columSelected.tasks.length - 1].id
-          : "c";
-      // add the task to column
-      columSelected.tasks.push({
-        id: newTaskId + "-c",
-        label: name,
-      } as ITask);
-      return newColumnsData;
-    });
+    createKanbanTask(name, projectId as string, columnId).then(
+      (responseData) => {
+        console.log(responseData);
+        updateColumns((_prevColumns: IColumn[]) => {
+          //get a copy of the columns
+          const newColumnsData: IColumn[] = Array.from(_prevColumns);
+          //get the column
+          const columSelected = newColumnsData.find((c: IColumn) => {
+            return c.id === columnId;
+          }) as IColumn;
+          //get a new task id (to-do : the idd must be getted from the server)
+          const newTaskId: string =
+            columSelected.tasks.length > 0
+              ? columSelected.tasks[columSelected.tasks.length - 1].id
+              : "c";
+          // add the task to column
+          columSelected.tasks.push({
+            id: newTaskId + "-c",
+            label: name,
+          } as ITask);
+          return newColumnsData;
+        });
+      }
+    );
   };
 
-  const addColumnCallback: (name: string) => void = (name) => {
-    //to-do the id must be getted from the server
-    updateColumns((_prevColumns) => {
-      const lastColumn = _prevColumns[_prevColumns.length - 1].id;
-      return [
-        ..._prevColumns,
-        {
-          id: lastColumn + "-c",
-          label: name,
-          tasks: [],
-        } as IColumn,
-      ];
+  const addColumnCallback: (name: string) => void = async (name) => {
+    //create the column on the server (dont wait for response)
+    createKanbanList(name, projectId as string).then((responseData) => {
+      console.log(responseData);
+      updateColumns((_prevColumns) => {
+        return [
+          ..._prevColumns,
+          {
+            id: responseData.project.list.id,
+            label: name,
+            tasks: [],
+          } as IColumn,
+        ];
+      });
     });
   };
 
