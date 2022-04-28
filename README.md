@@ -7,7 +7,7 @@ Tasky allows the organization to organize all its projects in a simple way by au
 Additionally, it has tools to facilitate agile development, such as the kanban board for each project, organizational chat, and ticket system.
 
 ## What do I need to start?
-To enter Tasky go to [Tasky.com](reactapptesting-4bfbb.web.app). From there you can access with your Google username or create a user using an email address.
+To enter Tasky go to [Tasky.com](https://reactapptesting-4bfbb.web.app/login). From there you can access with your Google username or create a user using an email address.
 
 ## Why are features missing?
 The application is in alpha so many of its main features are not online at the moment. Please note that due to this all information is deleted periodically, including registered users.
