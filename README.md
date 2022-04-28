@@ -1,6 +1,6 @@
 # Tasky
 *Manage tasks quickly*
-What if Trello & Slack but better
+A Trello like board demo with login /logout / user profile forms  
 
 ## Why should i use it?
 Tasky allows the organization to organize all its projects in a simple way by automating the priority of the requirements based on dependencies.
