@@ -27,6 +27,6 @@ Tasky.com is developed by [Julio Kania](linkedin.com/in/juliokania) as a practic
 - Backend with [Firebase](https://firebase.google.com/):
 
 > Pending technical features
-- Unit Testing with Jest
-- Redux (meaby just to learn it) 
-- Github actions (automatic testing & deploy from main branch)
+- Unit Testing with Jest (It is not so easy since most of the components use global context variables to access the database assuming that the user is already logged in) 
+- Redux (It is not justified to use it for this project as it is a fairly small system) 
+- Github actions
