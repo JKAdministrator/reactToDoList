@@ -8,6 +8,8 @@ import {
   IUser,
   IProject,
   ISection,
+  IGetProjectResult,
+  IProjectResultList,
 } from "./index.d";
 import i18n from "i18next";
 import Firebase from "./firebase";
@@ -353,36 +355,123 @@ const AppContextProvider: React.FC<React.ReactNode> = ({ children }) => {
     projectId: string,
     listId: string,
     taskId: string
-  ) => void = useCallback(
+  ) => Promise<any> = useCallback(
     (projectId: string, listId: string, taskId: string) => {
-      let functions: Functions = getFunctions(firebaseApp) as Functions;
-      const deleteKanbanTaskFunction = httpsCallable(
-        functions,
-        "deleteKanbanTask"
-      );
-
-      deleteKanbanTaskFunction({
-        uid: userObject?.uid,
-        project: {
-          id: projectId,
-          list: {
-            id: listId,
-            task: {
-              id: taskId,
+      return new Promise((resolve, reject) => {
+        httpsCallable(
+          getFunctions(firebaseApp),
+          "deleteKanbanTask"
+        )({
+          uid: userObject?.uid,
+          project: {
+            id: projectId,
+            list: {
+              id: listId,
+              task: {
+                id: taskId,
+              },
             },
           },
-        },
+        })
+          .then((response: any) => {
+            response.data.errorCode === 0
+              ? resolve({})
+              : reject(response.data.errorMessage as string);
+          })
+          .catch((e) => {
+            reject(e.toString());
+          });
       });
     },
     [userLoginState]
   );
 
-  const deleteKanbanList: (projectId: string, listId: string) => void =
+  const getProject: (projectId: string) => Promise<IGetProjectResult> =
+    useCallback(
+      (projectId: string) => {
+        return new Promise((resolve, reject) => {
+          httpsCallable(
+            getFunctions(firebaseApp),
+            "getProject"
+          )({
+            project: {
+              id: projectId,
+            },
+          })
+            .then((response: any) => {
+              response.data.errorCode === 0
+                ? resolve(response.data.project as IGetProjectResult)
+                : reject(response.data.errorMessage as string);
+            })
+            .catch((e) => {
+              reject(e.toString());
+            });
+        });
+      },
+      [userLoginState]
+    );
+
+  const deleteKanbanList: (projectId: string, listId: string) => Promise<any> =
     useCallback(
       (projectId: string, listId: string) => {
+        return new Promise((resolve, reject) => {
+          httpsCallable(
+            getFunctions(firebaseApp),
+            "deleteKanbanList"
+          )({
+            uid: userObject?.uid,
+            project: {
+              id: projectId,
+              list: {
+                id: listId,
+              },
+            },
+          })
+            .then((response: any) => {
+              response.data.errorCode === 0
+                ? resolve({})
+                : reject(response.data.errorMessage as string);
+            })
+            .catch((e) => {
+              reject(e.toString());
+            });
+        });
+      },
+      [userLoginState]
+    );
+
+  const resortKanbanLists: (
+    projectId: string,
+    oldOrder: number,
+    newOrder: number
+  ) => void = useCallback(
+    (projectId: string, oldOrder: number, newOrder: number) => {
+      httpsCallable(
+        getFunctions(firebaseApp),
+        "resortKanbanLists"
+      )({
+        uid: userObject?.uid,
+        project: {
+          id: projectId,
+          list: {
+            oldOrder: oldOrder,
+            newOrder: newOrder,
+          },
+        },
+      });
+    },
+    []
+  );
+
+  const getKanbanList: (
+    projectId: string,
+    listId: string
+  ) => Promise<IProjectResultList> = useCallback(
+    (projectId: string, listId: string) => {
+      return new Promise((resolve, reject) => {
         httpsCallable(
           getFunctions(firebaseApp),
-          "deleteKanbanList"
+          "getKanbanList"
         )({
           uid: userObject?.uid,
           project: {
@@ -391,10 +480,50 @@ const AppContextProvider: React.FC<React.ReactNode> = ({ children }) => {
               id: listId,
             },
           },
-        });
-      },
-      [userLoginState]
-    );
+        })
+          .then((response: any) => {
+            response.data.errorCode === 0
+              ? resolve(response.data.project.list as IProjectResultList)
+              : reject(response.data.errorMessage.toString());
+          })
+          .catch((e) => {
+            reject(e.toString());
+          });
+      });
+    },
+    [userLoginState]
+  );
+
+  const resortKanbanTasks: (
+    projectId: string,
+    oldListId: string,
+    newListId: string,
+    oldOrder: number,
+    newOrder: number,
+    taskId: string
+  ) => void = useCallback(
+    (projectId, oldListId, newListId, oldOrder, newOrder, taskId) => {
+      httpsCallable(
+        getFunctions(firebaseApp),
+        "resortKanbanTasks"
+      )({
+        uid: userObject?.uid,
+        project: {
+          id: projectId,
+          list: {
+            oldListId: oldListId,
+            newListId: newListId,
+            task: {
+              oldOrder: oldOrder,
+              newOrder: newOrder,
+              id: taskId,
+            },
+          },
+        },
+      });
+    },
+    [userLoginState]
+  );
 
   const createProject: (name: string) => Promise<any> = useCallback(
     (name: string) => {
@@ -423,7 +552,7 @@ const AppContextProvider: React.FC<React.ReactNode> = ({ children }) => {
                   ],
                 };
               });
-              resolve(null);
+              resolve(response.data.project);
             } else {
               reject(response);
             }
@@ -528,8 +657,12 @@ const AppContextProvider: React.FC<React.ReactNode> = ({ children }) => {
     createKanbanTask,
     deleteKanbanTask,
     deleteKanbanList,
+    getProject,
     headerLinks,
     setHeaderLinks,
+    resortKanbanLists,
+    resortKanbanTasks,
+    getKanbanList,
   };
 
   return (

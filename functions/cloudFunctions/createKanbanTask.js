@@ -17,30 +17,34 @@ exports.createKanbanTask = functions.https.onCall(async (data, context) => {
       });
 
     //get the project document
-    let projectDocumentRef = await admin
+    let listDocumentRef = await admin
       .firestore()
       .collection("projects")
       .doc(data.project.id)
+      .collection("lists")
+      .doc(data.project.list.id)
       .get();
 
     //add the task to the list of tasks for the project
-    let projectTasks = projectDocumentRef.data().tasks;
-    console.log("project tasks before", projectTasks);
-    if (!projectTasks) projectTasks = [];
+    let projectTasks = listDocumentRef.data().tasks;
     projectTasks.push({
       id: taskDocumentRef.id,
       name: data.project.list.task.name,
       listId: data.project.list.id,
     });
-    console.log("project tasks after", projectTasks);
 
-    await admin.firestore().collection("projects").doc(data.project.id).update(
-      {
-        tasks: projectTasks,
-      },
-      { merge: true }
-    );
-    console.log("project taks updated");
+    await admin
+      .firestore()
+      .collection("projects")
+      .doc(data.project.id)
+      .collection("lists")
+      .doc(data.project.list.id)
+      .update(
+        {
+          tasks: projectTasks,
+        },
+        { merge: true }
+      );
 
     return {
       errorCode: 0,

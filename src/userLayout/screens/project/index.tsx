@@ -1,7 +1,12 @@
 import React, { useEffect, useState } from "react";
 import Box from "@mui/material/Box";
 import style from "./style.module.scss";
-import { IAppContextData, ISection } from "../../../appContext/index.d";
+import {
+  IAppContextData,
+  IGetProjectResult,
+  IProjectResultList,
+  ISection,
+} from "../../../appContext/index.d";
 import { AppContext } from "../../../appContext";
 import { useTranslation } from "react-i18next";
 import { Route, Routes, useNavigate, useParams } from "react-router-dom";
@@ -11,6 +16,7 @@ import KanbanBoard from "./sections/kanbanBoard";
 import { IPropsScreenProject } from "./index.d";
 import FolderIcon from "@mui/icons-material/Folder";
 import Chat from "./sections/chat";
+import { stringify } from "querystring";
 
 interface TabPanelProps {
   children?: React.ReactNode;
@@ -45,7 +51,7 @@ const ScreenProject: React.FC = () => {
   const navigate = useNavigate();
   const { projectId } = useParams();
   const { t } = useTranslation();
-  const { userObject, setHeaderLinks } = React.useContext(
+  const { userObject, setHeaderLinks, getProject } = React.useContext(
     AppContext
   ) as IAppContextData;
   const [tabPanelCurrentValue, setTabPanelCurrentValue] = React.useState(0);
@@ -55,6 +61,7 @@ const ScreenProject: React.FC = () => {
   };
 
   useEffect(() => {
+    //set the header
     setHeaderLinks((_prevHeadersLinks: ISection[]) => {
       return [
         {

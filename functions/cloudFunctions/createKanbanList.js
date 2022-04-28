@@ -12,6 +12,7 @@ exports.createKanbanList = functions.https.onCall(async (data, context) => {
       .add({
         name: data.project.list.name,
         creationDate: admin.firestore.FieldValue.serverTimestamp(),
+        tasks: [],
       });
 
     //get the project document

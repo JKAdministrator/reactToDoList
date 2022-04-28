@@ -5,6 +5,7 @@ import {
   Functions,
   getFunctions,
 } from "firebase/functions";
+import { connectStorageEmulator } from "firebase/storage";
 import { IFirebaseConfig } from "./index.d";
 
 interface IFirebaseController {
@@ -23,6 +24,7 @@ const firebaseConfig: IFirebaseConfig = {
 };
 const Firebase: FirebaseApp = initializeApp(firebaseConfig);
 if (process.env.REACT_APP_USE_FIREBASE_EMULATOR === "1") {
+  console.log("using emulator");
   let auth: Auth = getAuth();
   let functions: Functions = getFunctions(Firebase);
   connectFunctionsEmulator(functions, "localhost", 5001);

@@ -20,23 +20,26 @@ exports.deleteKanbanTask = functions.https.onCall(async (data, context) => {
       .doc(data.project.list.task.id)
       .delete();
 
-    //remove the task from the owner
-    let projectDocumentRef = await admin
+    //remove the task prom the list
+    let listDocumentRef = await admin
       .firestore()
       .collection("projects")
       .doc(data.project.id)
+      .collection("lists")
+      .doc(data.project.list.id)
       .get();
 
-    let newTasks = projectDocumentRef.data().tasks;
-    let taskIndex = newTasks.findIndex((t) => {
-      return t.id === data.project.list.task.id;
+    let newTasks = listDocumentRef.data().tasks.filter((t) => {
+      return t.id !== data.project.list.task.id;
     });
-    newTasks.splice(taskIndex, 1);
+    for (let i = 0; i < newTasks.length; i++) newTasks[i].order = i;
 
     await admin
       .firestore()
       .collection("projects")
       .doc(data.project.id)
+      .collection("lists")
+      .doc(data.project.list.id)
       .set({ tasks: newTasks }, { merge: true });
 
     return {

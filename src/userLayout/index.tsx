@@ -1,19 +1,8 @@
 import { Box, CircularProgress, Paper } from "@mui/material";
-import React, { useEffect, useState } from "react";
-//import ScreeenConfiguration from "./screens/configuration";
-//import ScreenProjects from "./screens/projects";
+import React, { useState } from "react";
 import style from "./style.module.scss";
 import Headerbar from "./headerbar";
-import {
-  BrowserRouter,
-  Navigate,
-  Route,
-  Routes,
-  useLocation,
-  useNavigate,
-  useParams,
-} from "react-router-dom";
-import { IPropsScreenProject } from "./screens/project/index.d";
+import { Route, Routes, useLocation } from "react-router-dom";
 
 export enum EnumSections {
   CONFIGURATION = "/configuration",
@@ -29,10 +18,6 @@ export const sections: ISection[] = [
   { id: EnumSections.PROJECTS, label: "screen-projects-title" },
   { id: EnumSections.CONFIGURATION, label: "screen-configuration-title" },
 ];
-
-interface IStateObject {
-  currentSection: EnumSections | string;
-}
 
 const ScreenProject: React.LazyExoticComponent<React.FC> = React.lazy(() => {
   return import("./screens/project");
@@ -58,17 +43,9 @@ interface IProps {
 }
 const UserLayout: React.FC<IProps> = (props: IProps) => {
   const location = useLocation();
-  const navigate = useNavigate();
-  const params = useParams();
-  const projectId: string | undefined = params.projectId;
-
-  const [currentSection, setCurrentSection] = useState<EnumSections | null>(
+  const [currentSection] = useState<EnumSections | null>(
     location.pathname as EnumSections
   );
-
-  function onSectionChange(e: EnumSections) {
-    setCurrentSection(e);
-  }
 
   return (
     <Paper

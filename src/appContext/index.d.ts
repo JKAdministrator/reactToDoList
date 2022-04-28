@@ -75,11 +75,34 @@ export interface IAppContextData {
     projectId: string,
     listId: string
   ) => Promise<any>;
-  deleteKanbanTask: (projectId: string, listId: string, taskId: string) => void;
-  deleteKanbanList: (projectId: string, listId: string) => void;
+  deleteKanbanTask: (
+    projectId: string,
+    listId: string,
+    taskId: string
+  ) => Promise<any>;
+  deleteKanbanList: (projectId: string, listId: string) => Promise<any>;
   userImage: string;
   headerLinks: ISection[] | undefined;
   setHeaderLinks: React.Dispatch<React.SetStateAction<ISection[]>>;
+  getProject: (projectId: string) => Promise<IGetProjectResult>;
+  resortKanbanLists: (
+    projectId: string,
+    olrOrder: number,
+    newOrder: number
+  ) => void;
+  resortKanbanTasks: (
+    projectId: string,
+    oldListId: string,
+    newListId: string,
+    olrOrder: number,
+    newOrder: number,
+    taskId: string
+  ) => void;
+  getKanbanList: (
+    projectId: string,
+    listId: string
+  ) => Promise<IProjectResultList>;
+
   //  currentLanguage: string;
 }
 /**
@@ -139,4 +162,30 @@ interface IhttpCallableDeleteProjectResponse {
       userProjects: IProject[];
     };
   };
+}
+export interface IProjectResultTask {
+  name: string;
+  id: string;
+  listId: string;
+  state: EnumGetProjectResultState;
+}
+
+export interface IProjectResultList {
+  name: string;
+  id: string;
+  tasks: IProjectResultTask[];
+  state: EnumGetProjectResultState;
+}
+
+export interface IGetProjectResult {
+  creationDate: { _seconds: number; _nanoseconds: number };
+  id: string;
+  isOpen: boolean;
+  lists: IProjectResultList[];
+  name: string;
+  owner: string;
+}
+export enum EnumGetProjectResultState {
+  LOADING = "LOADING",
+  READY = "READY",
 }

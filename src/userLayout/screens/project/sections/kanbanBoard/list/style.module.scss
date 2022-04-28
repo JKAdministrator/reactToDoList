@@ -1,0 +1,10 @@
+.isLoading {
+  opacity: 0.5 !important;
+  cursor: progress !important;
+}
+.isLoading * {
+  pointer-events: none !important;
+}
+.isReady {
+  opacity: 1 !important;
+}

@@ -1,5 +1,3 @@
-const cors = require("cors")({ origin: true });
-
 const createUserModule = require("./cloudFunctions/createUser");
 const loginUserModule = require("./cloudFunctions/loginUser");
 const updateUserModule = require("./cloudFunctions/updateUser");
@@ -10,6 +8,10 @@ const createKanbanListModule = require("./cloudFunctions/createKanbanList");
 const createKanbanTaskModule = require("./cloudFunctions/createKanbanTask");
 const deleteKanbanTaskModule = require("./cloudFunctions/deleteKanbanTask");
 const deleteKanbanListModule = require("./cloudFunctions/deleteKanbanList");
+const getProjectModule = require("./cloudFunctions/getProject");
+const resortKanbanListsModule = require("./cloudFunctions/resortKanbanLists");
+const resortKanbanTasksModule = require("./cloudFunctions/resortKanbanTasks");
+const getKanbanListModule = require("./cloudFunctions/getKanbanList");
 exports.createUser = createUserModule.createUser;
 exports.loginUser = loginUserModule.loginUser;
 exports.updateUser = updateUserModule.updateUser;
@@ -20,3 +22,7 @@ exports.createKanbanList = createKanbanListModule.createKanbanList;
 exports.createKanbanTask = createKanbanTaskModule.createKanbanTask;
 exports.deleteKanbanTask = deleteKanbanTaskModule.deleteKanbanTask;
 exports.deleteKanbanList = deleteKanbanListModule.deleteKanbanList;
+exports.getProject = getProjectModule.getProject;
+exports.resortKanbanLists = resortKanbanListsModule.resortKanbanLists;
+exports.resortKanbanTasks = resortKanbanTasksModule.resortKanbanTasks;
+exports.getKanbanList = getKanbanListModule.getKanbanList;
