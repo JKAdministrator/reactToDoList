@@ -2,11 +2,8 @@
 *Manage tasks quickly*
 A Trello like board demo with login /logout / user profile forms  
 
-## What do I need to start?
-Go to [Tasky.com](https://reactapptesting-4bfbb.web.app/login)
-
 ## About this app
-Tasky.com is developed by [Julio Kania](linkedin.com/in/juliokania) as a practical exercise to learn React.
+The app is developed by [Julio Kania](linkedin.com/in/juliokania) as a practical exercise to learn React.
 
 > Technical information:
 - [React v18](https://reactjs.org/)
